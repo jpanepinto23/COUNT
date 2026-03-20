@@ -105,7 +105,7 @@ export default function SignupPage() {
                 </div>
                 <div style={{ flex: 1, position: 'relative' }}>
                   <input type="number" placeholder="Height" value={height} onChange={e => setHeight(e.target.value)} style={{ ...inputStyle, paddingRight: 36 }} />
-                  <span style={unitStye}>ft</span>
+                  <span style={unitStyle}>ft</span>
                 </div>
               </div>
               <div style={{ position: 'relative' }}>
