@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase'
 export default function SignupPage() {
   const [step, setStep] = useState(1)
   const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(''
   const [password, setPassword] = useState('')
   const [age, setAge] = useState('')
   const [height, setHeight] = useState('')
@@ -105,12 +105,12 @@ export default function SignupPage() {
                 </div>
                 <div style={{ flex: 1, position: 'relative' }}>
                   <input type="number" placeholder="Height" value={height} onChange={e => setHeight(e.target.value)} style={{ ...inputStyle, paddingRight: 36 }} />
-                  <span style={unitStyle}>cm</span>
+                  <span style={unitStye}>ft</span>
                 </div>
               </div>
               <div style={{ position: 'relative' }}>
                 <input type="number" placeholder="Weight" value={weight} onChange={e => setWeight(e.target.value)} style={{ ...inputStyle, paddingRight: 36 }} />
-                <span style={unitStyle}>kg</span>
+                <span style={unitStyle}>lbs</span>
               </div>
               {error && <p style={{ color: '#ef4444', fontSize: 13 }}>{error}</p>}
               <button type="submit" disabled={loading} style={btnStyle}>
