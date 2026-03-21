@@ -8,8 +8,8 @@ import type { WorkoutType } from '@/lib/types'
 
 const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string }[] = [
   { value: 'push',      label: 'Push',      photo: '4488764' },
-  { value: 'pull',      label: 'Pull',      photo: '5497493' },
-  { value: 'legs',      label: 'Legs',      photo: '6388373' },
+  { value: 'pull',      label: 'Pull',      photo: '6922157 },
+  { value: 'legs',      label: 'Legs',      photo: '5837242' },
   { value: 'upper',     label: 'Upper',     photo: '3916766' },
   { value: 'lower',     label: 'Lower',     photo: '4944435' },
   { value: 'full_body', label: 'Full Body', photo: '6628962' },
@@ -234,7 +234,7 @@ export default function LogPage() {
                 style={{
                   position: 'relative',
                   height: 90,
-                  backgroundImage: `url(https://images.pexels.com/photos/${t.photo}/pexels-photo-${t.photo}.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&dpr=1)`,
+                  backgroundImage: `url(https://images.pexels.com/photos/${t.photo}/pexels-photo-${t.photo}.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   border: workoutType === t.value ? '2.5px solid #B5593C' : '2px solid transparent',
