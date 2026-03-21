@@ -20,7 +20,7 @@ const POINTS_CARD_PHOTO = 'https://images.pexels.com/photos/1552249/pexels-photo
 export default function HomePage() {
   const { user, refreshUser } = useAuth()
   const [recentWorkouts, setRecentWorkouts] = useState<Workout[]>([])
-  const [refer useState(0)
+  const [referralCount, setReferralCount] = useState(0)
   const [copied, setCopied] = useState(false)
   const router = useRouter()
   const supabase = createClient()
