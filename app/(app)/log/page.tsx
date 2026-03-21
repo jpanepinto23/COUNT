@@ -234,7 +234,7 @@ export default function LogPage() {
                 style={{
                   position: 'relative',
                   height: 90,
-                  backgroundImage: `url(https://images.pexels.com/photos/${t.photo}/pexels-photo-${t.photo}.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2`,
+                  backgroundImage: `url(https://images.pexels.com/photos/${t.photo}/pexels-photo-${t.photo}.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2)`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   border: workoutType === t.value ? '2.5px solid #B5593C' : '2px solid transparent',
