@@ -109,7 +109,7 @@ export default function InvitePage() {
         <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: '#8A8478', marginBottom: 12 }}>How it works</p>
         {[
           { icon: '🔗', title: 'Share your link or code', desc: 'Send your unique referral link to a friend.' },
-          { icon: '✍️', title: 'Friend signs up', desc: 'They enter your code during signup — it's pre-filled from your link.' },
+          { icon: '✍️', title: 'Friend signs up', desc: "They enter your code during signup — it's pre-filled from your link." },
           { icon: '💪', title: 'They log their first workout', desc: 'Once they complete their first session, the bonus triggers.' },
           { icon: '🏆', title: 'You both get 500 pts', desc: 'Bonus points land in both accounts instantly.' },
         ].map((step, i) => (
