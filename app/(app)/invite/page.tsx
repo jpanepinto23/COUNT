@@ -26,7 +26,7 @@ export default function InvitePage() {
       .eq('referrer_id', user.id)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
-        if (data) setReferrals(data as ReferralRow[])
+        if (data) setReferrals(data as unknown as ReferralRow[])
       })
   }, [user?.id]) // eslint-disable-line
 
