@@ -7,7 +7,7 @@ import { calculatePoints, getTier, getTierLabel } from '@/lib/points'
 import type { WorkoutType } from '@/lib/types'
 
 const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string }[] = [
-  { value: 'push',      label: 'Push',      photo: '6050745' },
+  { value: 'push',      label: 'Push',      photo: '4488764' },
   { value: 'pull',      label: 'Pull',      photo: '5497493' },
   { value: 'legs',      label: 'Legs',      photo: '6388373' },
   { value: 'upper',     label: 'Upper',     photo: '3916766' },
@@ -249,8 +249,8 @@ export default function LogPage() {
                   position: 'absolute',
                   inset: 0,
                   background: workoutType === t.value
-                    ? 'linear-gradient(to top, rgba(181,89,60,0.55) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.25) 100%)'
-                    : 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.15) 100%)',
+                    ? 'linear-gradient(to top, rgba(181,89,60,0.50) 0%, rgba(0,0,0,0.30) 50%, rgba(0,0,0,0.15) 100%)'
+                    : 'linear-gradient(to top, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.18) 55%, rgba(0,0,0,0.08) 100%)',
                   borderRadius: 10,
                   transition: 'background 0.15s',
                 }} />
