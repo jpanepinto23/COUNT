@@ -8,15 +8,15 @@ import { calculatePoints, getTier, getTierLabel } from '@/lib/points'
 import type { WorkoutType } from '@/lib/types'
 
 const WORKOUT_TYPES: { value: WorkoutType; label: string; emoji: string }[] = [
-  { value: 'push', label: 'Push', emoji: 'ð«¸' },
-  { value: 'pull', label: 'Pull', emoji: 'ð«·' },
-  { value: 'legs', label: 'Legs', emoji: 'ð¦µ' },
-  { value: 'upper', label: 'Upper', emoji: 'ðª' },
-  { value: 'lower', label: 'Lower', emoji: 'ðï¸ââï¸' },
-  { value: 'full_body', label: 'Full Body', emoji: 'â­' },
-  { value: 'cardio', label: 'Cardio', emoji: 'ð' },
-  { value: 'hiit', label: 'HIIT', emoji: 'ð¥' },
-  { value: 'custom', label: 'Custom', emoji: 'âï¸' },
+  { value: 'push', label: 'Push', emoji: '🫸' },
+  { value: 'pull', label: 'Pull', emoji: '🫷' },
+  { value: 'legs', label: 'Legs', emoji: '🦵' },
+  { value: 'upper', label: 'Upper', emoji: '💪' },
+  { value: 'lower', label: 'Lower', emoji: '🏋️' },
+  { value: 'full_body', label: 'Full Body', emoji: '⚡' },
+  { value: 'cardio', label: 'Cardio', emoji: '🏃' },
+  { value: 'hiit', label: 'HIIT', emoji: '🔥' },
+  { value: 'custom', label: 'Custom', emoji: '✏️' },
 ]
 
 const DURATIONS = [30, 45, 60, 75, 90]
