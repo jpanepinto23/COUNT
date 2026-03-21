@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase'
 export default function SignupPage() {
   const [step, setStep] = useState(1)
   const [name, setName] = useState('')
-  const [email, setEmail] = useState(''
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [age, setAge] = useState('')
   const [height, setHeight] = useState('')
