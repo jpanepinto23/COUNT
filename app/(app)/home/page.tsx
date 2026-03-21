@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import { getTierLabel, getTierMultiplier, getNextTierSessions } from '@/lib/points'
 import type { Workout } from '@/lib/types'
+import TallyLogo from '@/components/TallyLogo'
 
 const TIER_COLORS: Record<string, string> = {
   bronze:   '#B5593C',
@@ -86,6 +87,11 @@ export default function HomePage() {
 
   return (
     <div style={{ padding: '20px 16px', paddingBottom: 8 }}>
+
+      {/* Logo */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+        <TallyLogo size={0.8} />
+      </div>
 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
