@@ -114,7 +114,7 @@ export default function LogPage() {
       }
     }
 
-    // Register GPS as connected device (upsert â only once per user)
+    // Register GPS as connected device (upsert — only once per user)
     if (verified && verificationMethod === 'gps') {
       await supabase.from('connected_devices').upsert(
         { user_id: user.id, type: 'gps', status: 'active' },
@@ -186,18 +186,18 @@ export default function LogPage() {
   }
 
   const VERIFICATION_LABELS: Record<string, string> = {
-    apple_health: 'ð Apple Health',
-    garmin: 'â Garmin',
-    fitbit: 'ð Fitbit',
-    google_fit: 'ð Google Fit',
-    gps: 'ð GPS',
+    apple_health: '🍎 Apple Health',
+    garmin: '⌚ Garmin',
+    fitbit: '💚 Fitbit',
+    google_fit: '🏃 Google Fit',
+    gps: '📍 GPS',
   }
 
   if (step === 'success') {
     return (
       <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#FAF8F4' }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 56, marginBottom: 16 }}>ð</div>
+          <div style={{ fontSize: 56, marginBottom: 16 }}>🏆</div>
           <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, marginBottom: 8, fontFamily: 'Archivo, sans-serif' }}>Session logged!</h2>
           <p style={{ color: '#8A8478', marginBottom: 24 }}>You showed up. That&apos;s what counts.</p>
           <div style={{
@@ -209,7 +209,7 @@ export default function LogPage() {
               +{earnedPoints}
             </p>
             <p style={{ color: '#8A8478', fontSize: 12, marginTop: 4 }}>
-              {getTierLabel(tier)} tier Â· {multiplier}x multiplier
+              {getTierLabel(tier)} tier · {multiplier}x multiplier
             </p>
           </div>
 
@@ -219,7 +219,7 @@ export default function LogPage() {
               borderRadius: 10, padding: '8px 16px', marginBottom: 28,
               fontSize: 12, color: '#166534', fontWeight: 700,
             }}>
-              â Verified via {VERIFICATION_LABELS[verificationSource] ?? verificationSource}
+              ✓ Verified via {VERIFICATION_LABELS[verificationSource] ?? verificationSource}
             </div>
           )}
 
@@ -284,7 +284,7 @@ export default function LogPage() {
             />
           )}
 
-          <button onClick={() => setStep('details')} style={btnPrimary}>Next â</button>
+          <button onClick={() => setStep('details')} style={btnPrimary}>Next →</button>
         </>
       )}
 
@@ -341,9 +341,9 @@ export default function LogPage() {
 
           {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12 }}>{error}</p>}
           <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={() => setStep('type')} style={btnSecondary}>â Back</button>
+            <button onClick={() => setStep('type')} style={btnSecondary}>← Back</button>
             <button onClick={handleLog} disabled={loading} style={{ ...btnPrimary, flex: 2 }}>
-              {loading ? 'Logging...' : 'Log Session â'}
+              {loading ? 'Logging...' : 'Log Session ✓'}
             </button>
           </div>
         </>
