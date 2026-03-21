@@ -8,7 +8,7 @@ import type { WorkoutType } from '@/lib/types'
 
 const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string }[] = [
   { value: 'push',      label: 'Push',      photo: '4488764' },
-  { value: 'pull',      label: 'Pull',      photo: '6922157 },
+  { value: 'pull',      label: 'Pull',      photo: '6922157' },
   { value: 'legs',      label: 'Legs',      photo: '5837242' },
   { value: 'upper',     label: 'Upper',     photo: '3916766' },
   { value: 'lower',     label: 'Lower',     photo: '4944435' },
