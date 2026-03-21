@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import { getTierLabel, getTierMultiplier, getNextTierSessions } from '@/lib/points'
@@ -21,7 +20,7 @@ const POINTS_CARD_PHOTO = 'https://images.pexels.com/photos/1552249/pexels-photo
 export default function HomePage() {
   const { user, refreshUser } = useAuth()
   const [recentWorkouts, setRecentWorkouts] = useState<Workout[]>([])
-  const [referralCount, setReferralCount] = useState(0)
+  const [refer useState(0)
   const [copied, setCopied] = useState(false)
   const router = useRouter()
   const supabase = createClient()
