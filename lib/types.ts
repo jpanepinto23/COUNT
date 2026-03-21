@@ -23,6 +23,10 @@ export interface User {
   points_balance: number
   points_lifetime_earned: number
   free_unverified_remaining: number
+  referral_code?: string
+  referred_by?: string | null
+  referral_bonus_claimed?: boolean
+  referral_count?: number
 }
 
 export interface Workout {
@@ -75,4 +79,14 @@ export interface LeaderboardEntry {
   name: string
   current_streak: number
   tier: Tier
+}
+
+export interface Referral {
+  id: string
+  referrer_id: string
+  referred_id: string
+  bonus_points: number
+  bonus_awarded: boolean
+  created_at: string
+  bonus_awarded_at?: string
 }
