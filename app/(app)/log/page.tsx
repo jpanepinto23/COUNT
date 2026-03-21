@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
@@ -7,16 +6,16 @@ import { createClient } from '@/lib/supabase'
 import { calculatePoints, getTier, getTierLabel } from '@/lib/points'
 import type { WorkoutType } from '@/lib/types'
 
-const WORKOUT_TYPES: { value: WorkoutType; label: string; emoji: string }[] = [
-  { value: 'push', label: 'Push', emoji: '🫸' },
-  { value: 'pull', label: 'Pull', emoji: '🫷' },
-  { value: 'legs', label: 'Legs', emoji: '🦵' },
-  { value: 'upper', label: 'Upper', emoji: '💪' },
-  { value: 'lower', label: 'Lower', emoji: '🏋️' },
-  { value: 'full_body', label: 'Full Body', emoji: '⚡' },
-  { value: 'cardio', label: 'Cardio', emoji: '🏃' },
-  { value: 'hiit', label: 'HIIT', emoji: '🔥' },
-  { value: 'custom', label: 'Custom', emoji: '✏️' },
+const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string }[] = [
+  { value: 'push',      label: 'Push',      photo: '6050745' },
+  { value: 'pull',      label: 'Pull',      photo: '5497493' },
+  { value: 'legs',      label: 'Legs',      photo: '6388373' },
+  { value: 'upper',     label: 'Upper',     photo: '3916766' },
+  { value: 'lower',     label: 'Lower',     photo: '4944435' },
+  { value: 'full_body', label: 'Full Body', photo: '6628962' },
+  { value: 'cardio',    label: 'Cardio',    photo: '5327545' },
+  { value: 'hiit',      label: 'HIIT',      photo: '2261481' },
+  { value: 'custom',    label: 'Custom',    photo: '3999606' },
 ]
 
 const DURATIONS = [30, 45, 60, 75, 90]
@@ -56,7 +55,6 @@ export default function LogPage() {
     setLoading(true)
     setError('')
 
-    // Check: one session per calendar day
     const todayStart = new Date()
     todayStart.setHours(0, 0, 0, 0)
     const { data: todaySession } = await supabase
@@ -72,8 +70,6 @@ export default function LogPage() {
       return
     }
 
-    // Step 1: Try Terra activity verification (checks if user has a connected tracker
-    // that recorded an activity today)
     let verified = false
     let verificationMethod: string = 'unverified'
     let heartRateAvg: number | null = null
@@ -90,16 +86,16 @@ export default function LogPage() {
     if (terraActivity && terraActivity.length > 0) {
       verified = true
       const provider = terraActivity[0].provider?.toUpperCase()
-      verificationMethod = provider === 'APPLE' ? 'apple_health'
-        : provider === 'GARMIN' ? 'garmin'
-        : provider === 'FITBIT' ? 'fitbit'
-        : provider === 'GOOGLE' ? 'google_fit'
-        : provider?.toLowerCase() ?? 'unverified'
+      verificationMethod =
+        provider === 'APPLE'   ? 'apple_health' :
+        provider === 'GARMIN'  ? 'garmin'       :
+        provider === 'FITBIT'  ? 'fitbit'        :
+        provider === 'GOOGLE'  ? 'google_fit'    :
+        provider?.toLowerCase() ?? 'unverified'
       heartRateAvg = terraActivity[0].heart_rate_avg
-      calories = terraActivity[0].calories
+      calories     = terraActivity[0].calories
     }
 
-    // Step 2: Fall back to GPS if no Terra activity found
     if (!verified) {
       try {
         await new Promise<void>((resolve) => {
@@ -114,7 +110,6 @@ export default function LogPage() {
       }
     }
 
-    // Register GPS as connected device (upsert — only once per user)
     if (verified && verificationMethod === 'gps') {
       await supabase.from('connected_devices').upsert(
         { user_id: user.id, type: 'gps', status: 'active' },
@@ -129,29 +124,26 @@ export default function LogPage() {
       lifetimeSessions: user.lifetime_sessions,
     })
 
-    // Insert workout
     const { error: workoutError } = await supabase.from('workouts').insert({
-      user_id: user.id,
-      type: workoutType,
-      custom_name: workoutType === 'custom' ? customName : null,
-      duration_minutes: duration,
-      verification_method: verificationMethod,
+      user_id:              user.id,
+      type:                 workoutType,
+      custom_name:          workoutType === 'custom' ? customName : null,
+      duration_minutes:     duration,
+      verification_method:  verificationMethod,
       verified,
-      heart_rate_avg: heartRateAvg,
+      heart_rate_avg:       heartRateAvg,
       calories,
-      base_points: pts.base,
-      multiplier_applied: pts.multiplier,
-      total_points_earned: pts.total,
+      base_points:          pts.base,
+      multiplier_applied:   pts.multiplier,
+      total_points_earned:  pts.total,
     })
 
     if (workoutError) { setError(workoutError.message); setLoading(false); return }
 
-    // Update user stats
     const newSessions = user.lifetime_sessions + 1
     const newTier = getTier(newSessions)
     const tierMultipliers: Record<string, number> = { bronze: 1.0, silver: 1.5, gold: 2.0, platinum: 3.0 }
 
-    // Update streak
     const yesterday = new Date()
     yesterday.setDate(yesterday.getDate() - 1)
     yesterday.setHours(0, 0, 0, 0)
@@ -160,21 +152,23 @@ export default function LogPage() {
       .select('id')
       .eq('user_id', user.id)
       .gte('logged_at', yesterday.toISOString())
-              .lt('logged_at', new Date(new Date().setHours(0,0,0,0)).toISOString())
+      .lt('logged_at', new Date(new Date().setHours(0,0,0,0)).toISOString())
       .limit(1)
 
-    const newStreak = (yesterdaySession && yesterdaySession.length > 0) ? user.current_streak + 1 : 1
+    const newStreak  = (yesterdaySession && yesterdaySession.length > 0) ? user.current_streak + 1 : 1
     const newLongest = Math.max(user.longest_streak, newStreak)
-    const newFreeUnverified = !verified ? Math.max(0, user.free_unverified_remaining - 1) : user.free_unverified_remaining
+    const newFreeUnverified = !verified
+      ? Math.max(0, user.free_unverified_remaining - 1)
+      : user.free_unverified_remaining
 
     await supabase.from('users').update({
-      lifetime_sessions: newSessions,
-      tier: newTier,
-      multiplier: tierMultipliers[newTier],
-      points_balance: user.points_balance + pts.total,
+      lifetime_sessions:      newSessions,
+      tier:                   newTier,
+      multiplier:             tierMultipliers[newTier],
+      points_balance:         user.points_balance + pts.total,
       points_lifetime_earned: user.points_lifetime_earned + pts.total,
-      current_streak: newStreak,
-      longest_streak: newLongest,
+      current_streak:         newStreak,
+      longest_streak:         newLongest,
       free_unverified_remaining: newFreeUnverified,
     }).eq('id', user.id)
 
@@ -187,10 +181,10 @@ export default function LogPage() {
 
   const VERIFICATION_LABELS: Record<string, string> = {
     apple_health: '🍎 Apple Health',
-    garmin: '⌚ Garmin',
-    fitbit: '💚 Fitbit',
-    google_fit: '🏃 Google Fit',
-    gps: '📍 GPS',
+    garmin:       '⌚ Garmin',
+    fitbit:       '💚 Fitbit',
+    google_fit:   '🏃 Google Fit',
+    gps:          '📍 GPS',
   }
 
   if (step === 'success') {
@@ -200,10 +194,7 @@ export default function LogPage() {
           <div style={{ fontSize: 56, marginBottom: 16 }}>🏆</div>
           <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, marginBottom: 8, fontFamily: 'Archivo, sans-serif' }}>Session logged!</h2>
           <p style={{ color: '#8A8478', marginBottom: 24 }}>You showed up. That&apos;s what counts.</p>
-          <div style={{
-            background: '#111110', borderRadius: 16, padding: '20px 32px',
-            marginBottom: verificationSource ? 12 : 28, display: 'inline-block',
-          }}>
+          <div style={{ background: '#111110', borderRadius: 16, padding: '20px 32px', marginBottom: verificationSource ? 12 : 28, display: 'inline-block' }}>
             <p style={{ color: '#8A8478', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 }}>Points Earned</p>
             <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 44, fontWeight: 900, color: '#B5593C', lineHeight: 1 }}>
               +{earnedPoints}
@@ -212,28 +203,14 @@ export default function LogPage() {
               {getTierLabel(tier)} tier · {multiplier}x multiplier
             </p>
           </div>
-
           {verificationSource && (
-            <div style={{
-              background: '#F0FDF4', border: '1px solid #86efac',
-              borderRadius: 10, padding: '8px 16px', marginBottom: 28,
-              fontSize: 12, color: '#166534', fontWeight: 700,
-            }}>
+            <div style={{ background: '#F0FDF4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 16px', marginBottom: 28, fontSize: 12, color: '#166534', fontWeight: 700 }}>
               ✓ Verified via {VERIFICATION_LABELS[verificationSource] ?? verificationSource}
             </div>
           )}
-
           <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={() => router.push('/home')} style={{
-              flex: 1, padding: 15, background: '#111110', color: '#F5F0EA',
-              border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 800,
-              fontFamily: 'Archivo, sans-serif', cursor: 'pointer',
-            }}>Back to Home</button>
-            <button onClick={() => router.push('/rewards')} style={{
-              flex: 1, padding: 15, background: '#FDF5F1', color: '#B5593C',
-              border: '1.5px solid #B5593C', borderRadius: 10, fontSize: 14, fontWeight: 800,
-              fontFamily: 'Archivo, sans-serif', cursor: 'pointer',
-            }}>Shop Rewards</button>
+            <button onClick={() => router.push('/home')} style={{ flex: 1, padding: 15, background: '#111110', color: '#F5F0EA', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}>Back to Home</button>
+            <button onClick={() => router.push('/rewards')} style={{ flex: 1, padding: 15, background: '#FDF5F1', color: '#B5593C', border: '1.5px solid #B5593C', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}>Shop Rewards</button>
           </div>
         </div>
       </div>
@@ -255,19 +232,41 @@ export default function LogPage() {
                 key={t.value}
                 onClick={() => setWorkoutType(t.value)}
                 style={{
-                  padding: '16px 10px',
-                  background: workoutType === t.value ? '#111110' : '#fff',
-                  border: `1.5px solid ${workoutType === t.value ? '#111110' : '#E0D9CE'}`,
-                  borderRadius: 12, cursor: 'pointer',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                  transition: 'all 0.15s',
+                  position: 'relative',
+                  height: 90,
+                  backgroundImage: `url(https://images.pexels.com/photos/${t.photo}/pexels-photo-${t.photo}.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&dpr=1)`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  border: workoutType === t.value ? '2.5px solid #B5593C' : '2px solid transparent',
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                  overflow: 'hidden',
+                  padding: 0,
+                  outline: 'none',
                 }}
               >
-                <span style={{ fontSize: 22 }}>{t.emoji}</span>
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: workoutType === t.value
+                    ? 'linear-gradient(to top, rgba(181,89,60,0.55) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.25) 100%)'
+                    : 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.15) 100%)',
+                  borderRadius: 10,
+                  transition: 'background 0.15s',
+                }} />
                 <span style={{
-                  fontSize: 11, fontWeight: 800,
-                  color: workoutType === t.value ? '#F5F0EA' : '#111110',
+                  position: 'absolute',
+                  bottom: 8,
+                  left: 0,
+                  right: 0,
+                  textAlign: 'center',
+                  fontSize: 10,
+                  fontWeight: 900,
+                  color: '#FFFFFF',
                   fontFamily: 'Archivo, sans-serif',
+                  letterSpacing: 1,
+                  textTransform: 'uppercase',
+                  textShadow: '0 1px 4px rgba(0,0,0,0.6)',
                 }}>
                   {t.label}
                 </span>
@@ -298,11 +297,15 @@ export default function LogPage() {
                   key={d}
                   onClick={() => setDuration(d)}
                   style={{
-                    flex: 1, padding: '14px 0',
+                    flex: 1,
+                    padding: '14px 0',
                     background: duration === d ? '#B5593C' : '#fff',
                     border: `1.5px solid ${duration === d ? '#B5593C' : '#E0D9CE'}`,
-                    borderRadius: 10, cursor: 'pointer',
-                    fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700,
+                    borderRadius: 10,
+                    cursor: 'pointer',
+                    fontFamily: 'JetBrains Mono, monospace',
+                    fontSize: 13,
+                    fontWeight: 700,
                     color: duration === d ? '#F5F0EA' : '#111110',
                   }}
                 >
@@ -313,11 +316,7 @@ export default function LogPage() {
             <p style={{ color: '#8A8478', fontSize: 11, marginTop: 6 }}>minutes</p>
           </div>
 
-          {/* Points preview */}
-          <div style={{
-            background: '#FDF5F1', border: '1.5px solid #E0D9CE',
-            borderRadius: 14, padding: 16, marginBottom: 20,
-          }}>
+          <div style={{ background: '#FDF5F1', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: 16, marginBottom: 20 }}>
             <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10, color: '#8A8478' }}>Points Preview</p>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
               <span style={{ fontSize: 13, color: '#8A8478' }}>Base ({duration}min)</span>
@@ -340,9 +339,11 @@ export default function LogPage() {
           </div>
 
           {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12 }}>{error}</p>}
+
           <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 12, color: '#0369A1' }}>
             📍 Allow location when prompted — we use GPS to verify your session and unlock full points.
           </div>
+
           <div style={{ display: 'flex', gap: 10 }}>
             <button onClick={() => setStep('type')} style={btnSecondary}>← Back</button>
             <button onClick={handleLog} disabled={loading} style={{ ...btnPrimary, flex: 2 }}>
