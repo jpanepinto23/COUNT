@@ -340,6 +340,9 @@ export default function LogPage() {
           </div>
 
           {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12 }}>{error}</p>}
+          <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 12, color: '#0369A1' }}>
+            📍 Allow location when prompted — we use GPS to verify your session and unlock full points.
+          </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button onClick={() => setStep('type')} style={btnSecondary}>← Back</button>
             <button onClick={handleLog} disabled={loading} style={{ ...btnPrimary, flex: 2 }}>
