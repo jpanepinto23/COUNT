@@ -41,7 +41,7 @@ export default function InvitePage() {
       try {
         await navigator.share({
           title: 'Join me on COUNT',
-          text: `I've been earning points every time I work out. Join COUNT with my code ${user.referral_code} and we both get 500 bonus points! 💪`,
+          text: `I've been earning points every time I work out. Join COUNT with my code ${user?.referral_code} and we both get 500 bonus points! 💪`,
           url: referralLink,
         })
       } catch {}
