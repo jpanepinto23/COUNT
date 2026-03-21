@@ -1,18 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 
-// Generates a unique 6-char referral code (e.g. "JOE3X7")
 function generateReferralCode(name: string): string {
   const prefix = name.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 3).padEnd(3, 'X')
   const suffix = Math.random().toString(36).toUpperCase().slice(2, 5)
   return prefix + suffix
 }
 
-export default function SignupPage() {
+function SignupContent() {
   const [step, setStep] = useState(1)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -27,7 +26,6 @@ export default function SignupPage() {
   const searchParams = useSearchParams()
   const supabase = createClient()
 
-  // Pre-fill referral code from URL ?ref=CODE
   useEffect(() => {
     const ref = searchParams.get('ref')
     if (ref) setRefCode(ref.toUpperCase())
@@ -48,7 +46,6 @@ export default function SignupPage() {
     const userId = data.user.id
     const myReferralCode = generateReferralCode(name)
 
-    // Look up referrer by code (if provided)
     let referrerId: string | null = null
     if (refCode.trim()) {
       const { data: referrer } = await supabase
@@ -85,7 +82,6 @@ export default function SignupPage() {
       return
     }
 
-    // Log the referral relationship so the referrer can track it
     if (referrerId) {
       await supabase.from('referrals').insert({
         referrer_id: referrerId,
@@ -105,7 +101,6 @@ export default function SignupPage() {
       </div>
 
       <div style={{ width: '100%', maxWidth: 380 }}>
-        {/* Step indicator */}
         <div style={{ display: 'flex', gap: 6, marginBottom: 28 }}>
           {[1, 2].map(s => (
             <div key={s} style={{ flex: 1, height: 3, borderRadius: 2, background: s <= step ? '#B5593C' : '#E0D9CE' }} />
@@ -120,8 +115,6 @@ export default function SignupPage() {
               <input type="text" placeholder="Full name" value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
               <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
               <input type="password" placeholder="Password (min 6 chars)" value={password} onChange={e => setPassword(e.target.value)} style={inputStyle} />
-
-              {/* Referral code field */}
               <div style={{ position: 'relative' }}>
                 <input
                   type="text"
@@ -137,7 +130,6 @@ export default function SignupPage() {
                   </span>
                 )}
               </div>
-
               {error && <p style={{ color: '#ef4444', fontSize: 13 }}>{error}</p>}
               <button
                 onClick={() => {
@@ -189,6 +181,15 @@ export default function SignupPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// useSearchParams() requires Suspense in Next.js App Router
+export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupContent />
+    </Suspense>
   )
 }
 
