@@ -137,3 +137,42 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER on_workout_logged
 AFTER INSERT ON public.workouts
 FOR EACH ROW EXECUTE FUNCTION update_leaderboard_on_workout();
+
+
+-- ============================================================
+-- REFERRALS (run this migration after initial schema setup)
+-- ============================================================
+
+-- Add referral columns to users
+ALTER TABLE public.users
+  ADD COLUMN IF NOT EXISTS referral_code TEXT UNIQUE,
+  ADD COLUMN IF NOT EXISTS referred_by UUID REFERENCES public.users(id),
+  ADD COLUMN IF NOT EXISTS referral_bonus_claimed BOOLEAN DEFAULT FALSE;
+
+-- Generate referral codes for existing users (run once)
+-- UPDATE public.users SET referral_code = UPPER(SUBSTRING(MD5(id::text), 1, 6)) WHERE referral_code IS NULL;
+
+-- Referrals tracking table
+CREATE TABLE IF NOT EXISTS public.referrals (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  referrer_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  referred_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  bonus_points INTEGER NOT NULL DEFAULT 500,
+  bonus_awarded BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  bonus_awarded_at TIMESTAMPTZ,
+  UNIQUE(referred_id) -- each user can only be referred once
+);
+
+ALTER TABLE public.referrals ENABLE ROW LEVEL SECURITY;
+
+-- Referrers can see referrals they created
+CREATE POLICY "Users can read own referrals" ON public.referrals
+  FOR SELECT USING (auth.uid() = referrer_id OR auth.uid() = referred_id);
+
+-- Allow system inserts/updates (used by signup + log flows)
+CREATE POLICY "Service role can insert referrals" ON public.referrals
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Service role can update referrals" ON public.referrals
+  FOR UPDATE USING (true);
