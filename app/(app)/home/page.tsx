@@ -22,7 +22,6 @@ export default function HomePage() {
   const [recentWorkouts, setRecentWorkouts] = useState<Workout[]>([])
   const [referralCount, setReferralCount] = useState(0)
   const [copied, setCopied] = useState(false)
-  const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
