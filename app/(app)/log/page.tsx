@@ -172,6 +172,27 @@ export default function LogPage() {
       free_unverified_remaining: newFreeUnverified,
     }).eq('id', user.id)
 
+    // ── Referral bonus: award 500 pts to referrer on first workout ──
+    if (user.lifetime_sessions === 0 && user.referred_by && !user.referral_bonus_claimed) {
+      const { data: referrer } = await supabase
+        .from('users')
+        .select('id, points_balance, points_lifetime_earned')
+        .eq('id', user.referred_by)
+        .single()
+      if (referrer) {
+        await supabase.from('users').update({
+          points_balance:         referrer.points_balance + 500,
+          points_lifetime_earned: referrer.points_lifetime_earned + 500,
+        }).eq('id', referrer.id)
+        await supabase.from('users').update({
+          referral_bonus_claimed: true,
+        }).eq('id', user.id)
+        await supabase.from('referrals')
+          .update({ bonus_awarded: true, bonus_awarded_at: new Date().toISOString() })
+          .eq('referred_id', user.id)
+      }
+    }
+
     setEarnedPoints(pts.total)
     setVerificationSource(verified ? verificationMethod : null)
     await refreshUser()
