@@ -4,11 +4,11 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 
-const HERO_PHOTO = 'https://images.pexels.com/photos/4164507/pexels-photo-4164507.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+const HERO_PHOTO = 'https://images.pexels.com/photos/2261481/pexels-photo-2261481.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
 const STRIP_PHOTOS = [
-  { id: '1552251', label: 'Lift' },
-  { id: '4720815', label: 'Grind' },
-  { id: '5327571', label: 'Push' },
+  { id: '3916766', label: 'Lift' },
+  { id: '4164515', label: 'Grind' },
+  { id: '6389886', label: 'Push' },
 ]
 const TIERS = [
   { tier: 'Bronze', mult: '1x', sessions: 'Start here', color: '#CD7F32' },
