@@ -9,7 +9,7 @@ import type { WorkoutType } from '@/lib/types'
 const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string }[] = [
   { value: 'push',      label: 'Push',      photo: '4488764' },
   { value: 'pull',      label: 'Pull',      photo: '6922157' },
-  { value: 'legs',      label: 'Legs',      photo: '5837242' },
+  { value: 'legs',      label: 'Legs',      photo: '583722' },
   { value: 'upper',     label: 'Upper',     photo: '3916766' },
   { value: 'lower',     label: 'Lower',     photo: '4944435' },
   { value: 'full_body', label: 'Full Body', photo: '6628962' },
@@ -284,6 +284,28 @@ export default function LogPage() {
           )}
 
           <button onClick={() => setStep('details')} style={btnPrimary}>Next →</button>
+
+          <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '14px 16px', marginTop: 12 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: '#94A3B8', marginBottom: 10 }}>How it works</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <span>🏆</span>
+                <span style={{ fontSize: 12, color: '#334155' }}><strong>Earn points every session</strong> — each workout adds to your score and moves you up the leaderboard.</span>
+              </div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <span>📍</span>
+                <span style={{ fontSize: 12, color: '#334155' }}><strong>Verify with GPS or a wearable</strong> (Apple Health, Garmin, Fitbit, Google Fit) to earn <strong>100% of your points</strong>.</span>
+              </div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <span>✅</span>
+                <span style={{ fontSize: 12, color: '#334155' }}><strong>Unverified sessions still count</strong> — you earn fewer points, but every workout matters.</span>
+              </div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <span>⚖️</span>
+                <span style={{ fontSize: 12, color: '#334155' }}><strong>Why verify?</strong> It keeps the leaderboard fair and honest for everyone competing.</span>
+              </div>
+            </div>
+          </div>
         </>
       )}
 
@@ -340,8 +362,17 @@ export default function LogPage() {
 
           {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12 }}>{error}</p>}
 
-          <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 12, color: '#0369A1' }}>
-            📍 Allow location when prompted — we use GPS to verify your session and unlock full points.
+          <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: 12, padding: '12px 14px', marginBottom: 16 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#0369A1', marginBottom: 8 }}>🔒 Verify your workout for full points</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: '#0C4A6E' }}>
+                <span>📍</span><span><strong>GPS</strong> — allow location access when prompted</span>
+              </div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: '#0C4A6E' }}>
+                <span>⌚</span><span><strong>Wearable</strong> — Apple Health, Garmin, Fitbit, or Google Fit</span>
+              </div>
+            </div>
+            <p style={{ fontSize: 11, color: '#0369A1', marginTop: 8, marginBottom: 0 }}>Verified sessions earn <strong>100% of your points</strong>. Unverified sessions still count for less.</p>
           </div>
 
           <div style={{ display: 'flex', gap: 10 }}>
