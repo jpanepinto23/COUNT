@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import { getTierLabel, getTierMultiplier, getNextTierSessions } from '@/lib/points'
@@ -15,12 +16,14 @@ const TIER_COLORS: Record<string, string> = {
 
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
-// Pexels photo for the points card — dark moody gym interior
 const POINTS_CARD_PHOTO = 'https://images.pexels.com/photos/1552249/pexels-photo-1552249.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&dpr=1'
 
 export default function HomePage() {
   const { user, refreshUser } = useAuth()
   const [recentWorkouts, setRecentWorkouts] = useState<Workout[]>([])
+  const [referralCount, setReferralCount] = useState(0)
+  const [copied, setCopied] = useState(false)
+  const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
@@ -32,6 +35,16 @@ export default function HomePage() {
       .order('logged_at', { ascending: false })
       .limit(5)
       .then(({ data }) => { if (data) setRecentWorkouts(data) })
+
+    // Fetch referral count
+    if (user.referral_code) {
+      supabase
+        .from('referrals')
+        .select('id', { count: 'exact' })
+        .eq('referrer_id', user.id)
+        .then(({ count }) => { if (count !== null) setReferralCount(count) })
+    }
+
     refreshUser()
   }, [user?.id]) // eslint-disable-line
 
@@ -45,7 +58,6 @@ export default function HomePage() {
        (threshold - (tier === 'bronze' ? 0 : tier === 'silver' ? 30 : tier === 'gold' ? 60 : 120))) * 100
     : 100
 
-  // Last 7 days for streak view
   const today = new Date()
   const week = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(today)
@@ -55,6 +67,24 @@ export default function HomePage() {
   const workedOutDates = new Set(
     recentWorkouts.map(w => new Date(w.logged_at).toDateString())
   )
+
+  const referralLink = `https://count-fitness-app.vercel.app/auth/signup?ref=${user.referral_code ?? ''}`
+
+  async function handleShare() {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Join me on COUNT',
+          text: `I've been earning points every time I work out. Join COUNT with my code ${user.referral_code} and we both get 500 bonus points! 💪`,
+          url: referralLink,
+        })
+      } catch {}
+    } else {
+      await navigator.clipboard.writeText(referralLink)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
 
   return (
     <div style={{ padding: '20px 16px', paddingBottom: 8 }}>
@@ -86,7 +116,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Points card — photo background with dark overlay */}
+      {/* Points card */}
       <div style={{
         backgroundImage: `url(${POINTS_CARD_PHOTO})`,
         backgroundSize: 'cover',
@@ -97,11 +127,8 @@ export default function HomePage() {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        {/* Dark overlay — 82% opacity for readability */}
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,10,9,0.82)', borderRadius: 16 }} />
-        {/* Subtle rust accent circle */}
         <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: '#B5593C', opacity: 0.12 }} />
-        {/* Content above overlay */}
         <div style={{ position: 'relative', zIndex: 1 }}>
           <p style={{ color: '#8A8478', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 }}>Points Balance</p>
           <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 38, fontWeight: 900, color: '#F5F0EA', lineHeight: 1, marginBottom: 8 }}>
@@ -123,6 +150,42 @@ export default function HomePage() {
         <StatCard label="Streak"   value={user.current_streak}    unit="days"  accent="#B5593C" />
         <StatCard label="Sessions" value={user.lifetime_sessions}  unit="total" accent="#111110" />
         <StatCard label="Best"     value={user.longest_streak}     unit="days"  accent="#111110" />
+      </div>
+
+      {/* ── INVITE A FRIEND ── prominent, dark card, same visual weight as Log */}
+      <div style={{ background: '#111110', borderRadius: 16, padding: '18px', marginBottom: 14, position: 'relative', overflow: 'hidden' }}>
+        {/* Rust accent blobs */}
+        <div style={{ position: 'absolute', top: -24, right: -24, width: 90, height: 90, borderRadius: '50%', background: '#B5593C', opacity: 0.18 }} />
+        <div style={{ position: 'absolute', bottom: -16, left: -16, width: 60, height: 60, borderRadius: '50%', background: '#B5593C', opacity: 0.10 }} />
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 3 }}>Invite a Friend</p>
+              <p style={{ fontSize: 16, fontWeight: 900, color: '#F5F0EA', fontFamily: 'Archivo, sans-serif', lineHeight: 1.2 }}>
+                Give 500 pts.<br />Get 500 pts.
+              </p>
+            </div>
+            <div style={{ background: '#B5593C', borderRadius: 10, padding: '6px 8px', fontSize: 18 }}>🔗</div>
+          </div>
+
+          {/* Referral code pill */}
+          <div style={{ background: 'rgba(245,240,234,0.07)', border: '1px solid rgba(245,240,234,0.12)', borderRadius: 10, padding: '10px 14px', marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 18, fontWeight: 900, color: '#F5F0EA', letterSpacing: 4 }}>
+              {user.referral_code ?? '------'}
+            </span>
+            <span style={{ fontSize: 11, color: '#8A8478', fontFamily: 'Archivo, sans-serif' }}>
+              {referralCount} {referralCount === 1 ? 'friend' : 'friends'} joined
+            </span>
+          </div>
+
+          {/* Share button */}
+          <button
+            onClick={handleShare}
+            style={{ width: '100%', padding: '12px', background: '#B5593C', color: '#F5F0EA', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: 'Archivo, sans-serif', letterSpacing: 0.3 }}
+          >
+            {copied ? '✓ Link Copied!' : 'Share Your Link →'}
+          </button>
+        </div>
       </div>
 
       {/* Weekly view */}
