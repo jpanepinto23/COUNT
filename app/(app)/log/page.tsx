@@ -160,7 +160,7 @@ export default function LogPage() {
       .select('id')
       .eq('user_id', user.id)
       .gte('logged_at', yesterday.toISOString())
-      .lt('logged_at', new Date(new Date().setHours(0,0,0,0)) > 0 ? new Date(new Date().setHours(0,0,0,0)).toISOString() : new Date().toISOString())
+              .lt('logged_at', new Date(new Date().setHours(0,0,0,0)).toISOString())
       .limit(1)
 
     const newStreak = (yesterdaySession && yesterdaySession.length > 0) ? user.current_streak + 1 : 1
