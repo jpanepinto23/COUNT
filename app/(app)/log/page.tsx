@@ -235,6 +235,7 @@ export default function LogPage() {
     google_fit:   '🏃 Google Fit',
     gps:          '📍 GPS',
     gps_denied:   '⚠️ GPS Blocked',
+    strava:       '🏊 Strava',
   }
 
   if (step === 'success') {
@@ -435,8 +436,6 @@ export default function LogPage() {
       )}
     </div>
   )
-  strava: '🏊 Strava',
-}
 
 const inputStyle: React.CSSProperties = {
   padding: '14px 16px',
