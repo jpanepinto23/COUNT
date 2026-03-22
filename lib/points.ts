@@ -19,6 +19,16 @@ export function getTierMultiplier(tier: Tier): number {
   return multipliers[tier]
 }
 
+export function getReferralPoints(tier: Tier): number {
+  const points: Record<Tier, number> = {
+    bronze: 300,
+    silver: 500,
+    gold: 750,
+    platinum: 1000,
+  }
+  return points[tier]
+}
+
 export function getTierLabel(tier: Tier): string {
   return tier.charAt(0).toUpperCase() + tier.slice(1)
 }
@@ -31,10 +41,10 @@ export function getNextTierSessions(lifetimeSessions: number): { next: Tier | nu
 }
 
 export function calculateBasePoints(durationMinutes: number): number {
-  let base = 100
+  let base = 150
   if (durationMinutes >= 60) base += 50
   else if (durationMinutes >= 45) base += 25
-  return base // max 150
+  return base // max 200
 }
 
 export function calculatePoints({
