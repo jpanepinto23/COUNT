@@ -175,7 +175,7 @@ export default function ProfilePage() {
           <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 13, fontWeight: 800, color: tierColor, textTransform: 'uppercase', letterSpacing: 1 }}>
             {getTierLabel(tier)}
           </span>
-          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#8A8478' }}>Â· {getTierMultiplier(tier)}x multiplier</span>
+          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#8A8478' }}>· {getTierMultiplier(tier)}x multiplier</span>
         </div>
       </div>
 
@@ -192,7 +192,7 @@ export default function ProfilePage() {
           <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 12 }}>Body Stats</p>
           <div style={{ display: 'flex', gap: 20 }}>
             {user.age && <StatInline label="Age" value={`${user.age} yr`} />}
-            {user.height && <StatInline label="Height" value={`${user.height} ft`} />}
+            {user.height && <StatInline label="Height" value={`${Math.floor(user.height)}'${Math.round((user.height % 1) * 12)}"`} />}
             {user.weight && <StatInline label="Weight" value={`${user.weight} lbs`} />}
           </div>
         </div>
@@ -333,7 +333,7 @@ export default function ProfilePage() {
                 <div>
                   <p style={{ fontSize: 13, fontWeight: 700 }}>{r.reward?.product_name ?? 'Reward'}</p>
                   <p style={{ fontSize: 11, color: '#8A8478' }}>
-                    {r.reward?.brand_name} Â· {new Date(r.redeemed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    {r.reward?.brand_name} · {new Date(r.redeemed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
                 <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 900, color: '#111110' }}>
