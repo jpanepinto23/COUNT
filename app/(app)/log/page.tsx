@@ -3,8 +3,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
-import { calculatePoints, getTier, getTierLabel } from '@/lib/points'
-import type { WorkoutType } from '@/lib/types'
+import { calculatePoints, getTier, getTierLabel, getReferralPoints } from '@/lib/points'
+import type { WorkoutType, Tier } from '@/lib/types'
 
 const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string }[] = [
   { value: 'push',      label: 'Push',      photo: '4488764' },
@@ -200,17 +200,17 @@ export default function LogPage() {
       free_unverified_remaining: newFreeUnverified,
     }).eq('id', user.id)
 
-    // ── Referral bonus: award 500 pts to referrer on first workout ──
+    // ── Referral bonus: award tier-scaled pts to referrer on first workout ──
     if (user.lifetime_sessions === 0 && user.referred_by && !user.referral_bonus_claimed) {
       const { data: referrer } = await supabase
         .from('users')
-        .select('id, points_balance, points_lifetime_earned')
+        .select('id, points_balance, points_lifetime_earned, tier')
         .eq('id', user.referred_by)
         .single()
       if (referrer) {
         await supabase.from('users').update({
-          points_balance:         referrer.points_balance + 500,
-          points_lifetime_earned: referrer.points_lifetime_earned + 500,
+          points_balance:         referrer.points_balance + getReferralPoints(referrer.tier as Tier),
+          points_lifetime_earned: referrer.points_lifetime_earned + getReferralPoints(referrer.tier as Tier),
         }).eq('id', referrer.id)
         await supabase.from('users').update({
           referral_bonus_claimed: true,
