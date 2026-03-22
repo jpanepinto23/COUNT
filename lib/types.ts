@@ -3,7 +3,7 @@ export type WorkoutType =
   | 'full_body' | 'cardio' | 'hiit' | 'custom'
 
 export type VerificationMethod =
-  | 'apple_health' | 'google_fit' | 'gps' | 'photo' | 'unverified'
+  | 'apple_health' | 'google_fit' | 'gps' | 'photo' | 'unverified' | 'strava'
 
 export type Tier = 'bronze' | 'silver' | 'gold' | 'platinum'
 
