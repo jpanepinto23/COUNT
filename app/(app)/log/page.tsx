@@ -96,13 +96,14 @@ export default function LogPage() {
       calories     = terraActivity[0].calories
     }
 
+    let gpsDenied = false
     if (!verified) {
       try {
         await new Promise<void>((resolve) => {
           navigator.geolocation.getCurrentPosition(
             () => { verified = true; verificationMethod = 'gps'; resolve() },
-            () => resolve(),
-            { timeout: 5000 }
+            (err) => { if ((err as GeolocationPositionError).code === 1) gpsDenied = true; resolve() },
+            { timeout: 15000, enableHighAccuracy: false }
           )
         })
       } catch {
@@ -194,7 +195,7 @@ export default function LogPage() {
     }
 
     setEarnedPoints(pts.total)
-    setVerificationSource(verified ? verificationMethod : null)
+    setVerificationSource(verified ? verificationMethod : gpsDenied ? 'gps_denied' : null)
     await refreshUser()
     setLoading(false)
     setStep('success')
@@ -406,6 +407,7 @@ export default function LogPage() {
       )}
     </div>
   )
+  gps_denied:   '⚠️ GPS Blocked',
 }
 
 const inputStyle: React.CSSProperties = {
