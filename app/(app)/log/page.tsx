@@ -436,6 +436,7 @@ export default function LogPage() {
       )}
     </div>
   )
+}
 
 const inputStyle: React.CSSProperties = {
   padding: '14px 16px',
