@@ -15,12 +15,12 @@ const TIER_COLORS: Record<string, string> = {
 }
 
 const DEVICE_INFO: Record<string, { label: string; emoji: string; provider: string }> = {
-  apple_health: { label: 'Apple Health', emoji: 'ÃÂ°ÃÂÃÂÃÂ', provider: 'APPLE' },
-  garmin: { label: 'Garmin', emoji: 'ÃÂ¢ÃÂÃÂ', provider: 'GARMIN' },
-  fitbit: { label: 'Fitbit', emoji: 'ÃÂ°ÃÂÃÂÃÂ', provider: 'FITBIT' },
-  google_fit: { label: 'Google Fit', emoji: 'ÃÂ°ÃÂÃÂÃÂ', provider: 'GOOGLE' },
-  gps: { label: 'GPS Check-in', emoji: 'ÃÂ°ÃÂÃÂÃÂ', provider: '' },
-  photo: { label: 'Photo Verification', emoji: 'ÃÂ°ÃÂÃÂÃÂ¸', provider: '' },
+  apple_health: { label: 'Apple Health', emoji: '🍎', provider: 'APPLE' },
+  garmin: { label: 'Garmin', emoji: '⌚', provider: 'GARMIN' },
+  fitbit: { label: 'Fitbit', emoji: '💚', provider: 'FITBIT' },
+  google_fit: { label: 'Google Fit', emoji: '🏃', provider: 'GOOGLE' },
+  gps: { label: 'GPS Check-in', emoji: '📍', provider: '' },
+  photo: { label: 'Photo Verification', emoji: '📸', provider: '' },
 }
 
 export default function ProfilePage() {
@@ -72,7 +72,7 @@ export default function ProfilePage() {
         .then(({ data }) => { if (data) setDevices(data) })
     }
     if (params.get('error')) {
-      setConnectMessage({ text: 'Connection failed ÃÂ¢ÃÂÃÂ please try again.', ok: false })
+      setConnectMessage({ text: 'Connection failed — please try again.', ok: false })
       window.history.replaceState({}, '', '/profile')
     }
   }, [user?.id]) // eslint-disable-line
@@ -202,7 +202,7 @@ export default function ProfilePage() {
           <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 13, fontWeight: 800, color: tierColor, textTransform: 'uppercase', letterSpacing: 1 }}>
             {getTierLabel(tier)}
           </span>
-          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#8A8478' }}>ÃÂ· {getTierMultiplier(tier)}x multiplier</span>
+          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#8A8478' }}>· {getTierMultiplier(tier)}x multiplier</span>
         </div>
       </div>
 
@@ -229,9 +229,9 @@ export default function ProfilePage() {
           }} style={{ fontSize: 12, color: '#B5593C', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px' }}>Edit</button>
         </div>
         <div style={{ display: 'flex', gap: 20 }}>
-          {(() => { const age = localAge !== undefined ? localAge : u.age; return age ? <StatInline label="Age" value={`${age} yr`} /> : <StatInline label="Age" value="â" /> })()}
-          {(() => { const h = localHeight !== undefined ? localHeight : u.height; return h != null ? <StatInline label="Height" value={`${Math.floor(h)}'${Math.round((h % 1) * 12)}"`} /> : <StatInline label="Height" value="â" /> })()}
-          {(() => { const w = localWeight !== undefined ? localWeight : u.weight; return w ? <StatInline label="Weight" value={`${w} lbs`} /> : <StatInline label="Weight" value="â" /> })()}
+          {(() => { const age = localAge !== undefined ? localAge : u.age; return age ? <StatInline label="Age" value={`${age} yr`} /> : <StatInline label="Age" value="—" /> })()}
+          {(() => { const h = localHeight !== undefined ? localHeight : u.height; return h != null ? <StatInline label="Height" value={`${Math.floor(h)}'${Math.round((h % 1) * 12)}"`} /> : <StatInline label="Height" value="—" /> })()}
+          {(() => { const w = localWeight !== undefined ? localWeight : u.weight; return w ? <StatInline label="Weight" value={`${w} lbs`} /> : <StatInline label="Weight" value="—" /> })()}
         </div>
       </div>
 
@@ -271,7 +271,7 @@ export default function ProfilePage() {
                   <div>
                     <p style={{ fontSize: 13, fontWeight: 700, color: '#111110' }}>{info.label}</p>
                     <p style={{ fontSize: 11, color: '#8A8478' }}>
-                      {isConnected ? 'ÃÂ¢ÃÂÃÂ Connected ÃÂ¢ÃÂÃÂ workouts auto-verified' : 'Tap to connect'}
+                      {isConnected ? '✓ Connected — workouts auto-verified' : 'Tap to connect'}
                     </p>
                   </div>
                 </div>
@@ -315,10 +315,10 @@ export default function ProfilePage() {
           background: '#F0FDF4', border: '1.5px solid #86efac',
           display: 'flex', alignItems: 'center', gap: 10,
         }}>
-          <span style={{ fontSize: 20 }}>ÃÂ°ÃÂÃÂÃÂ</span>
+          <span style={{ fontSize: 20 }}>📍</span>
           <div>
             <p style={{ fontSize: 13, fontWeight: 700, color: '#111110' }}>GPS Check-in</p>
-            <p style={{ fontSize: 11, color: '#8A8478' }}>ÃÂ¢ÃÂÃÂ Always active ÃÂ¢ÃÂÃÂ auto-used when logging</p>
+            <p style={{ fontSize: 11, color: '#8A8478' }}>✓ Always active — auto-used when logging</p>
           </div>
         </div>
       </div>
@@ -331,7 +331,7 @@ export default function ProfilePage() {
             {devices.filter(d => d.type !== 'gps').map((d, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontSize: 20 }}>{DEVICE_INFO[d.type]?.emoji ?? 'ÃÂ°ÃÂÃÂÃÂ±'}</span>
+                  <span style={{ fontSize: 20 }}>{DEVICE_INFO[d.type]?.emoji ?? '📱'}</span>
                   <div>
                     <p style={{ fontSize: 13, fontWeight: 700 }}>{DEVICE_INFO[d.type]?.label ?? d.type}</p>
                     <p style={{ fontSize: 11, color: '#8A8478' }}>
@@ -370,7 +370,7 @@ export default function ProfilePage() {
                 <div>
                   <p style={{ fontSize: 13, fontWeight: 700 }}>{r.reward?.product_name ?? 'Reward'}</p>
                   <p style={{ fontSize: 11, color: '#8A8478' }}>
-                    {r.reward?.brand_name} ÃÂ· {new Date(r.redeemed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    {r.reward?.brand_name} · {new Date(r.redeemed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
                 <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 900, color: '#111110' }}>
