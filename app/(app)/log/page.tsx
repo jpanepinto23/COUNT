@@ -173,7 +173,7 @@ export default function LogPage() {
       free_unverified_remaining: newFreeUnverified,
     }).eq('id', user.id)
 
-    // ── Referral bonus: award 500 pts to referrer on first workout ──
+    // ââ Referral bonus: award 500 pts to referrer on first workout ââ
     if (user.lifetime_sessions === 0 && user.referred_by && !user.referral_bonus_claimed) {
       const { data: referrer } = await supabase
         .from('users')
@@ -202,18 +202,19 @@ export default function LogPage() {
   }
 
   const VERIFICATION_LABELS: Record<string, string> = {
-    apple_health: '🍎 Apple Health',
-    garmin:       '⌚ Garmin',
-    fitbit:       '💚 Fitbit',
-    google_fit:   '🏃 Google Fit',
-    gps:          '📍 GPS',
+    apple_health: 'ð Apple Health',
+    garmin:       'â Garmin',
+    fitbit:       'ð Fitbit',
+    google_fit:   'ð Google Fit',
+    gps:          'ð GPS',
+    gps_denied:   '⚠️ GPS Blocked',
   }
 
   if (step === 'success') {
     return (
       <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#FAF8F4' }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 56, marginBottom: 16 }}>🏆</div>
+          <div style={{ fontSize: 56, marginBottom: 16 }}>ð</div>
           <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, marginBottom: 8, fontFamily: 'Archivo, sans-serif' }}>Session logged!</h2>
           <p style={{ color: '#8A8478', marginBottom: 24 }}>You showed up. That&apos;s what counts.</p>
           <div style={{ background: '#111110', borderRadius: 16, padding: '20px 32px', marginBottom: verificationSource ? 12 : 28, display: 'inline-block' }}>
@@ -222,12 +223,12 @@ export default function LogPage() {
               +{earnedPoints}
             </p>
             <p style={{ color: '#8A8478', fontSize: 12, marginTop: 4 }}>
-              {getTierLabel(tier)} tier · {multiplier}x multiplier
+              {getTierLabel(tier)} tier Â· {multiplier}x multiplier
             </p>
           </div>
           {verificationSource && (
             <div style={{ background: '#F0FDF4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 16px', marginBottom: 28, fontSize: 12, color: '#166534', fontWeight: 700 }}>
-              ✓ Verified via {VERIFICATION_LABELS[verificationSource] ?? verificationSource}
+              â Verified via {VERIFICATION_LABELS[verificationSource] ?? verificationSource}
             </div>
           )}
           <div style={{ display: 'flex', gap: 10 }}>
@@ -305,25 +306,25 @@ export default function LogPage() {
             />
           )}
 
-          <button onClick={() => setStep('details')} style={btnPrimary}>Next →</button>
+          <button onClick={() => setStep('details')} style={btnPrimary}>Next â</button>
 
           <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '14px 16px', marginTop: 12 }}>
             <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: '#94A3B8', marginBottom: 10 }}>How it works</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <span>🏆</span>
-                <span style={{ fontSize: 12, color: '#334155' }}><strong>Earn points every session</strong> — each workout adds to your score and moves you up the leaderboard.</span>
+                <span>ð</span>
+                <span style={{ fontSize: 12, color: '#334155' }}><strong>Earn points every session</strong> â each workout adds to your score and moves you up the leaderboard.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <span>📍</span>
+                <span>ð</span>
                 <span style={{ fontSize: 12, color: '#334155' }}><strong>Verify with GPS or a wearable</strong> (Apple Health, Garmin, Fitbit, Google Fit) to earn <strong>100% of your points</strong>.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <span>✅</span>
-                <span style={{ fontSize: 12, color: '#334155' }}><strong>Unverified sessions still count</strong> — you earn fewer points, but every workout matters.</span>
+                <span>â</span>
+                <span style={{ fontSize: 12, color: '#334155' }}><strong>Unverified sessions still count</strong> â you earn fewer points, but every workout matters.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <span>⚖️</span>
+                <span>âï¸</span>
                 <span style={{ fontSize: 12, color: '#334155' }}><strong>Why verify?</strong> It keeps the leaderboard fair and honest for everyone competing.</span>
               </div>
             </div>
@@ -385,29 +386,28 @@ export default function LogPage() {
           {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12 }}>{error}</p>}
 
           <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: 12, padding: '12px 14px', marginBottom: 16 }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: '#0369A1', marginBottom: 8 }}>🔒 Verify your workout for full points</p>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#0369A1', marginBottom: 8 }}>ð Verify your workout for full points</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: '#0C4A6E' }}>
-                <span>📍</span><span><strong>GPS</strong> — allow location access when prompted</span>
+                <span>ð</span><span><strong>GPS</strong> â allow location access when prompted</span>
               </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: '#0C4A6E' }}>
-                <span>⌚</span><span><strong>Wearable</strong> — Apple Health, Garmin, Fitbit, or Google Fit</span>
+                <span>â</span><span><strong>Wearable</strong> â Apple Health, Garmin, Fitbit, or Google Fit</span>
               </div>
             </div>
             <p style={{ fontSize: 11, color: '#0369A1', marginTop: 8, marginBottom: 0 }}>Verified sessions earn <strong>100% of your points</strong>. Unverified sessions still count for less.</p>
           </div>
 
           <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={() => setStep('type')} style={btnSecondary}>← Back</button>
+            <button onClick={() => setStep('type')} style={btnSecondary}>â Back</button>
             <button onClick={handleLog} disabled={loading} style={{ ...btnPrimary, flex: 2 }}>
-              {loading ? 'Logging...' : 'Log Session ✓'}
+              {loading ? 'Logging...' : 'Log Session â'}
             </button>
           </div>
         </>
       )}
     </div>
   )
-  gps_denied:   '⚠️ GPS Blocked',
 }
 
 const inputStyle: React.CSSProperties = {
