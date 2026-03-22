@@ -15,12 +15,12 @@ const TIER_COLORS: Record<string, string> = {
 }
 
 const DEVICE_INFO: Record<string, { label: string; emoji: string; provider: string }> = {
-  apple_health: { label: 'Apple Health', emoji: 'ð', provider: 'APPLE' },
-  garmin: { label: 'Garmin', emoji: 'â', provider: 'GARMIN' },
-  fitbit: { label: 'Fitbit', emoji: 'ð', provider: 'FITBIT' },
-  google_fit: { label: 'Google Fit', emoji: 'ð', provider: 'GOOGLE' },
-  gps: { label: 'GPS Check-in', emoji: 'ð', provider: '' },
-  photo: { label: 'Photo Verification', emoji: 'ð¸', provider: '' },
+  apple_health: { label: 'Apple Health', emoji: 'Ã°ÂÂÂ', provider: 'APPLE' },
+  garmin: { label: 'Garmin', emoji: 'Ã¢ÂÂ', provider: 'GARMIN' },
+  fitbit: { label: 'Fitbit', emoji: 'Ã°ÂÂÂ', provider: 'FITBIT' },
+  google_fit: { label: 'Google Fit', emoji: 'Ã°ÂÂÂ', provider: 'GOOGLE' },
+  gps: { label: 'GPS Check-in', emoji: 'Ã°ÂÂÂ', provider: '' },
+  photo: { label: 'Photo Verification', emoji: 'Ã°ÂÂÂ¸', provider: '' },
 }
 
 export default function ProfilePage() {
@@ -34,6 +34,12 @@ export default function ProfilePage() {
   const [connecting, setConnecting] = useState<string | null>(null)
   const [disconnecting, setDisconnecting] = useState<string | null>(null)
   const [connectMessage, setConnectMessage] = useState<{ text: string; ok: boolean } | null>(null)
+  const [editingStats, setEditingStats] = useState(false)
+  const [savingStats, setSavingStats] = useState(false)
+  const [statsForm, setStatsForm] = useState({ age: '', heightFt: '', heightIn: '', weight: '' })
+  const [localAge, setLocalAge] = useState<number | null | undefined>(undefined)
+  const [localHeight, setLocalHeight] = useState<number | null | undefined>(undefined)
+  const [localWeight, setLocalWeight] = useState<number | null | undefined>(undefined)
 
   useEffect(() => {
     if (!user) return
@@ -66,7 +72,7 @@ export default function ProfilePage() {
         .then(({ data }) => { if (data) setDevices(data) })
     }
     if (params.get('error')) {
-      setConnectMessage({ text: 'Connection failed â please try again.', ok: false })
+      setConnectMessage({ text: 'Connection failed Ã¢ÂÂ please try again.', ok: false })
       window.history.replaceState({}, '', '/profile')
     }
   }, [user?.id]) // eslint-disable-line
@@ -127,6 +133,26 @@ export default function ProfilePage() {
     router.replace('/auth/login')
   }
 
+  async function handleSaveStats() {
+    setSavingStats(true)
+    try {
+      const ageVal = statsForm.age ? parseInt(statsForm.age) : null
+      const ft = statsForm.heightFt ? parseFloat(statsForm.heightFt) : 0
+      const ins = statsForm.heightIn ? parseFloat(statsForm.heightIn) : 0
+      const heightVal = (statsForm.heightFt || statsForm.heightIn) ? ft + ins / 12 : null
+      const weightVal = statsForm.weight ? parseFloat(statsForm.weight) : null
+      await supabase.from('users').update({ age: ageVal, height: heightVal, weight: weightVal }).eq('id', user.id)
+      setLocalAge(ageVal)
+      setLocalHeight(heightVal)
+      setLocalWeight(weightVal)
+      setEditingStats(false)
+    } catch {
+      // silently ignore
+    } finally {
+      setSavingStats(false)
+    }
+  }
+
   if (!user) return null
 
   const tier = user.tier ?? 'bronze'
@@ -175,7 +201,7 @@ export default function ProfilePage() {
           <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 13, fontWeight: 800, color: tierColor, textTransform: 'uppercase', letterSpacing: 1 }}>
             {getTierLabel(tier)}
           </span>
-          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#8A8478' }}>· {getTierMultiplier(tier)}x multiplier</span>
+          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#8A8478' }}>Â· {getTierMultiplier(tier)}x multiplier</span>
         </div>
       </div>
 
@@ -187,16 +213,26 @@ export default function ProfilePage() {
       </div>
 
       {/* Body stats */}
-      {(user.age || user.height || user.weight) && (
-        <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
-          <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 12 }}>Body Stats</p>
-          <div style={{ display: 'flex', gap: 20 }}>
-            {user.age && <StatInline label="Age" value={`${user.age} yr`} />}
-            {user.height && <StatInline label="Height" value={`${Math.floor(user.height)}'${Math.round((user.height % 1) * 12)}"`} />}
-            {user.weight && <StatInline label="Weight" value={`${user.weight} lbs`} />}
-          </div>
+      <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', margin: 0 }}>Body Stats</p>
+          <button onClick={() => {
+            const h = localHeight !== undefined ? localHeight : user.height
+            setStatsForm({
+              age: String(localAge !== undefined ? (localAge ?? '') : (user.age ?? '')),
+              heightFt: h != null ? String(Math.floor(h)) : '',
+              heightIn: h != null ? String(Math.round((h % 1) * 12)) : '',
+              weight: String(localWeight !== undefined ? (localWeight ?? '') : (user.weight ?? '')),
+            })
+            setEditingStats(true)
+          }} style={{ fontSize: 12, color: '#B5593C', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px' }}>Edit</button>
         </div>
-      )}
+        <div style={{ display: 'flex', gap: 20 }}>
+          {(() => { const age = localAge !== undefined ? localAge : user.age; return age ? <StatInline label="Age" value={`${age} yr`} /> : <StatInline label="Age" value="—" /> })()}
+          {(() => { const h = localHeight !== undefined ? localHeight : user.height; return h != null ? <StatInline label="Height" value={`${Math.floor(h)}'${Math.round((h % 1) * 12)}"`} /> : <StatInline label="Height" value="—" /> })()}
+          {(() => { const w = localWeight !== undefined ? localWeight : user.weight; return w ? <StatInline label="Weight" value={`${w} lbs`} /> : <StatInline label="Weight" value="—" /> })()}
+        </div>
+      </div>
 
       {/* Connect Fitness Trackers */}
       <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
@@ -234,7 +270,7 @@ export default function ProfilePage() {
                   <div>
                     <p style={{ fontSize: 13, fontWeight: 700, color: '#111110' }}>{info.label}</p>
                     <p style={{ fontSize: 11, color: '#8A8478' }}>
-                      {isConnected ? 'â Connected â workouts auto-verified' : 'Tap to connect'}
+                      {isConnected ? 'Ã¢ÂÂ Connected Ã¢ÂÂ workouts auto-verified' : 'Tap to connect'}
                     </p>
                   </div>
                 </div>
@@ -278,10 +314,10 @@ export default function ProfilePage() {
           background: '#F0FDF4', border: '1.5px solid #86efac',
           display: 'flex', alignItems: 'center', gap: 10,
         }}>
-          <span style={{ fontSize: 20 }}>ð</span>
+          <span style={{ fontSize: 20 }}>Ã°ÂÂÂ</span>
           <div>
             <p style={{ fontSize: 13, fontWeight: 700, color: '#111110' }}>GPS Check-in</p>
-            <p style={{ fontSize: 11, color: '#8A8478' }}>â Always active â auto-used when logging</p>
+            <p style={{ fontSize: 11, color: '#8A8478' }}>Ã¢ÂÂ Always active Ã¢ÂÂ auto-used when logging</p>
           </div>
         </div>
       </div>
@@ -294,7 +330,7 @@ export default function ProfilePage() {
             {devices.filter(d => d.type !== 'gps').map((d, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontSize: 20 }}>{DEVICE_INFO[d.type]?.emoji ?? 'ð±'}</span>
+                  <span style={{ fontSize: 20 }}>{DEVICE_INFO[d.type]?.emoji ?? 'Ã°ÂÂÂ±'}</span>
                   <div>
                     <p style={{ fontSize: 13, fontWeight: 700 }}>{DEVICE_INFO[d.type]?.label ?? d.type}</p>
                     <p style={{ fontSize: 11, color: '#8A8478' }}>
@@ -333,7 +369,7 @@ export default function ProfilePage() {
                 <div>
                   <p style={{ fontSize: 13, fontWeight: 700 }}>{r.reward?.product_name ?? 'Reward'}</p>
                   <p style={{ fontSize: 11, color: '#8A8478' }}>
-                    {r.reward?.brand_name} · {new Date(r.redeemed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    {r.reward?.brand_name} Â· {new Date(r.redeemed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
                 <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 900, color: '#111110' }}>
@@ -357,6 +393,50 @@ export default function ProfilePage() {
       >
         {signingOut ? 'Signing out...' : 'Sign Out'}
       </button>
+
+      {/* Edit Body Stats Modal */}
+      {editingStats && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+          onClick={() => setEditingStats(false)}>
+          <div style={{ background: '#fff', borderRadius: '20px 20px 0 0', padding: 24, width: '100%', maxWidth: 480 }}
+            onClick={e => e.stopPropagation()}>
+            <p style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 20 }}>Edit Body Stats</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1 }}>
+                Age
+                <input type="number" value={statsForm.age} onChange={e => setStatsForm(f => ({ ...f, age: e.target.value }))}
+                  placeholder="35" style={{ display: 'block', width: '100%', marginTop: 4, padding: '10px 12px', border: '1.5px solid #E0D9CE', borderRadius: 8, fontSize: 15, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, boxSizing: 'border-box' as const }} />
+              </label>
+              <label style={{ fontSize: 11, fontWeight: 700, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1 }}>
+                Height
+                <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                  <input type="number" value={statsForm.heightFt} onChange={e => setStatsForm(f => ({ ...f, heightFt: e.target.value }))}
+                    placeholder="6" style={{ flex: 1, padding: '10px 12px', border: '1.5px solid #E0D9CE', borderRadius: 8, fontSize: 15, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700 }} />
+                  <span style={{ alignSelf: 'center', fontSize: 13, color: '#8A8478' }}>ft</span>
+                  <input type="number" value={statsForm.heightIn} onChange={e => setStatsForm(f => ({ ...f, heightIn: e.target.value }))}
+                    placeholder="0" min="0" max="11" style={{ flex: 1, padding: '10px 12px', border: '1.5px solid #E0D9CE', borderRadius: 8, fontSize: 15, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700 }} />
+                  <span style={{ alignSelf: 'center', fontSize: 13, color: '#8A8478' }}>in</span>
+                </div>
+              </label>
+              <label style={{ fontSize: 11, fontWeight: 700, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1 }}>
+                Weight (lbs)
+                <input type="number" value={statsForm.weight} onChange={e => setStatsForm(f => ({ ...f, weight: e.target.value }))}
+                  placeholder="175" style={{ display: 'block', width: '100%', marginTop: 4, padding: '10px 12px', border: '1.5px solid #E0D9CE', borderRadius: 8, fontSize: 15, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, boxSizing: 'border-box' as const }} />
+              </label>
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+              <button onClick={() => setEditingStats(false)}
+                style={{ flex: 1, padding: 14, background: 'transparent', border: '1.5px solid #E0D9CE', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                Cancel
+              </button>
+              <button onClick={handleSaveStats} disabled={savingStats}
+                style={{ flex: 2, padding: 14, background: '#111110', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'Archivo, sans-serif' }}>
+                {savingStats ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
