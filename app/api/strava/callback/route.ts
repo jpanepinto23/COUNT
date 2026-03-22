@@ -56,7 +56,6 @@ export async function GET(request: NextRequest) {
   await supabase.from('connected_devices').upsert({
     user_id: user.id,
     type: 'strava',
-    provider: 'STRAVA',
     status: 'active',
   }, { onConflict: 'user_id,type' })
 
