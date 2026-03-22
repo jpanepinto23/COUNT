@@ -96,6 +96,33 @@ export default function LogPage() {
       calories     = terraActivity[0].calories
     }
 
+    // Strava auto-verify
+    if (!verified) {
+      const { data: stravaConn } = await supabase
+        .from('strava_connections')
+        .select('access_token, token_expires_at')
+        .eq('user_id', user.id)
+        .single()
+      if (stravaConn && new Date(stravaConn.token_expires_at) > new Date()) {
+        try {
+          const _today = new Date()
+          const _after = Math.floor(
+            new Date(_today.getFullYear(), _today.getMonth(), _today.getDate()).getTime() / 1000
+          )
+          const _stravaRes = await fetch(
+            `https://www.strava.com/api/v3/athlete/activities?after=${_after}&before=${_after + 86400}&per_page=1`,
+            { headers: { Authorization: `Bearer ${stravaConn.access_token}` } }
+          )
+          if (_stravaRes.ok) {
+            const _acts = await _stravaRes.json()
+            if (Array.isArray(_acts) && _acts.length > 0) {
+              verified = true
+              verificationMethod = 'strava'
+            }
+          }
+        } catch { /* strava check is best-effort */ }
+      }
+    }
     let gpsDenied = false
     if (!verified) {
       try {
@@ -408,6 +435,7 @@ export default function LogPage() {
       )}
     </div>
   )
+  strava: '🏊 Strava',
 }
 
 const inputStyle: React.CSSProperties = {
