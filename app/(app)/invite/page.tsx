@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
+import { getReferralPoints } from '@/lib/points'
 import { createClient } from '@/lib/supabase'
 
 interface ReferralRow {
@@ -33,15 +34,16 @@ export default function InvitePage() {
   if (!user) return null
 
   const referralLink = `https://count-fitness-app.vercel.app/auth/signup?ref=${user.referral_code ?? ''}`
-  const pendingBonus = referrals.filter(r => !r.bonus_awarded).length * 500
-  const earnedBonus  = referrals.filter(r => r.bonus_awarded).length * 500
+  const bonusPerReferral = getReferralPoints(user.tier)
+  const pendingBonus = referrals.filter(r => !r.bonus_awarded).length * bonusPerReferral
+  const earnedBonus  = referrals.filter(r => r.bonus_awarded).length * bonusPerReferral
 
   async function handleShare() {
     if (navigator.share) {
       try {
         await navigator.share({
           title: 'Join me on COUNT',
-          text: `I've been earning points every time I work out. Join COUNT with my code ${user?.referral_code} and we both get 500 bonus points! 💪`,
+          text: `I've been earning points every time I work out. Join COUNT with my code ${user?.referral_code} and we both get ${bonusPerReferral} bonus points! 💪`,
           url: referralLink,
         })
       } catch {}
@@ -62,7 +64,7 @@ export default function InvitePage() {
         </Link>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, fontFamily: 'Archivo, sans-serif' }}>Invite Friends</h1>
-          <p style={{ fontSize: 12, color: '#8A8478' }}>You and your friend each get 500 pts</p>
+          <p style={{ fontSize: 12, color: '#8A8478' }}>{`You and your friend each get ${bonusPerReferral} pts`}</p>
         </div>
       </div>
 
@@ -111,7 +113,7 @@ export default function InvitePage() {
           { icon: '🔗', title: 'Share your link or code', desc: 'Send your unique referral link to a friend.' },
           { icon: '✍️', title: 'Friend signs up', desc: "They enter your code during signup — it's pre-filled from your link." },
           { icon: '💪', title: 'They log their first workout', desc: 'Once they complete their first session, the bonus triggers.' },
-          { icon: '🏆', title: 'You both get 500 pts', desc: 'Bonus points land in both accounts instantly.' },
+          { icon: '🏆', title: `You both get ${bonusPerReferral} pts`, desc: 'Bonus points land in both accounts instantly.' },
         ].map((step, i) => (
           <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: i < 3 ? 12 : 0 }}>
             <span style={{ fontSize: 18, marginTop: 1 }}>{step.icon}</span>
@@ -141,7 +143,7 @@ export default function InvitePage() {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   {r.bonus_awarded ? (
-                    <span style={{ fontSize: 12, fontWeight: 800, color: '#22c55e' }}>+500 pts ✓</span>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: '#22c55e' }}>{`+${bonusPerReferral} pts ✓`}</span>
                   ) : (
                     <span style={{ fontSize: 11, color: '#f59e0b', fontWeight: 700 }}>Awaiting 1st workout</span>
                   )}
