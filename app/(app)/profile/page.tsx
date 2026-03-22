@@ -15,9 +15,7 @@ const TIER_COLORS: Record<string, string> = {
 }
 
 const DEVICE_INFO: Record<string, { label: string; emoji: string; provider: string }> = {
-  apple_health: { label: 'Apple Health', emoji: '🍎', provider: 'APPLE' },
-  garmin: { label: 'Garmin', emoji: '⌚', provider: 'GARMIN' },
-  fitbit: { label: 'Fitbit', emoji: '💚', provider: 'FITBIT' },
+    strava: { label: 'Strava', emoji: '🏊', provider: 'STRAVA' },
   google_fit: { label: 'Google Fit', emoji: '🏃', provider: 'GOOGLE' },
   gps: { label: 'GPS Check-in', emoji: '📍', provider: '' },
   photo: { label: 'Photo Verification', emoji: '📸', provider: '' },
@@ -77,16 +75,16 @@ export default function ProfilePage() {
     }
   }, [user?.id]) // eslint-disable-line
 
-  async function handleConnectTracker(provider: string) {
+  async function handleConnectStrava() {
     if (!user) return
-    setConnecting(provider)
+    setConnecting('strava')
     setConnectMessage(null)
 
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('No session')
 
-      const res = await fetch(`/api/terra/connect?provider=${provider}`, {
+      const res = await fetch('/api/strava/connect', {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
       const json = await res.json()
@@ -95,7 +93,7 @@ export default function ProfilePage() {
         throw new Error(json.error ?? 'Failed to get Terra URL')
       }
 
-      // Open Terra's OAuth widget in the same window
+      // Redirect to Strava OAuth
       window.location.href = json.url
     } catch (err: any) {
       setConnectMessage({ text: err.message ?? 'Connection failed', ok: false })
@@ -111,7 +109,7 @@ export default function ProfilePage() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('No session')
 
-      const res = await fetch(`/api/terra/disconnect?type=${deviceType}`, {
+      const res = await fetch('/api/strava/disconnect', {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
@@ -162,9 +160,7 @@ export default function ProfilePage() {
   const connectedTypes = new Set(devices.filter(d => d.status === 'active').map(d => d.type))
 
   const CONNECTABLE_TRACKERS = [
-    { type: 'apple_health', provider: 'APPLE' },
-    { type: 'garmin', provider: 'GARMIN' },
-    { type: 'fitbit', provider: 'FITBIT' },
+    { type: 'strava', provider: 'STRAVA' },
   ]
 
   return (
@@ -291,7 +287,7 @@ export default function ProfilePage() {
                   </button>
                 ) : (
                   <button
-                    onClick={() => handleConnectTracker(provider)}
+                    onClick={() => handleConnectStrava()}
                     disabled={isLoading || connecting !== null}
                     style={{
                       fontSize: 11, fontWeight: 800, color: '#F5F0EA',
