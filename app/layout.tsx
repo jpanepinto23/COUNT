@@ -12,6 +12,9 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
     title: 'COUNT',
   },
+  other: {
+    'impact-site-verification': 'd3eb117b-46ee-4809-9fcb-084371585fe3',
+  },
 }
 
 export const viewport: Viewport = {
