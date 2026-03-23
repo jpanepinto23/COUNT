@@ -16,7 +16,7 @@ const TIER_COLORS: Record<string, string> = {
 
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
-const POINTS_CARD_PHOTO = 'https://images.pexels.com/photos/1552249/pexels-photo-1552249.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&dpr=1'
+const POINTS_CARD_PHOTO = 'https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop'
 
 export default function HomePage() {
   const { user, refreshUser } = useAuth()
