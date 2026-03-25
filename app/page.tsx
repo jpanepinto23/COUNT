@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/auth-context'
 const HERO_PHOTO = 'https://images.pexels.com/photos/2261481/pexels-photo-2261481.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
 
 const STRIP_PHOTOS = [
-  { id: '3916766', label: 'Lift' }
+  { id: '3916766', label: 'Lift' },
   { id: '4164515', label: 'Grind' },
   { id: '6389886', label: 'Push' },
 ]
