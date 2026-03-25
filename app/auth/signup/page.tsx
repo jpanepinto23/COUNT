@@ -10,14 +10,43 @@ function generateReferralCode(name: string): string {
   return prefix + suffix
 }
 
+function formatHeight(totalInches: number): string {
+  const ft = Math.floor(totalInches / 12)
+  const inches = totalInches % 12
+  return `${ft}' ${inches}"`
+}
+
+function Stepper({ value, onChange, min, max, format, label }: {
+  value: number; onChange: (v: number) => void; min: number; max: number;
+  format: (v: number) => string; label: string
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1 }}>
+      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: '#8A8478', fontFamily: 'Archivo, sans-serif' }}>
+        {label}
+      </span>
+      <div style={{ display: 'flex', alignItems: 'center', border: '1.5px solid #E0D9CE', borderRadius: 12, overflow: 'hidden', width: '100%', background: '#FDFAF6' }}>
+        <button type="button" onClick={() => onChange(Math.max(min, value - 1))}
+          style={{ width: 48, height: 54, border: 'none', background: 'transparent', fontSize: 22, color: '#5C5346', borderRight: '1.5px solid #E0D9CE', cursor: 'pointer', flexShrink: 0 }}>−</button>
+        <div style={{ flex: 1, textAlign: 'center', fontSize: 20, fontWeight: 800, color: '#2D2926', fontFamily: 'Archivo, sans-serif', padding: '0 4px' }}>
+          {format(value)}
+        </div>
+        <button type="button" onClick={() => onChange(Math.min(max, value + 1))}
+          style={{ width: 48, height: 54, border: 'none', background: 'transparent', fontSize: 22, color: '#5C5346', borderLeft: '1.5px solid #E0D9CE', cursor: 'pointer', flexShrink: 0 }}>+</button>
+      </div>
+    </div>
+  )
+}
+
+
+
 function SignupContent() {
   const [step, setStep] = useState(1)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [age, setAge] = useState('')
-  const [heightFt, setHeightFt] = useState('')
-  const [heightIn, setHeightIn] = useState('')
+  const [age, setAge] = useState(25)
+  const [heightInches, setHeightInches] = useState(70)
   const [weight, setWeight] = useState('')
   const [refCode, setRefCode] = useState('')
   const [error, setError] = useState('')
@@ -56,14 +85,13 @@ function SignupContent() {
       if (referrer) referrerId = referrer.id
     }
 
-    const heightTotalInches = heightFt ? parseInt(heightFt) * 12 + parseInt(heightIn || '0') : null
 
     const { error: profileError } = await supabase.from('users').insert({
       id: userId,
       email,
       name,
-      age: age ? parseInt(age) : null,
-      height: heightTotalInches,
+      age: age,
+      height: heightInches,
       weight: weight ? parseFloat(weight) : null,
       current_streak: 0,
       longest_streak: 0,
@@ -127,7 +155,7 @@ function SignupContent() {
                 />
                 {refCode && (
                   <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 11, color: '#22c55e', fontWeight: 700 }}>
-                    +500 pts 🎁
+                    +500 pts ð
                   </span>
                 )}
               </div>
@@ -140,7 +168,7 @@ function SignupContent() {
                 }}
                 style={btnStyle}
               >
-                Continue →
+                Continue â
               </button>
             </div>
           </>
@@ -149,48 +177,27 @@ function SignupContent() {
         {step === 2 && (
           <form onSubmit={handleSignup}>
             <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif' }}>Your stats</h1>
-            <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>Optional — used for your profile.</p>
+            <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>Optional â used for your profile.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-              {/* Age */}
-              <div style={{ position: 'relative' }}>
-                <input
-                  type="number"
-                  placeholder="Age"
+              {/* Age + Height steppers */}
+              <div style={{ display: 'flex', gap: 12 }}>
+                <Stepper
                   value={age}
-                  onChange={e => setAge(e.target.value)}
-                  style={{ ...inputStyle, paddingRight: 36 }}
+                  onChange={setAge}
+                  min={13}
+                  max={100}
+                  format={v => `${v} yr`}
+                  label="Age"
                 />
-                <span style={unitStyle}>yr</span>
-              </div>
-
-              {/* Height — feet + inches selects */}
-              <div style={{ display: 'flex', gap: 10 }}>
-                <div style={{ flex: 1 }}>
-                  <select
-                    value={heightFt}
-                    onChange={e => { setHeightFt(e.target.value); if (!heightIn) setHeightIn('0') }}
-                    style={selectStyle}
-                  >
-                    <option value="">Feet</option>
-                    {[4, 5, 6, 7].map(ft => (
-                      <option key={ft} value={String(ft)}>{ft} ft</option>
-                    ))}
-                  </select>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <select
-                    value={heightIn}
-                    onChange={e => setHeightIn(e.target.value)}
-                    style={selectStyle}
-                    disabled={!heightFt}
-                  >
-                    <option value="">Inches</option>
-                    {Array.from({ length: 12 }, (_, i) => (
-                      <option key={i} value={String(i)}>{i} in</option>
-                    ))}
-                  </select>
-                </div>
+                <Stepper
+                  value={heightInches}
+                  onChange={setHeightInches}
+                  min={48}
+                  max={95}
+                  format={formatHeight}
+                  label="Height"
+                />
               </div>
 
               {/* Weight */}
@@ -207,7 +214,7 @@ function SignupContent() {
 
               {error && <p style={{ color: '#ef4444', fontSize: 13 }}>{error}</p>}
               <button type="submit" disabled={loading} style={btnStyle}>
-                {loading ? 'Creating account...' : 'Start Counting →'}
+                {loading ? 'Creating account...' : 'Start Counting â'}
               </button>
               <button type="button" onClick={() => setStep(1)} style={{ ...btnStyle, background: 'transparent', color: '#8A8478', border: '1.5px solid #E0D9CE' }}>
                 Back
@@ -218,7 +225,7 @@ function SignupContent() {
 
         <div style={{ marginTop: 20, textAlign: 'center' }}>
           <span style={{ color: '#8A8478', fontSize: 13 }}>Already have an account? </span>
-          <Link href="/auth/login" style={{ color: '#B5593C', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>Sign in →</Link>
+          <Link href="/auth/login" style={{ color: '#B5593C', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>Sign in â</Link>
         </div>
       </div>
     </div>
@@ -425,7 +432,7 @@ function SignupContent() {
                 />
                 {refCode && (
                   <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 11, color: '#22c55e', fontWeight: 700 }}>
-                    +500 pts 🎁
+                    +500 pts ð
                   </span>
                 )}
               </div>
@@ -438,7 +445,7 @@ function SignupContent() {
                 }}
                 style={btnStyle}
               >
-                Continue →
+                Continue â
               </button>
             </div>
           </>
@@ -447,7 +454,7 @@ function SignupContent() {
         {step === 2 && (
           <form onSubmit={handleSignup}>
             <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif' }}>Your stats</h1>
-            <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>Optional — used for your profile.</p>
+            <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>Optional â used for your profile.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ display: 'flex', gap: 10 }}>
                 <div style={{ flex: 1, position: 'relative' }}>
@@ -465,7 +472,7 @@ function SignupContent() {
               </div>
               {error && <p style={{ color: '#ef4444', fontSize: 13 }}>{error}</p>}
               <button type="submit" disabled={loading} style={btnStyle}>
-                {loading ? 'Creating account...' : 'Start Counting →'}
+                {loading ? 'Creating account...' : 'Start Counting â'}
               </button>
               <button type="button" onClick={() => setStep(1)} style={{ ...btnStyle, background: 'transparent', color: '#8A8478', border: '1.5px solid #E0D9CE' }}>
                 Back
@@ -476,7 +483,7 @@ function SignupContent() {
 
         <div style={{ marginTop: 20, textAlign: 'center' }}>
           <span style={{ color: '#8A8478', fontSize: 13 }}>Already have an account? </span>
-          <Link href="/auth/login" style={{ color: '#B5593C', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>Sign in →</Link>
+          <Link href="/auth/login" style={{ color: '#B5593C', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>Sign in â</Link>
         </div>
       </div>
     </div>
