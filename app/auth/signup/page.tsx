@@ -1,6 +1,16 @@
 'use client'
 
-import { us
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase'
+
+// Generates a unique 6-char referral code (e.g. "JOE3X7")
+function generateReferralCode(name: string): string {
+  const prefix = name.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 3).padEnd(3, 'X')
+  const suffix = Math.random().toString(36).toUpperCase().slice(2, 5)
+  return prefix + suffix
+}
 
 function formatHeight(totalInches: number): string {
   const ft = Math.floor(totalInches / 12)
@@ -19,7 +29,7 @@ function Stepper({ value, onChange, min, max, format, label }: {
       </span>
       <div style={{ display: 'flex', alignItems: 'center', border: '1.5px solid #E0D9CE', borderRadius: 12, overflow: 'hidden', width: '100%', background: '#FDFAF6' }}>
         <button type="button" onClick={() => onChange(Math.max(min, value - 1))}
-          style={{ width: 48, height: 54, border: 'none', background: 'transparent', fontSize: 22, color: '#5C5346', borderRight: '1.5px solid #E0D9CE', cursor: 'pointer', flexShrink: 0 }}>−</button>
+          style={{ width: 48, height: 54, border: 'none', background: 'transparent', fontSize: 22, color: '#5C5346', borderRight: '1.5px solid #E0D9CE', cursor: 'pointer', flexShrink: 0 }}>&#8722;</button>
         <div style={{ flex: 1, textAlign: 'center', fontSize: 20, fontWeight: 800, color: '#2D2926', fontFamily: 'Archivo, sans-serif', padding: '0 4px' }}>
           {format(value)}
         </div>
@@ -29,10 +39,7 @@ function Stepper({ value, onChange, min, max, format, label }: {
     </div>
   )
 }
-eState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { createClient } from '@/lib/supabase'
+
 
 export default function SignupPage() {
   const [step, setStep] = useState(1)
@@ -42,10 +49,18 @@ export default function SignupPage() {
   const [age, setAge] = useState(25)
   const [heightInches, setHeightInches] = useState(70)
   const [weight, setWeight] = useState('')
+  const [refCode, setRefCode] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
+
+  // Pre-fill referral code from URL ?ref=CODE
+  useEffect(() => {
+    const ref = searchParams.get('ref')
+    if (ref) setRefCode(ref.toUpperCase())
+  }, [searchParams])
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
@@ -59,8 +74,22 @@ export default function SignupPage() {
       return
     }
 
+    const userId = data.user.id
+    const myReferralCode = generateReferralCode(name)
+
+    // Look up referrer by code (if provided)
+    let referrerId: string | null = null
+    if (refCode.trim()) {
+      const { data: referrer } = await supabase
+        .from('users')
+        .select('id')
+        .eq('referral_code', refCode.trim().toUpperCase())
+        .single()
+      if (referrer) referrerId = referrer.id
+    }
+
     const { error: profileError } = await supabase.from('users').insert({
-      id: data.user.id,
+      id: userId,
       email,
       name,
       age: age,
@@ -74,12 +103,25 @@ export default function SignupPage() {
       points_balance: 0,
       points_lifetime_earned: 0,
       free_unverified_remaining: 5,
+      referral_code: myReferralCode,
+      referred_by: referrerId,
+      referral_bonus_claimed: false,
     })
 
     if (profileError) {
       setError(profileError.message)
       setLoading(false)
       return
+    }
+
+    // Log the referral relationship so the referrer can track it
+    if (referrerId) {
+      await supabase.from('referrals').insert({
+        referrer_id: referrerId,
+        referred_id: userId,
+        bonus_points: 500,
+        bonus_awarded: false,
+      })
     }
 
     router.replace('/home')
@@ -107,6 +149,24 @@ export default function SignupPage() {
               <input type="text" placeholder="Full name" value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
               <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
               <input type="password" placeholder="Password (min 6 chars)" value={password} onChange={e => setPassword(e.target.value)} style={inputStyle} />
+
+              {/* Referral code field */}
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  placeholder="Referral code (optional)"
+                  value={refCode}
+                  onChange={e => setRefCode(e.target.value.toUpperCase())}
+                  maxLength={8}
+                  style={{ ...inputStyle, paddingRight: refCode ? 90 : 16, fontFamily: refCode ? 'JetBrains Mono, monospace' : 'Archivo, sans-serif', letterSpacing: refCode ? 2 : 0 }}
+                />
+                {refCode && (
+                  <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 11, color: '#22c55e', fontWeight: 700 }}>
+                    +500 pts ð
+                  </span>
+                )}
+              </div>
+
               {error && <p style={{ color: '#ef4444', fontSize: 13 }}>{error}</p>}
               <button
                 onClick={() => {
@@ -127,7 +187,7 @@ export default function SignupPage() {
             <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif' }}>Your stats</h1>
             <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>Optional â used for your profile.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div style={{ display: 'flex', gap: 12 }}>
+              <div style={{ display: 'flex', gap: 10 }}>
                 <Stepper value={age} onChange={setAge} min={13} max={100} format={v => `${v} yr`} label="Age" />
                 <Stepper value={heightInches} onChange={setHeightInches} min={48} max={95} format={formatHeight} label="Height" />
               </div>
