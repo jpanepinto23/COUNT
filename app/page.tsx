@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/auth-context'
 const HERO_PHOTO = 'https://images.pexels.com/photos/2261481/pexels-photo-2261481.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
 
 const STRIP_PHOTOS = [
-  { id: '3916766', label: 'Lift' },
+  { id: '3916766', label: 'Lift' }
   { id: '4164515', label: 'Grind' },
   { id: '6389886', label: 'Push' },
 ]
@@ -87,7 +87,7 @@ export default function LandingPage() {
             Log workouts. Earn points. Move up tiers. Get rewarded for actually showing up.
           </p>
           <Link href="/auth/signup" style={{ display: 'block', textAlign: 'center', padding: '16px 24px', background: '#B5593C', color: '#F5F0EA', textDecoration: 'none', borderRadius: 10, fontSize: 16, fontWeight: 800, fontFamily: 'Archivo, sans-serif', marginBottom: 10 }}>
-            Start earning free â
+                        Start earning free {'\u2192'}
           </Link>
           <Link href="/auth/login" style={{ display: 'block', textAlign: 'center', padding: '14px 24px', background: 'rgba(255,255,255,0.06)', color: '#C4BDB3', textDecoration: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600, border: '1px solid #2a2a29' }}>
             Sign in
