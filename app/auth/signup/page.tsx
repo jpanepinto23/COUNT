@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
@@ -41,7 +41,7 @@ function Stepper({ value, onChange, min, max, format, label }: {
 }
 
 
-export default function SignupPage() {
+function SignupContent() {
   const [step, setStep] = useState(1)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -162,7 +162,7 @@ export default function SignupPage() {
                 />
                 {refCode && (
                   <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 11, color: '#22c55e', fontWeight: 700 }}>
-                    +500 pts ð
+                    +500 pts Ã°ÂÂÂ
                   </span>
                 )}
               </div>
@@ -176,7 +176,7 @@ export default function SignupPage() {
                 }}
                 style={btnStyle}
               >
-                Continue â
+                Continue Ã¢ÂÂ
               </button>
             </div>
           </>
@@ -185,7 +185,7 @@ export default function SignupPage() {
         {step === 2 && (
           <form onSubmit={handleSignup}>
             <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif' }}>Your stats</h1>
-            <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>Optional â used for your profile.</p>
+            <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>Optional Ã¢ÂÂ used for your profile.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ display: 'flex', gap: 10 }}>
                 <Stepper value={age} onChange={setAge} min={13} max={100} format={v => `${v} yr`} label="Age" />
@@ -197,7 +197,7 @@ export default function SignupPage() {
               </div>
               {error && <p style={{ color: '#ef4444', fontSize: 13 }}>{error}</p>}
               <button type="submit" disabled={loading} style={btnStyle}>
-                {loading ? 'Creating account...' : 'Start Counting â'}
+                {loading ? 'Creating account...' : 'Start Counting Ã¢ÂÂ'}
               </button>
               <button type="button" onClick={() => setStep(1)} style={{ ...btnStyle, background: 'transparent', color: '#8A8478', border: '1.5px solid #E0D9CE' }}>
                 Back
@@ -208,10 +208,18 @@ export default function SignupPage() {
 
         <div style={{ marginTop: 20, textAlign: 'center' }}>
           <span style={{ color: '#8A8478', fontSize: 13 }}>Already have an account? </span>
-          <Link href="/auth/login" style={{ color: '#B5593C', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>Sign in â</Link>
+          <Link href="/auth/login" style={{ color: '#B5593C', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>Sign in Ã¢ÂÂ</Link>
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupContent />
+    </Suspense>
   )
 }
 
