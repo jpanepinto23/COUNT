@@ -31,6 +31,16 @@ const PARTNERS = [
   { name: 'Gymreapers', url: 'https://gymreapers.com' },
 ]
 
+const INTEGRATIONS = [
+  { name: 'Strava',       color: '#FC4C02' },
+  { name: 'Apple Health', color: '#FF2D55' },
+  { name: 'Google Fit',   color: '#34A853' },
+  { name: 'Garmin',       color: '#007CC3' },
+  { name: 'MyFitnessPal', color: '#0066FF' },
+  { name: 'Amazon',       color: '#FF9900' },
+  { name: 'Legion',       color: '#C8A96E' },
+]
+
 export default function LandingPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
@@ -137,7 +147,20 @@ export default function LandingPage() {
         <p style={{ textAlign: 'center', color: '#444', fontSize: 12, marginTop: 12, fontFamily: 'JetBrains Mono, monospace' }}>+ more brands coming soon</p>
       </div>
 
-      {/* ââ Social Proof Stats âââââââââââââââââââââââââââââââââââ */}
+      {      {/* ââ Works With ââââââââââââââââââââââââââââââ */}
+      <div style={{ padding: '40px 20px', background: '#111110', borderTop: '1px solid #1E1E1D' }}>
+        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase', color: '#6B6456', marginBottom: 24, textAlign: 'center', fontFamily: 'Archivo, sans-serif' }}>Syncs &amp; Works With</p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', maxWidth: 480, margin: '0 auto' }}>
+          {INTEGRATIONS.map(b => (
+            <div key={b.name} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#1A1A19', borderRadius: 8, padding: '10px 16px', border: '1px solid #252524' }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: b.color, flexShrink: 0 }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#D4C4A8', letterSpacing: 0.2, fontFamily: 'Archivo, sans-serif' }}>{b.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      /* ââ Social Proof Stats âââââââââââââââââââââââââââââââââââ */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, padding: '0 20px 40px' }}>
         {[
           { num: '100%', label: 'Free' },
