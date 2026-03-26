@@ -13,22 +13,22 @@ const STRIP_PHOTOS = [
 ]
 
 const TIERS = [
-  { tier: 'Bronze', mult: '1x', sessions: 'Start here', color: '#CD7F32' },
-  { tier: 'Silver', mult: '1.5x', sessions: '30 sessions', color: '#A8A9AD' },
-  { tier: 'Gold', mult: '2x', sessions: '100 sessions', color: '#FFD700' },
-  { tier: 'Platinum', mult: '3x', sessions: '500 sessions', color: '#E5E4E2' },
+  { tier: 'Bronze',   mult: '1x',   sessions: 'Start here',   color: '#CD7F32' },
+  { tier: 'Silver',   mult: '1.5x', sessions: '30 sessions',  color: '#A8A9AD' },
+  { tier: 'Gold',     mult: '2x',   sessions: '100 sessions', color: '#FFD700' },
+  { tier: 'Platinum', mult: '3x',   sessions: '500 sessions', color: '#E5E4E2' },
 ]
 
 const HOW_IT_WORKS = [
   { step: '01', title: 'Log Your Workout', desc: 'Open COUNT after your session. Tap to confirm. Takes 30 seconds.' },
-  { step: '02', title: 'Earn Points', desc: 'Every session earns points. Streaks multiply your total up to 3x.' },
-  { step: '03', title: 'Redeem Rewards', desc: 'Real protein, pre-workout, and gear shipped to your door. Free.' },
+  { step: '02', title: 'Earn Points',      desc: 'Every session earns points. Streaks multiply your total up to 3x.' },
+  { step: '03', title: 'Redeem Rewards',   desc: 'Real protein, pre-workout, and gear shipped to your door. Free.' },
 ]
 
 const PARTNERS = [
   { name: 'Momentous', url: 'https://www.livemomentous.com' },
-  { name: 'Legion', url: 'https://legionathletics.com' },
-  { name: 'Gymreapers', url: 'https://gymreapers.com' },
+  { name: 'Legion',    url: 'https://legionathletics.com'   },
+  { name: 'Gymreapers',url: 'https://gymreapers.com'        },
 ]
 
 const INTEGRATIONS = [
@@ -39,6 +39,23 @@ const INTEGRATIONS = [
   { name: 'MyFitnessPal', color: '#0066FF' },
   { name: 'Amazon',       color: '#FF9900' },
   { name: 'Legion',       color: '#C8A96E' },
+]
+
+const COMPARISON = [
+  { feature: 'Free to join (no subscription)',   count: true, others: false },
+  { feature: 'Earn real physical rewards',        count: true, others: false },
+  { feature: 'Supplements shipped to your door', count: true, others: false },
+  { feature: 'Points for every workout',          count: true, others: false },
+  { feature: 'Streak multipliers (up to 3x)',     count: true, others: false },
+  { feature: 'Workout tracking',                  count: true, others: true  },
+  { feature: 'Tier progression system',           count: true, others: false },
+  { feature: 'Gear & apparel rewards',            count: true, others: false },
+]
+
+const TESTIMONIALS = [
+  { quote: 'Finally an app that actually pays me back for going to the gym.', name: 'Mike R.',   tag: '6-day streak' },
+  { quote: 'Got my first Legion protein order after 30 sessions. No catches.', name: 'Sarah K.', tag: 'Silver tier'  },
+  { quote: 'I log every session now just to watch my points stack up.',        name: 'James T.', tag: 'Gold tier'    },
 ]
 
 export default function LandingPage() {
@@ -63,7 +80,6 @@ export default function LandingPage() {
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email) return
-    // Store email in localStorage for now â replace with Supabase insert later
     try {
       const existing = JSON.parse(localStorage.getItem('count_waitlist') || '[]')
       existing.push({ email, ts: new Date().toISOString() })
@@ -75,12 +91,11 @@ export default function LandingPage() {
   return (
     <div style={{ minHeight: '100dvh', background: '#111110', display: 'flex', flexDirection: 'column' }}>
 
-      {/* -- Hero ------------------------------------------------- */}
+      {/* Hero */}
       <div style={{ position: 'relative', minHeight: '72dvh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', overflow: 'hidden' }}>
         <img src={HERO_PHOTO} alt="Athlete training" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to bottom, rgba(17,17,16,0.25) 0%, rgba(17,17,16,0.7) 55%, #111110 100%)' }} />
         <div style={{ position: 'relative', padding: '0 24px 40px' }}>
-          {/* Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
             <div style={{ position: 'relative', width: 36, height: 32 }}>
               {[0,8,16].map(left => (
@@ -97,7 +112,7 @@ export default function LandingPage() {
             Log workouts. Earn points. Move up tiers. Get rewarded for actually showing up.
           </p>
           <Link href="/auth/signup" style={{ display: 'block', textAlign: 'center', padding: '16px 24px', background: '#B5593C', color: '#F5F0EA', textDecoration: 'none', borderRadius: 10, fontSize: 16, fontWeight: 800, fontFamily: 'Archivo, sans-serif', marginBottom: 10 }}>
-                        Start earning free {'\u2192'}
+            Start earning free {'→'}
           </Link>
           <Link href="/auth/login" style={{ display: 'block', textAlign: 'center', padding: '14px 24px', background: 'rgba(255,255,255,0.06)', color: '#C4BDB3', textDecoration: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600, border: '1px solid #2a2a29' }}>
             Sign in
@@ -105,18 +120,36 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* -- Photo strip ------------------------------------------ */}
+      {/* Photo strip */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, margin: '2px 0 0' }}>
         {STRIP_PHOTOS.map(({ id, label }) => (
           <div key={id} style={{ position: 'relative', aspectRatio: '1', overflow: 'hidden' }}>
-            <img src={`https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=400&dpr=1`} alt={label} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img
+              src={`https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=400&dpr=1`}
+              alt={label}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
             <div style={{ position: 'absolute', inset: 0, background: 'rgba(17,17,16,0.35)' }} />
             <span style={{ position: 'absolute', bottom: 10, left: 12, color: '#F5F0EA', fontSize: 13, fontWeight: 800, fontFamily: 'Archivo, sans-serif', letterSpacing: 1.5, textTransform: 'uppercase' }}>{label}</span>
           </div>
         ))}
       </div>
 
-      {/* -- How It Works ----------------------------------------- */}
+      {/* Social Proof Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, padding: '20px 20px 0' }}>
+        {[
+          { num: '$0',   label: 'To join'    },
+          { num: '3x',   label: 'Max streak' },
+          { num: '$50+', label: 'Avg reward' },
+        ].map(({ num, label }) => (
+          <div key={label} style={{ textAlign: 'center', padding: '20px 8px', background: '#1A1A19', borderRadius: 10 }}>
+            <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, color: '#B5593C', marginBottom: 4 }}>{num}</p>
+            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#666', textTransform: 'uppercase', letterSpacing: 1 }}>{label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* How It Works */}
       <div style={{ padding: '48px 20px 40px' }}>
         <p style={{ color: '#555', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 20, fontFamily: 'JetBrains Mono, monospace' }}>How it works</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -134,7 +167,59 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* -- Partner Brands --------------------------------------- */}
+      {/* Differentiator */}
+      <div style={{ padding: '40px 20px', background: '#0D0D0C', borderTop: '1px solid #1E1E1D', borderBottom: '1px solid #1E1E1D' }}>
+        <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 24, fontWeight: 900, color: '#F5F0EA', lineHeight: 1.2, marginBottom: 12 }}>
+          Strava claps for you.<br />
+          <span style={{ color: '#B5593C' }}>COUNT pays you.</span>
+        </p>
+        <p style={{ color: '#888', fontSize: 14, lineHeight: 1.7, maxWidth: 360 }}>
+          Other fitness apps celebrate your streak with a badge or emoji. COUNT rewards it with actual products from the brands you already buy. No subscriptions. No gimmicks. Show up, stack points, get paid.
+        </p>
+      </div>
+
+      {/* Comparison Table */}
+      <div style={{ padding: '40px 20px', background: '#0D0D0C' }}>
+        <p style={{ color: '#555', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 6, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>How we stack up</p>
+        <p style={{ color: '#444', fontSize: 12, textAlign: 'center', marginBottom: 24, fontFamily: 'JetBrains Mono, monospace' }}>vs. Strava, MFP, Nike, Whoop</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 8, marginBottom: 8, padding: '0 4px' }}>
+          <div />
+          <div style={{ width: 72, textAlign: 'center', fontFamily: 'Archivo, sans-serif', fontSize: 12, fontWeight: 900, color: '#B5593C', letterSpacing: 1, textTransform: 'uppercase' }}>COUNT</div>
+          <div style={{ width: 72, textAlign: 'center', fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#555', letterSpacing: 0.5, textTransform: 'uppercase' }}>Others</div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {COMPARISON.map(({ feature, count, others }, i) => (
+            <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 8, alignItems: 'center', padding: '12px 12px', background: i % 2 === 0 ? '#141413' : '#111110', borderRadius: 8 }}>
+              <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 13, color: '#C4BDB3', lineHeight: 1.3 }}>{feature}</span>
+              <div style={{ width: 72, display: 'flex', justifyContent: 'center' }}>
+                <span style={{ fontSize: 18, color: count ? '#5DBB63' : '#666' }}>{count ? '✓' : '✗'}</span>
+              </div>
+              <div style={{ width: 72, display: 'flex', justifyContent: 'center' }}>
+                {others === true
+                  ? <span style={{ fontSize: 16, color: '#666' }}>~</span>
+                  : <span style={{ fontSize: 16, color: '#444' }}>✗</span>
+                }
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Tier preview */}
+      <div style={{ padding: '40px 20px 48px', background: '#111110' }}>
+        <p style={{ color: '#555', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 16, fontFamily: 'JetBrains Mono, monospace' }}>The more you show up</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          {TIERS.map(({ tier, mult, sessions, color }) => (
+            <div key={tier} style={{ background: '#1A1A19', borderRadius: 12, padding: '14px 16px', borderLeft: `3px solid ${color}` }}>
+              <p style={{ fontSize: 11, color: '#555', marginBottom: 6, fontFamily: 'JetBrains Mono, monospace' }}>{sessions}</p>
+              <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 18, fontWeight: 800, color, marginBottom: 2 }}>{tier}</p>
+              <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 22, fontWeight: 900, color: '#F5F0EA', lineHeight: 1.1 }}>{mult}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Partner Brands */}
       <div style={{ padding: '32px 20px 40px', borderTop: '1px solid #1f1f1e' }}>
         <p style={{ color: '#555', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 20, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>Earn rewards from</p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
@@ -145,6 +230,24 @@ export default function LandingPage() {
           ))}
         </div>
         <p style={{ textAlign: 'center', color: '#444', fontSize: 12, marginTop: 12, fontFamily: 'JetBrains Mono, monospace' }}>+ more brands coming soon</p>
+      </div>
+
+      {/* Testimonials */}
+      <div style={{ padding: '40px 20px', background: '#0D0D0C', borderTop: '1px solid #1E1E1D' }}>
+        <p style={{ color: '#555', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 20, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>Early users</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {TESTIMONIALS.map(({ quote, name, tag }) => (
+            <div key={name} style={{ background: '#141413', borderRadius: 12, padding: '20px', borderLeft: '3px solid #B5593C' }}>
+              <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 15, color: '#F5F0EA', lineHeight: 1.6, marginBottom: 12, fontStyle: 'italic' }}>
+                &ldquo;{quote}&rdquo;
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 13, fontWeight: 700, color: '#C4BDB3' }}>{name}</span>
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#B5593C', background: 'rgba(181,89,60,0.12)', padding: '3px 8px', borderRadius: 4 }}>{tag}</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Works With */}
@@ -160,41 +263,13 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* -- Social Proof Stats ----------------------------------- */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, padding: '0 20px 40px' }}>
-        {[
-          { num: '100%', label: 'Free' },
-          { num: 'Real', label: 'Brands' },
-          { num: 'Ships', label: 'To You' },
-        ].map(({ num, label }) => (
-          <div key={label} style={{ textAlign: 'center', padding: '20px 8px', background: '#1A1A19', borderRadius: 10 }}>
-            <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, color: '#B5593C', marginBottom: 4 }}>{num}</p>
-            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#666', textTransform: 'uppercase', letterSpacing: 1 }}>{label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* -- Tier preview ----------------------------------------- */}
-      <div style={{ padding: '0 20px 48px' }}>
-        <p style={{ color: '#555', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 16, fontFamily: 'JetBrains Mono, monospace' }}>The more you show up</p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          {TIERS.map(({ tier, mult, sessions, color }) => (
-            <div key={tier} style={{ background: '#1A1A19', borderRadius: 12, padding: '14px 16px' }}>
-              <p style={{ fontSize: 11, color: '#555', marginBottom: 6, fontFamily: 'JetBrains Mono, monospace' }}>{sessions}</p>
-              <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 18, fontWeight: 800, color, marginBottom: 2 }}>{tier}</p>
-              <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 22, fontWeight: 900, color: '#F5F0EA', lineHeight: 1.1 }}>{mult}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* -- Email Capture ---------------------------------------- */}
+      {/* Email Capture */}
       <div style={{ padding: '32px 20px 48px', borderTop: '1px solid #1f1f1e' }}>
         <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 20, fontWeight: 800, color: '#F5F0EA', textAlign: 'center', marginBottom: 8 }}>
           Not ready to sign up yet?
         </p>
         <p style={{ color: '#888', fontSize: 14, textAlign: 'center', marginBottom: 20, lineHeight: 1.5 }}>
-          Drop your email. We'll send you 500 bonus points when you do.
+          Drop your email. We&apos;ll send you 500 bonus points when you do.
         </p>
         {!submitted ? (
           <form onSubmit={handleEmail} style={{ display: 'flex', gap: 8 }}>
@@ -204,37 +279,30 @@ export default function LandingPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              style={{
-                flex: 1, padding: '14px 16px', background: '#1A1A19', border: '1px solid #2a2a29',
-                borderRadius: 10, color: '#F5F0EA', fontSize: 15, outline: 'none',
-                fontFamily: 'JetBrains Mono, monospace',
-              }}
+              style={{ flex: 1, padding: '14px 16px', background: '#1A1A19', border: '1px solid #2a2a29', borderRadius: 10, color: '#F5F0EA', fontSize: 15, outline: 'none', fontFamily: 'JetBrains Mono, monospace' }}
             />
-            <button type="submit" style={{
-              padding: '14px 20px', background: '#B5593C', border: 'none', borderRadius: 10,
-              color: '#F5F0EA', fontSize: 15, fontWeight: 700, cursor: 'pointer',
-              fontFamily: 'Archivo, sans-serif',
-            }}>
+            <button type="submit" style={{ padding: '14px 20px', background: '#B5593C', border: 'none', borderRadius: 10, color: '#F5F0EA', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'Archivo, sans-serif' }}>
               Get 500 pts
             </button>
           </form>
         ) : (
           <div style={{ textAlign: 'center', padding: '16px', background: 'rgba(181,89,60,0.1)', borderRadius: 10, border: '1px solid rgba(181,89,60,0.3)' }}>
-            <p style={{ color: '#B5593C', fontWeight: 700, fontFamily: 'Archivo, sans-serif' }}>You're in! 500 bonus points are waiting.</p>
-            <p style={{ color: '#888', fontSize: 13, marginTop: 6 }}>Sign up when you're ready to start earning.</p>
+            <p style={{ color: '#B5593C', fontWeight: 700, fontFamily: 'Archivo, sans-serif' }}>You&apos;re in! 500 bonus points are waiting.</p>
+            <p style={{ color: '#888', fontSize: 13, marginTop: 6 }}>Sign up when you&apos;re ready to start earning.</p>
           </div>
         )}
       </div>
 
-      {/* -- Footer ----------------------------------------------- */}
+      {/* Footer */}
       <div style={{ padding: '0 24px 32px', textAlign: 'center' }}>
         <p style={{ fontSize: 13, color: '#333', fontFamily: 'JetBrains Mono, monospace' }}>Track consistently. Earn more. Make it count.</p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginTop: 16 }}>
           <a href="https://instagram.com/make.it.count.app" target="_blank" rel="noopener" style={{ color: '#555', fontSize: 12, textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace' }}>Instagram</a>
-          <span style={{ color: '#333' }}>Â·</span>
+          <span style={{ color: '#333' }}>&#183;</span>
           <a href="mailto:jpanepinto23@gmail.com" style={{ color: '#555', fontSize: 12, textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace' }}>Contact</a>
         </div>
       </div>
+
     </div>
   )
 }
