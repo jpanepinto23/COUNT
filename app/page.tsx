@@ -95,20 +95,21 @@ export default function LandingPage() {
         </div>
         {/* Subtle vignette at bottom only so video bleeds into content */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 80, background: 'linear-gradient(to bottom, transparent, #111110)', zIndex: 1 }} />
-        {/* Nav row — minimal, floated top-left */}
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ position: 'relative', width: 30, height: 26 }}>
-              {[0,7,14].map(left => (
-                <div key={left} style={{ position: 'absolute', top: 0, width: 3, height: 26, background: '#F5F0EA', borderRadius: 2, left }} />
-              ))}
-              <div style={{ position: 'absolute', top: 7, left: 3, width: 18, height: 2.5, background: '#B5593C', borderRadius: 2, transform: 'rotate(-30deg)' }} />
-            </div>
-            <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 18, fontWeight: 900, letterSpacing: 3, textTransform: 'uppercase', color: '#F5F0EA' }}>COUNT</span>
-          </div>
-          <Link href="/auth/login" style={{ color: '#ccc', fontSize: 13, fontWeight: 600, textDecoration: 'none', fontFamily: 'Archivo, sans-serif', letterSpacing: 0.5, background: 'rgba(0,0,0,0.35)', padding: '7px 14px', borderRadius: 8 }}>
-            Sign in
+        {/* Cover the YouTube channel watermark (bottom-right) with the Log in link */}
+        <div style={{ position: 'absolute', bottom: 0, right: 0, zIndex: 2, padding: '0 12px 12px 0' }}>
+          <Link href="/auth/login" style={{ display: 'inline-block', color: '#F5F0EA', fontSize: 13, fontWeight: 700, textDecoration: 'none', fontFamily: 'Archivo, sans-serif', letterSpacing: 0.5, background: 'rgba(0,0,0,0.55)', padding: '8px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)' }}>
+            Log in
           </Link>
+        </div>
+        {/* COUNT logo — top-left */}
+        <div style={{ position: 'absolute', top: 0, left: 0, zIndex: 2, padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ position: 'relative', width: 30, height: 26 }}>
+            {[0,7,14].map(left => (
+              <div key={left} style={{ position: 'absolute', top: 0, width: 3, height: 26, background: '#F5F0EA', borderRadius: 2, left }} />
+            ))}
+            <div style={{ position: 'absolute', top: 7, left: 3, width: 18, height: 2.5, background: '#B5593C', borderRadius: 2, transform: 'rotate(-30deg)' }} />
+          </div>
+          <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 18, fontWeight: 900, letterSpacing: 3, textTransform: 'uppercase', color: '#F5F0EA' }}>COUNT</span>
         </div>
       </div>
 
