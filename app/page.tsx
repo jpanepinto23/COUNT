@@ -83,9 +83,8 @@ export default function LandingPage() {
   return (
     <div style={{ minHeight: '100dvh', background: '#111110', display: 'flex', flexDirection: 'column' }}>
 
-      {/* ── Hero ─── video background, dark overlay ───────────── */}
-      <div style={{ position: 'relative', overflow: 'hidden', background: '#0E0D0C' }}>
-
+      {/* ── Hero ─── full-height video, no overlay text ───────── */}
+      <div style={{ position: 'relative', overflow: 'hidden', background: '#0E0D0C', height: '56vw', minHeight: 320, maxHeight: 520 }}>
         {/* Looping YouTube background video — muted, atmosphere only */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
           <iframe
@@ -94,15 +93,10 @@ export default function LandingPage() {
             style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '177.78vh', minWidth: '100%', height: '56.25vw', minHeight: '100%', border: 'none' }}
           />
         </div>
-
-        {/* Dark gradient overlay — text always readable */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(170deg, rgba(10,8,7,0.88) 0%, rgba(10,8,7,0.82) 60%, rgba(17,17,16,0.96) 100%)', zIndex: 1 }} />
-
-        {/* Hero content sits above video */}
-        <div style={{ position: 'relative', zIndex: 2, padding: '28px 24px 40px' }}>
-
-        {/* Nav row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 44 }}>
+        {/* Subtle vignette at bottom only so video bleeds into content */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 80, background: 'linear-gradient(to bottom, transparent, #111110)', zIndex: 1 }} />
+        {/* Nav row — minimal, floated top-left */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ position: 'relative', width: 30, height: 26 }}>
               {[0,7,14].map(left => (
@@ -112,27 +106,26 @@ export default function LandingPage() {
             </div>
             <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 18, fontWeight: 900, letterSpacing: 3, textTransform: 'uppercase', color: '#F5F0EA' }}>COUNT</span>
           </div>
-          <Link href="/auth/login" style={{ color: '#888', fontSize: 13, fontWeight: 600, textDecoration: 'none', fontFamily: 'Archivo, sans-serif', letterSpacing: 0.5 }}>
+          <Link href="/auth/login" style={{ color: '#ccc', fontSize: 13, fontWeight: 600, textDecoration: 'none', fontFamily: 'Archivo, sans-serif', letterSpacing: 0.5, background: 'rgba(0,0,0,0.35)', padding: '7px 14px', borderRadius: 8 }}>
             Sign in
           </Link>
         </div>
+      </div>
 
+      {/* ── Headline + CTA ────────────────────────────────────────── */}
+      <div style={{ padding: '36px 24px 40px', background: '#111110' }}>
         {/* Badge */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(181,89,60,0.12)', border: '1px solid rgba(181,89,60,0.25)', borderRadius: 20, padding: '5px 12px', marginBottom: 22 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(181,89,60,0.12)', border: '1px solid rgba(181,89,60,0.25)', borderRadius: 20, padding: '5px 12px', marginBottom: 20 }}>
           <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#B5593C' }} />
           <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#B5593C', letterSpacing: 1, textTransform: 'uppercase' }}>Free to join</span>
         </div>
-
         {/* Headline */}
         <h1 style={{ fontSize: 42, fontWeight: 900, letterSpacing: 0.5, color: '#F5F0EA', fontFamily: 'Archivo, sans-serif', lineHeight: 1.0, marginBottom: 16 }}>
-          Your workouts<br />
-          should <span style={{ color: '#B5593C' }}>pay you back.</span>
+          Your workouts<br /> should <span style={{ color: '#B5593C' }}>pay you back.</span>
         </h1>
-
         <p style={{ color: '#9A9087', fontSize: 16, lineHeight: 1.65, marginBottom: 32, maxWidth: 340 }}>
           Log sessions. Stack points. Move up tiers. Redeem real protein, pre-workout, and gear from brands you already buy&thinsp;&mdash;&thinsp;completely free.
         </p>
-
         {/* CTA buttons */}
         <Link href="/auth/signup" style={{ display: 'block', textAlign: 'center', padding: '17px 24px', background: '#B5593C', color: '#F5F0EA', textDecoration: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800, fontFamily: 'Archivo, sans-serif', marginBottom: 10, letterSpacing: 0.3 }}>
           Start earning &rarr;
@@ -140,21 +133,18 @@ export default function LandingPage() {
         <Link href="/auth/login" style={{ display: 'block', textAlign: 'center', padding: '15px 24px', background: 'transparent', color: '#666', textDecoration: 'none', borderRadius: 12, fontSize: 14, fontWeight: 600, border: '1px solid #222221', fontFamily: 'Archivo, sans-serif' }}>
           Already have an account
         </Link>
-
         {/* Inline stats */}
         <div style={{ display: 'flex', gap: 0, marginTop: 28, borderTop: '1px solid #1E1E1D', paddingTop: 24 }}>
           {[
-            { num: '$0',   label: 'to join'     },
-            { num: '3x',   label: 'max streak'  },
-            { num: '$50+', label: 'avg reward'  },
+            { num: '$0', label: 'to join' },
+            { num: '3x', label: 'max streak' },
+            { num: '$50+', label: 'avg reward' },
           ].map(({ num, label }, i) => (
             <div key={label} style={{ flex: 1, textAlign: 'center', borderRight: i < 2 ? '1px solid #1E1E1D' : 'none' }}>
               <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 24, fontWeight: 900, color: '#B5593C', marginBottom: 3 }}>{num}</p>
               <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: '#555', textTransform: 'uppercase', letterSpacing: 1.2 }}>{label}</p>
             </div>
           ))}
-        </div>
-
         </div>
       </div>
 
