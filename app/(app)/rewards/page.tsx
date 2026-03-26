@@ -13,30 +13,36 @@ const CATEGORIES = [
   { value: 'lifestyle', label: 'Lifestyle' },
 ]
 
-// Map brand name -> clearbit domain + accent color for the card trim
-const BRAND_META: Record<string, { domain: string; accent: string }> = {
-  'Amazon':           { domain: 'amazon.com',          accent: '#FF9900' },
+// simple-icons slug where available (cdn.simpleicons.org), otherwise icon.horse domain
+const BRAND_META: Record<string, { icon?: string; domain?: string; accent: string }> = {
+  'Amazon':           { icon: 'amazon',       accent: '#FF9900' },
   'Legion Athletics': { domain: 'legionathletics.com', accent: '#C8A96E' },
   'Momentous':        { domain: 'livemomentous.com',   accent: '#0D1B2A' },
   'Ten Thousand':     { domain: 'tenthousand.cc',      accent: '#1C1C1C' },
-  'Gymshark':         { domain: 'gymshark.com',        accent: '#00F5A0' },
-  'Strava':           { domain: 'strava.com',          accent: '#FC4C02' },
-  'Nike':             { domain: 'nike.com',            accent: '#111110' },
-  'MyFitnessPal':     { domain: 'myfitnesspal.com',    accent: '#0066FF' },
-  'Garmin':           { domain: 'garmin.com',          accent: '#007CC3' },
+  'Gymshark':         { icon: 'gymshark',     accent: '#111110' },
+  'Strava':           { icon: 'strava',       accent: '#FC4C02' },
+  'Nike':             { icon: 'nike',         accent: '#111110' },
+  'MyFitnessPal':     { icon: 'myfitnesspal', accent: '#0066FF' },
+  'Garmin':           { icon: 'garmin',       accent: '#007CC3' },
   'Rogue':            { domain: 'roguefitness.com',    accent: '#C41E3A' },
 }
 
 function logoUrl(brandName: string): string | null {
   const meta = BRAND_META[brandName]
   if (!meta) return null
-  return 'https://logo.clearbit.com/' + meta.domain
+  if (meta.icon) {
+    const hex = meta.accent.replace('#', '')
+    return 'https://cdn.simpleicons.org/' + meta.icon + '/' + hex
+  }
+  if (meta.domain) {
+    return 'https://icon.horse/icon/' + meta.domain
+  }
+  return null
 }
 
 function accentColor(brandName: string): string {
   const meta = BRAND_META[brandName]
   if (meta) return meta.accent
-  // Generate a consistent color from brand name
   let hash = 0
   for (let i = 0; i < brandName.length; i++) hash = brandName.charCodeAt(i) + ((hash << 5) - hash)
   const palette = ['#2C3E50', '#1A1A2E', '#2D3561', '#1B262C', '#16213E', '#0F3460']
@@ -92,12 +98,8 @@ export default function RewardsPage() {
           <p style={{ color: '#8A8478', fontSize: 13, marginBottom: 24 }}>
             You spent <strong style={{ color: '#111110' }}>{successReward.point_cost.toLocaleString()} pts</strong>
           </p>
-          <a
-            href={successReward.affiliate_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ ...btnPrimary, display: 'inline-block', textDecoration: 'none', marginBottom: 12 }}
-          >
+          <a href={successReward.affiliate_url} target="_blank" rel="noopener noreferrer"
+            style={{ ...btnPrimary, display: 'inline-block', textDecoration: 'none', marginBottom: 12 }}>
             Go to {successReward.brand_name} &rarr;
           </a>
           <br />
@@ -111,7 +113,6 @@ export default function RewardsPage() {
 
   return (
     <div style={{ padding: '20px 16px 40px' }}>
-
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 20 }}>
         <div>
@@ -129,22 +130,14 @@ export default function RewardsPage() {
       {/* Category filter */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 24, overflowX: 'auto', paddingBottom: 4 }}>
         {CATEGORIES.map(c => (
-          <button
-            key={c.value}
-            onClick={() => setCategory(c.value)}
-            style={{
-              padding: '8px 14px',
-              borderRadius: 20,
-              border: `1.5px solid ${category === c.value ? '#111110' : '#E0D9CE'}`,
-              background: category === c.value ? '#111110' : '#fff',
-              color: category === c.value ? '#F5F0EA' : '#8A8478',
-              fontSize: 12,
-              fontWeight: 700,
-              fontFamily: 'Archivo, sans-serif',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <button key={c.value} onClick={() => setCategory(c.value)} style={{
+            padding: '8px 14px', borderRadius: 20,
+            border: `1.5px solid ${category === c.value ? '#111110' : '#E0D9CE'}`,
+            background: category === c.value ? '#111110' : '#fff',
+            color: category === c.value ? '#F5F0EA' : '#8A8478',
+            fontSize: 12, fontWeight: 700, fontFamily: 'Archivo, sans-serif',
+            cursor: 'pointer', whiteSpace: 'nowrap',
+          }}>
             {c.label}
           </button>
         ))}
@@ -155,9 +148,7 @@ export default function RewardsPage() {
         <>
           <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 10 }}>Featured</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
-            {featured.map(r => (
-              <RewardCard key={r.id} reward={r} user={user} onRedeem={handleRedeem} redeeming={redeeming} />
-            ))}
+            {featured.map(r => <RewardCard key={r.id} reward={r} user={user} onRedeem={handleRedeem} redeeming={redeeming} />)}
           </div>
         </>
       )}
@@ -169,9 +160,7 @@ export default function RewardsPage() {
             <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 10 }}>All Rewards</p>
           )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            {rest.map(r => (
-              <RewardCardSmall key={r.id} reward={r} user={user} onRedeem={handleRedeem} redeeming={redeeming} />
-            ))}
+            {rest.map(r => <RewardCardSmall key={r.id} reward={r} user={user} onRedeem={handleRedeem} redeeming={redeeming} />)}
           </div>
         </>
       )}
@@ -186,62 +175,60 @@ export default function RewardsPage() {
   )
 }
 
-// Featured horizontal card
-function RewardCard({ reward, user, onRedeem, redeeming }: {
-  reward: Reward
-  user: { points_balance: number } | null
-  onRedeem: (r: Reward) => void
-  redeeming: string | null
-}) {
-  const canAfford = (user?.points_balance ?? 0) >= reward.point_cost
-  const logo = logoUrl(reward.brand_name)
-  const accent = accentColor(reward.brand_name)
-  const [imgFailed, setImgFailed] = useState(false)
+function BrandLogo({ brandName, size }: { brandName: string; size: 'featured' | 'small' }) {
+  const url = logoUrl(brandName)
+  const accent = accentColor(brandName)
+  const [failed, setFailed] = useState(false)
+  const w = size === 'featured' ? 52 : 44
+  const maxW = size === 'featured' ? 56 : 48
 
   return (
     <div style={{
-      background: '#FDFCFA',
-      border: '1.5px solid #E0D9CE',
-      borderRadius: 14,
-      overflow: 'hidden',
+      background: '#fff',
+      borderBottom: size === 'small' ? `3px solid ${accent}` : undefined,
+      borderRight: size === 'featured' ? `3px solid ${accent}` : undefined,
+      width: size === 'featured' ? 88 : '100%',
+      height: size === 'featured' ? '100%' : 76,
+      flexShrink: size === 'featured' ? 0 : undefined,
       display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: size === 'featured' ? 14 : 12,
     }}>
-      {/* Brand logo column */}
-      <div style={{
-        width: 88,
-        flexShrink: 0,
-        background: '#fff',
-        borderRight: `3px solid ${accent}`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 12,
-      }}>
-        {logo && !imgFailed ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={logo}
-            alt={reward.brand_name}
-            onError={() => setImgFailed(true)}
-            style={{ width: 52, height: 52, objectFit: 'contain' }}
-          />
-        ) : (
-          <span style={{
-            fontSize: 10,
-            fontWeight: 900,
-            fontFamily: 'Archivo, sans-serif',
-            textTransform: 'uppercase',
-            letterSpacing: 0.5,
-            color: accent,
-            textAlign: 'center',
-            lineHeight: 1.3,
-          }}>
-            {reward.brand_name}
-          </span>
-        )}
-      </div>
+      {url && !failed ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={url}
+          alt={brandName}
+          onError={() => setFailed(true)}
+          style={{ width: w, height: w, maxWidth: maxW, objectFit: 'contain' }}
+        />
+      ) : (
+        <span style={{
+          fontSize: size === 'featured' ? 10 : 11,
+          fontWeight: 900,
+          fontFamily: 'Archivo, sans-serif',
+          textTransform: 'uppercase',
+          letterSpacing: 0.5,
+          color: accent,
+          textAlign: 'center',
+          lineHeight: 1.3,
+        }}>
+          {brandName}
+        </span>
+      )}
+    </div>
+  )
+}
 
-      {/* Info */}
+function RewardCard({ reward, user, onRedeem, redeeming }: {
+  reward: Reward; user: { points_balance: number } | null
+  onRedeem: (r: Reward) => void; redeeming: string | null
+}) {
+  const canAfford = (user?.points_balance ?? 0) >= reward.point_cost
+  return (
+    <div style={{ background: '#FDFCFA', border: '1.5px solid #E0D9CE', borderRadius: 14, overflow: 'hidden', display: 'flex' }}>
+      <BrandLogo brandName={reward.brand_name} size="featured" />
       <div style={{ flex: 1, padding: '14px 12px', minWidth: 0 }}>
         <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
           {reward.is_hot && <Tag color="#ef4444">HOT</Tag>}
@@ -251,38 +238,18 @@ function RewardCard({ reward, user, onRedeem, redeeming }: {
         <p style={{ fontSize: 15, fontWeight: 800, fontFamily: 'Archivo, sans-serif', lineHeight: 1.2, marginBottom: 4 }}>{reward.product_name}</p>
         <p style={{ fontSize: 11, color: '#8A8478' }}>Retail ${reward.retail_value}</p>
       </div>
-
-      {/* Price + action */}
-      <div style={{
-        padding: '14px 14px',
-        textAlign: 'right',
-        flexShrink: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        justifyContent: 'space-between',
-      }}>
+      <div style={{ padding: '14px 14px', textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between' }}>
         <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14, fontWeight: 900, color: '#111110' }}>
-          {reward.point_cost.toLocaleString()}
-          <br />
+          {reward.point_cost.toLocaleString()}<br />
           <span style={{ fontSize: 9, fontWeight: 500, color: '#8A8478' }}>pts</span>
         </p>
-        <button
-          onClick={() => onRedeem(reward)}
-          disabled={!canAfford || redeeming === reward.id}
-          style={{
-            padding: '8px 14px',
-            background: canAfford ? '#B5593C' : '#EDEBE5',
-            color: canAfford ? '#F5F0EA' : '#8A8478',
-            border: 'none',
-            borderRadius: 8,
-            fontSize: 12,
-            fontWeight: 800,
-            fontFamily: 'Archivo, sans-serif',
-            cursor: canAfford ? 'pointer' : 'not-allowed',
-            whiteSpace: 'nowrap',
-          }}
-        >
+        <button onClick={() => onRedeem(reward)} disabled={!canAfford || redeeming === reward.id} style={{
+          padding: '8px 14px',
+          background: canAfford ? '#B5593C' : '#EDEBE5',
+          color: canAfford ? '#F5F0EA' : '#8A8478',
+          border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 800,
+          fontFamily: 'Archivo, sans-serif', cursor: canAfford ? 'pointer' : 'not-allowed', whiteSpace: 'nowrap',
+        }}>
           {redeeming === reward.id ? '...' : canAfford ? 'Redeem' : 'Need more'}
         </button>
       </div>
@@ -290,61 +257,14 @@ function RewardCard({ reward, user, onRedeem, redeeming }: {
   )
 }
 
-// Small grid card
 function RewardCardSmall({ reward, user, onRedeem, redeeming }: {
-  reward: Reward
-  user: { points_balance: number } | null
-  onRedeem: (r: Reward) => void
-  redeeming: string | null
+  reward: Reward; user: { points_balance: number } | null
+  onRedeem: (r: Reward) => void; redeeming: string | null
 }) {
   const canAfford = (user?.points_balance ?? 0) >= reward.point_cost
-  const logo = logoUrl(reward.brand_name)
-  const accent = accentColor(reward.brand_name)
-  const [imgFailed, setImgFailed] = useState(false)
-
   return (
-    <div style={{
-      background: '#FDFCFA',
-      border: '1.5px solid #E0D9CE',
-      borderRadius: 14,
-      overflow: 'hidden',
-      display: 'flex',
-      flexDirection: 'column',
-    }}>
-      {/* Logo header */}
-      <div style={{
-        background: '#fff',
-        borderBottom: `3px solid ${accent}`,
-        height: 72,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '0 12px',
-      }}>
-        {logo && !imgFailed ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={logo}
-            alt={reward.brand_name}
-            onError={() => setImgFailed(true)}
-            style={{ maxWidth: 100, maxHeight: 48, objectFit: 'contain' }}
-          />
-        ) : (
-          <span style={{
-            fontSize: 12,
-            fontWeight: 900,
-            fontFamily: 'Archivo, sans-serif',
-            textTransform: 'uppercase',
-            letterSpacing: 0.5,
-            color: accent,
-            textAlign: 'center',
-          }}>
-            {reward.brand_name}
-          </span>
-        )}
-      </div>
-
-      {/* Content */}
+    <div style={{ background: '#FDFCFA', border: '1.5px solid #E0D9CE', borderRadius: 14, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <BrandLogo brandName={reward.brand_name} size="small" />
       <div style={{ padding: '10px 12px 12px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <div style={{ display: 'flex', gap: 4, marginBottom: 5 }}>
           {reward.is_hot && <Tag color="#ef4444">HOT</Tag>}
@@ -357,20 +277,13 @@ function RewardCardSmall({ reward, user, onRedeem, redeeming }: {
             {reward.point_cost.toLocaleString()}
             <span style={{ fontSize: 9, color: '#8A8478', fontWeight: 500 }}> pts</span>
           </span>
-          <button
-            onClick={() => onRedeem(reward)}
-            disabled={!canAfford || redeeming === reward.id}
-            style={{
-              padding: '6px 10px',
-              background: canAfford ? '#B5593C' : '#EDEBE5',
-              color: canAfford ? '#F5F0EA' : '#8A8478',
-              border: 'none',
-              borderRadius: 6,
-              fontSize: 11,
-              fontWeight: 800,
-              cursor: canAfford ? 'pointer' : 'not-allowed',
-            }}
-          >
+          <button onClick={() => onRedeem(reward)} disabled={!canAfford || redeeming === reward.id} style={{
+            padding: '6px 10px',
+            background: canAfford ? '#B5593C' : '#EDEBE5',
+            color: canAfford ? '#F5F0EA' : '#8A8478',
+            border: 'none', borderRadius: 6, fontSize: 11, fontWeight: 800,
+            cursor: canAfford ? 'pointer' : 'not-allowed',
+          }}>
             {canAfford ? 'Redeem' : 'Need more'}
           </button>
         </div>
@@ -381,42 +294,20 @@ function RewardCardSmall({ reward, user, onRedeem, redeeming }: {
 
 function Tag({ color, children }: { color: string; children: string }) {
   return (
-    <span style={{
-      background: color + '18',
-      color,
-      fontSize: 9,
-      fontWeight: 900,
-      padding: '2px 6px',
-      borderRadius: 4,
-      letterSpacing: 0.5,
-      fontFamily: 'Archivo, sans-serif',
-    }}>
+    <span style={{ background: color + '18', color, fontSize: 9, fontWeight: 900, padding: '2px 6px', borderRadius: 4, letterSpacing: 0.5, fontFamily: 'Archivo, sans-serif' }}>
       {children}
     </span>
   )
 }
 
 const btnPrimary: React.CSSProperties = {
-  padding: '14px 28px',
-  background: '#111110',
-  color: '#F5F0EA',
-  border: 'none',
-  borderRadius: 10,
-  fontSize: 15,
-  fontWeight: 800,
-  fontFamily: 'Archivo, sans-serif',
-  cursor: 'pointer',
+  padding: '14px 28px', background: '#111110', color: '#F5F0EA',
+  border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 800,
+  fontFamily: 'Archivo, sans-serif', cursor: 'pointer',
 }
 
 const btnSecondary: React.CSSProperties = {
-  padding: 14,
-  background: '#fff',
-  color: '#111110',
-  border: '1.5px solid #E0D9CE',
-  borderRadius: 10,
-  fontSize: 14,
-  fontWeight: 800,
-  fontFamily: 'Archivo, sans-serif',
-  cursor: 'pointer',
-  width: '100%',
+  padding: 14, background: '#fff', color: '#111110',
+  border: '1.5px solid #E0D9CE', borderRadius: 10, fontSize: 14,
+  fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer', width: '100%',
 }
