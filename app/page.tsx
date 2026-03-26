@@ -86,18 +86,14 @@ export default function LandingPage() {
       {/* ── Hero ─── video background, dark overlay ───────────── */}
       <div style={{ position: 'relative', overflow: 'hidden', background: '#0E0D0C' }}>
 
-        {/* Looping background video — muted, atmosphere only */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
-        >
-          <source src="https://videos.pexels.com/video-files/3621104/3621104-hd_1280_720_30fps.mp4" type="video/mp4" />
-          <source src="https://videos.pexels.com/video-files/4057407/4057407-hd_1280_720_25fps.mp4" type="video/mp4" />
-          <source src="https://videos.pexels.com/video-files/4041391/4041391-hd_1280_720_25fps.mp4" type="video/mp4" />
-        </video>
+        {/* Looping YouTube background video — muted, atmosphere only */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/1tyX7qDArfA?autoplay=1&mute=1&loop=1&playlist=1tyX7qDArfA&controls=0&disablekb=1&playsinline=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3"
+            allow="autoplay; encrypted-media"
+            style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '177.78vh', minWidth: '100%', height: '56.25vw', minHeight: '100%', border: 'none' }}
+          />
+        </div>
 
         {/* Dark gradient overlay — text always readable */}
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(170deg, rgba(10,8,7,0.88) 0%, rgba(10,8,7,0.82) 60%, rgba(17,17,16,0.96) 100%)', zIndex: 1 }} />
