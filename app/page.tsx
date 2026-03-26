@@ -83,8 +83,27 @@ export default function LandingPage() {
   return (
     <div style={{ minHeight: '100dvh', background: '#111110', display: 'flex', flexDirection: 'column' }}>
 
-      {/* ── Hero ─── text-forward, no giant stock photo ────────── */}
-      <div style={{ padding: '28px 24px 40px', background: 'linear-gradient(160deg, #1A1410 0%, #111110 60%)' }}>
+      {/* ── Hero ─── video background, dark overlay ───────────── */}
+      <div style={{ position: 'relative', overflow: 'hidden', background: '#0E0D0C' }}>
+
+        {/* Looping background video — muted, atmosphere only */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+        >
+          <source src="https://videos.pexels.com/video-files/3621104/3621104-hd_1280_720_30fps.mp4" type="video/mp4" />
+          <source src="https://videos.pexels.com/video-files/4057407/4057407-hd_1280_720_25fps.mp4" type="video/mp4" />
+          <source src="https://videos.pexels.com/video-files/4041391/4041391-hd_1280_720_25fps.mp4" type="video/mp4" />
+        </video>
+
+        {/* Dark gradient overlay — text always readable */}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(170deg, rgba(10,8,7,0.88) 0%, rgba(10,8,7,0.82) 60%, rgba(17,17,16,0.96) 100%)', zIndex: 1 }} />
+
+        {/* Hero content sits above video */}
+        <div style={{ position: 'relative', zIndex: 2, padding: '28px 24px 40px' }}>
 
         {/* Nav row */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 44 }}>
@@ -138,6 +157,8 @@ export default function LandingPage() {
               <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: '#555', textTransform: 'uppercase', letterSpacing: 1.2 }}>{label}</p>
             </div>
           ))}
+        </div>
+
         </div>
       </div>
 
