@@ -83,9 +83,9 @@ export default function LandingPage() {
   return (
     <div style={{ minHeight: '100dvh', background: '#111110', display: 'flex', flexDirection: 'column' }}>
 
-      {/* ── Hero ─── full-height video, no overlay text ───────── */}
-      <div style={{ position: 'relative', overflow: 'hidden', background: '#0E0D0C', height: '56vw', minHeight: 320, maxHeight: 520 }}>
-        {/* Looping YouTube background video — muted, atmosphere only */}
+      {/* ── Hero ─── full-height video, big centered brand name ── */}
+      <div style={{ position: 'relative', overflow: 'hidden', background: '#0E0D0C', height: '60vw', minHeight: 340, maxHeight: 560 }}>
+        {/* Looping YouTube background video */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
           <iframe
             src="https://www.youtube-nocookie.com/embed/1tyX7qDArfA?autoplay=1&mute=1&loop=1&playlist=1tyX7qDArfA&controls=0&disablekb=1&playsinline=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3"
@@ -93,23 +93,40 @@ export default function LandingPage() {
             style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '177.78vh', minWidth: '100%', height: '56.25vw', minHeight: '100%', border: 'none' }}
           />
         </div>
-        {/* Subtle vignette at bottom only so video bleeds into content */}
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 80, background: 'linear-gradient(to bottom, transparent, #111110)', zIndex: 1 }} />
-        {/* Cover the YouTube channel watermark (bottom-right) with the Log in link */}
-        <div style={{ position: 'absolute', bottom: 0, right: 0, zIndex: 2, padding: '0 12px 12px 0' }}>
-          <Link href="/auth/login" style={{ display: 'inline-block', color: '#F5F0EA', fontSize: 13, fontWeight: 700, textDecoration: 'none', fontFamily: 'Archivo, sans-serif', letterSpacing: 0.5, background: 'rgba(0,0,0,0.55)', padding: '8px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)' }}>
+        {/* Dark overlay for contrast */}
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,8,7,0.45)', zIndex: 1 }} />
+        {/* Bottom fade into content */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 100, background: 'linear-gradient(to bottom, transparent, #111110)', zIndex: 1 }} />
+
+        {/* Log in — top right */}
+        <div style={{ position: 'absolute', top: 0, right: 0, zIndex: 3, padding: '18px 20px' }}>
+          <Link href="/auth/login" style={{ color: '#F5F0EA', fontSize: 13, fontWeight: 700, textDecoration: 'none', fontFamily: 'Archivo, sans-serif', letterSpacing: 0.5, background: 'rgba(0,0,0,0.45)', padding: '8px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)' }}>
             Log in
           </Link>
         </div>
-        {/* COUNT logo — top-left */}
-        <div style={{ position: 'absolute', top: 0, left: 0, zIndex: 2, padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ position: 'relative', width: 30, height: 26 }}>
-            {[0,7,14].map(left => (
-              <div key={left} style={{ position: 'absolute', top: 0, width: 3, height: 26, background: '#F5F0EA', borderRadius: 2, left }} />
+
+        {/* Big centered COUNT wordmark over the video */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
+          {/* Tally icon */}
+          <div style={{ position: 'relative', width: 52, height: 44 }}>
+            {[0, 13, 26].map(left => (
+              <div key={left} style={{ position: 'absolute', top: 0, width: 5, height: 44, background: '#F5F0EA', borderRadius: 3, left }} />
             ))}
-            <div style={{ position: 'absolute', top: 7, left: 3, width: 18, height: 2.5, background: '#B5593C', borderRadius: 2, transform: 'rotate(-30deg)' }} />
+            <div style={{ position: 'absolute', top: 12, left: 4, width: 34, height: 4, background: '#B5593C', borderRadius: 2, transform: 'rotate(-30deg)' }} />
           </div>
-          <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 18, fontWeight: 900, letterSpacing: 3, textTransform: 'uppercase', color: '#F5F0EA' }}>COUNT</span>
+          {/* Name */}
+          <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 'clamp(52px, 12vw, 96px)', fontWeight: 900, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#F5F0EA', lineHeight: 1, textShadow: '0 2px 24px rgba(0,0,0,0.6)' }}>
+            COUNT
+          </span>
+          {/* Tagline under name */}
+          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 'clamp(10px, 2vw, 13px)', color: 'rgba(245,240,234,0.55)', letterSpacing: '0.25em', textTransform: 'uppercase' }}>
+            make it count
+          </span>
+        </div>
+
+        {/* Cover YouTube channel watermark (bottom-right) */}
+        <div style={{ position: 'absolute', bottom: 0, right: 0, zIndex: 3, padding: '0 12px 14px 0' }}>
+          <div style={{ width: 120, height: 36, background: 'rgba(10,8,7,0.7)', borderRadius: 6 }} />
         </div>
       </div>
 
