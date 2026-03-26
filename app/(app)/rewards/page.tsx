@@ -13,33 +13,34 @@ const CATEGORIES = [
   { value: 'lifestyle', label: 'Lifestyle' },
 ]
 
-const BRAND_CONFIG: Record<string, { bg: string; color: string; label: string }> = {
-  'Amazon':           { bg: '#FF9900', color: '#111110', label: 'amazon' },
-  'Legion Athletics': { bg: '#111110', color: '#C8A96E', label: 'LEGION' },
-  'Momentous':        { bg: '#0D1B2A', color: '#FFFFFF', label: 'momentous' },
-  'Ten Thousand':     { bg: '#1C1C1C', color: '#F5F0EA', label: 'TEN THOUSAND' },
-  'Strava':           { bg: '#FC4C02', color: '#FFFFFF', label: 'STRAVA' },
-  'Rogue':            { bg: '#C41E3A', color: '#FFFFFF', label: 'ROGUE' },
-  'Nike':             { bg: '#111110', color: '#FFFFFF', label: 'NIKE' },
-  'MyFitnessPal':     { bg: '#0066FF', color: '#FFFFFF', label: 'MFP' },
-  'Garmin':           { bg: '#007CC3', color: '#FFFFFF', label: 'GARMIN' },
+// Map brand name -> clearbit domain + accent color for the card trim
+const BRAND_META: Record<string, { domain: string; accent: string }> = {
+  'Amazon':           { domain: 'amazon.com',          accent: '#FF9900' },
+  'Legion Athletics': { domain: 'legionathletics.com', accent: '#C8A96E' },
+  'Momentous':        { domain: 'livemomentous.com',   accent: '#0D1B2A' },
+  'Ten Thousand':     { domain: 'tenthousand.cc',      accent: '#1C1C1C' },
+  'Gymshark':         { domain: 'gymshark.com',        accent: '#00F5A0' },
+  'Strava':           { domain: 'strava.com',          accent: '#FC4C02' },
+  'Nike':             { domain: 'nike.com',            accent: '#111110' },
+  'MyFitnessPal':     { domain: 'myfitnesspal.com',    accent: '#0066FF' },
+  'Garmin':           { domain: 'garmin.com',          accent: '#007CC3' },
+  'Rogue':            { domain: 'roguefitness.com',    accent: '#C41E3A' },
 }
 
-function brandBg(name: string): string {
-  const cfg = BRAND_CONFIG[name]
-  if (cfg) return cfg.bg
+function logoUrl(brandName: string): string | null {
+  const meta = BRAND_META[brandName]
+  if (!meta) return null
+  return 'https://logo.clearbit.com/' + meta.domain
+}
+
+function accentColor(brandName: string): string {
+  const meta = BRAND_META[brandName]
+  if (meta) return meta.accent
+  // Generate a consistent color from brand name
   let hash = 0
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  for (let i = 0; i < brandName.length; i++) hash = brandName.charCodeAt(i) + ((hash << 5) - hash)
   const palette = ['#2C3E50', '#1A1A2E', '#2D3561', '#1B262C', '#16213E', '#0F3460']
   return palette[Math.abs(hash) % palette.length]
-}
-
-function brandLabel(name: string): string {
-  return BRAND_CONFIG[name]?.label ?? name.toUpperCase()
-}
-
-function brandTextColor(name: string): string {
-  return BRAND_CONFIG[name]?.color ?? '#FFFFFF'
 }
 
 export default function RewardsPage() {
@@ -185,6 +186,7 @@ export default function RewardsPage() {
   )
 }
 
+// Featured horizontal card
 function RewardCard({ reward, user, onRedeem, redeeming }: {
   reward: Reward
   user: { points_balance: number } | null
@@ -192,9 +194,9 @@ function RewardCard({ reward, user, onRedeem, redeeming }: {
   redeeming: string | null
 }) {
   const canAfford = (user?.points_balance ?? 0) >= reward.point_cost
-  const bg = brandBg(reward.brand_name)
-  const textColor = brandTextColor(reward.brand_name)
-  const label = brandLabel(reward.brand_name)
+  const logo = logoUrl(reward.brand_name)
+  const accent = accentColor(reward.brand_name)
+  const [imgFailed, setImgFailed] = useState(false)
 
   return (
     <div style={{
@@ -204,30 +206,42 @@ function RewardCard({ reward, user, onRedeem, redeeming }: {
       overflow: 'hidden',
       display: 'flex',
     }}>
+      {/* Brand logo column */}
       <div style={{
-        width: 84,
+        width: 88,
         flexShrink: 0,
-        background: bg,
+        background: '#fff',
+        borderRight: `3px solid ${accent}`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '0 8px',
+        padding: 12,
       }}>
-        <span style={{
-          color: textColor,
-          fontSize: 11,
-          fontWeight: 900,
-          fontFamily: 'Archivo, sans-serif',
-          textTransform: 'uppercase',
-          letterSpacing: 1,
-          textAlign: 'center',
-          lineHeight: 1.3,
-          wordBreak: 'break-word',
-        }}>
-          {label}
-        </span>
+        {logo && !imgFailed ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={logo}
+            alt={reward.brand_name}
+            onError={() => setImgFailed(true)}
+            style={{ width: 52, height: 52, objectFit: 'contain' }}
+          />
+        ) : (
+          <span style={{
+            fontSize: 10,
+            fontWeight: 900,
+            fontFamily: 'Archivo, sans-serif',
+            textTransform: 'uppercase',
+            letterSpacing: 0.5,
+            color: accent,
+            textAlign: 'center',
+            lineHeight: 1.3,
+          }}>
+            {reward.brand_name}
+          </span>
+        )}
       </div>
 
+      {/* Info */}
       <div style={{ flex: 1, padding: '14px 12px', minWidth: 0 }}>
         <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
           {reward.is_hot && <Tag color="#ef4444">HOT</Tag>}
@@ -238,6 +252,7 @@ function RewardCard({ reward, user, onRedeem, redeeming }: {
         <p style={{ fontSize: 11, color: '#8A8478' }}>Retail ${reward.retail_value}</p>
       </div>
 
+      {/* Price + action */}
       <div style={{
         padding: '14px 14px',
         textAlign: 'right',
@@ -275,6 +290,7 @@ function RewardCard({ reward, user, onRedeem, redeeming }: {
   )
 }
 
+// Small grid card
 function RewardCardSmall({ reward, user, onRedeem, redeeming }: {
   reward: Reward
   user: { points_balance: number } | null
@@ -282,9 +298,9 @@ function RewardCardSmall({ reward, user, onRedeem, redeeming }: {
   redeeming: string | null
 }) {
   const canAfford = (user?.points_balance ?? 0) >= reward.point_cost
-  const bg = brandBg(reward.brand_name)
-  const textColor = brandTextColor(reward.brand_name)
-  const label = brandLabel(reward.brand_name)
+  const logo = logoUrl(reward.brand_name)
+  const accent = accentColor(reward.brand_name)
+  const [imgFailed, setImgFailed] = useState(false)
 
   return (
     <div style={{
@@ -295,27 +311,40 @@ function RewardCardSmall({ reward, user, onRedeem, redeeming }: {
       display: 'flex',
       flexDirection: 'column',
     }}>
+      {/* Logo header */}
       <div style={{
-        background: bg,
-        height: 64,
+        background: '#fff',
+        borderBottom: `3px solid ${accent}`,
+        height: 72,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '0 10px',
+        padding: '0 12px',
       }}>
-        <span style={{
-          color: textColor,
-          fontSize: 13,
-          fontWeight: 900,
-          fontFamily: 'Archivo, sans-serif',
-          textTransform: 'uppercase',
-          letterSpacing: 1,
-          textAlign: 'center',
-        }}>
-          {label}
-        </span>
+        {logo && !imgFailed ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={logo}
+            alt={reward.brand_name}
+            onError={() => setImgFailed(true)}
+            style={{ maxWidth: 100, maxHeight: 48, objectFit: 'contain' }}
+          />
+        ) : (
+          <span style={{
+            fontSize: 12,
+            fontWeight: 900,
+            fontFamily: 'Archivo, sans-serif',
+            textTransform: 'uppercase',
+            letterSpacing: 0.5,
+            color: accent,
+            textAlign: 'center',
+          }}>
+            {reward.brand_name}
+          </span>
+        )}
       </div>
 
+      {/* Content */}
       <div style={{ padding: '10px 12px 12px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <div style={{ display: 'flex', gap: 4, marginBottom: 5 }}>
           {reward.is_hot && <Tag color="#ef4444">HOT</Tag>}
