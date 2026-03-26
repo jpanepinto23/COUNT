@@ -13,6 +13,35 @@ const CATEGORIES = [
   { value: 'lifestyle', label: 'Lifestyle' },
 ]
 
+const BRAND_CONFIG: Record<string, { bg: string; color: string; label: string }> = {
+  'Amazon':           { bg: '#FF9900', color: '#111110', label: 'amazon' },
+  'Legion Athletics': { bg: '#111110', color: '#C8A96E', label: 'LEGION' },
+  'Momentous':        { bg: '#0D1B2A', color: '#FFFFFF', label: 'momentous' },
+  'Ten Thousand':     { bg: '#1C1C1C', color: '#F5F0EA', label: 'TEN THOUSAND' },
+  'Strava':           { bg: '#FC4C02', color: '#FFFFFF', label: 'STRAVA' },
+  'Rogue':            { bg: '#C41E3A', color: '#FFFFFF', label: 'ROGUE' },
+  'Nike':             { bg: '#111110', color: '#FFFFFF', label: 'NIKE' },
+  'MyFitnessPal':     { bg: '#0066FF', color: '#FFFFFF', label: 'MFP' },
+  'Garmin':           { bg: '#007CC3', color: '#FFFFFF', label: 'GARMIN' },
+}
+
+function brandBg(name: string): string {
+  const cfg = BRAND_CONFIG[name]
+  if (cfg) return cfg.bg
+  let hash = 0
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  const palette = ['#2C3E50', '#1A1A2E', '#2D3561', '#1B262C', '#16213E', '#0F3460']
+  return palette[Math.abs(hash) % palette.length]
+}
+
+function brandLabel(name: string): string {
+  return BRAND_CONFIG[name]?.label ?? name.toUpperCase()
+}
+
+function brandTextColor(name: string): string {
+  return BRAND_CONFIG[name]?.color ?? '#FFFFFF'
+}
+
 export default function RewardsPage() {
   const { user, refreshUser } = useAuth()
   const [rewards, setRewards] = useState<Reward[]>([])
@@ -36,14 +65,12 @@ export default function RewardsPage() {
   async function handleRedeem(reward: Reward) {
     if (!user || user.points_balance < reward.point_cost) return
     setRedeeming(reward.id)
-
     const { error } = await supabase.from('redemptions').insert({
       user_id: user.id,
       reward_id: reward.id,
       points_spent: reward.point_cost,
       affiliate_link_generated: reward.affiliate_url,
     })
-
     if (!error) {
       await supabase.from('users').update({
         points_balance: user.points_balance - reward.point_cost,
@@ -70,7 +97,7 @@ export default function RewardsPage() {
             rel="noopener noreferrer"
             style={{ ...btnPrimary, display: 'inline-block', textDecoration: 'none', marginBottom: 12 }}
           >
-            Go to {successReward.brand_name} →
+            Go to {successReward.brand_name} &rarr;
           </a>
           <br />
           <button onClick={() => setSuccessReward(null)} style={{ ...btnSecondary, width: 'auto', padding: '12px 24px' }}>
@@ -82,19 +109,15 @@ export default function RewardsPage() {
   }
 
   return (
-    <div style={{ padding: '20px 16px' }}>
+    <div style={{ padding: '20px 16px 40px' }}>
+
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 20 }}>
         <div>
           <p style={{ color: '#8A8478', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5 }}>Reward Shop</p>
           <h1 style={{ fontSize: 24, fontWeight: 900, letterSpacing: -0.5, fontFamily: 'Archivo, sans-serif' }}>Spend Your Points</h1>
         </div>
-        <div style={{
-          background: '#111110',
-          borderRadius: 12,
-          padding: '8px 14px',
-          textAlign: 'center',
-        }}>
+        <div style={{ background: '#111110', borderRadius: 12, padding: '8px 14px', textAlign: 'center' }}>
           <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 16, fontWeight: 900, color: '#B5593C', lineHeight: 1 }}>
             {user?.points_balance.toLocaleString() ?? 0}
           </p>
@@ -103,7 +126,7 @@ export default function RewardsPage() {
       </div>
 
       {/* Category filter */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, overflowX: 'auto', paddingBottom: 4 }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 24, overflowX: 'auto', paddingBottom: 4 }}>
         {CATEGORIES.map(c => (
           <button
             key={c.value}
@@ -130,8 +153,10 @@ export default function RewardsPage() {
       {featured.length > 0 && (
         <>
           <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 10 }}>Featured</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
-            {featured.map(r => <RewardCard key={r.id} reward={r} user={user} onRedeem={handleRedeem} redeeming={redeeming} />)}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
+            {featured.map(r => (
+              <RewardCard key={r.id} reward={r} user={user} onRedeem={handleRedeem} redeeming={redeeming} />
+            ))}
           </div>
         </>
       )}
@@ -139,9 +164,13 @@ export default function RewardsPage() {
       {/* All rewards */}
       {rest.length > 0 && (
         <>
-          {featured.length > 0 && <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 10 }}>All Rewards</p>}
+          {featured.length > 0 && (
+            <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 10 }}>All Rewards</p>
+          )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            {rest.map(r => <RewardCardSmall key={r.id} reward={r} user={user} onRedeem={handleRedeem} redeeming={redeeming} />)}
+            {rest.map(r => (
+              <RewardCardSmall key={r.id} reward={r} user={user} onRedeem={handleRedeem} redeeming={redeeming} />
+            ))}
           </div>
         </>
       )}
@@ -163,42 +192,64 @@ function RewardCard({ reward, user, onRedeem, redeeming }: {
   redeeming: string | null
 }) {
   const canAfford = (user?.points_balance ?? 0) >= reward.point_cost
+  const bg = brandBg(reward.brand_name)
+  const textColor = brandTextColor(reward.brand_name)
+  const label = brandLabel(reward.brand_name)
 
   return (
     <div style={{
-      background: '#fff',
+      background: '#FDFCFA',
       border: '1.5px solid #E0D9CE',
       borderRadius: 14,
-      padding: 16,
+      overflow: 'hidden',
       display: 'flex',
-      gap: 14,
-      alignItems: 'center',
     }}>
       <div style={{
-        width: 64,
-        height: 64,
-        borderRadius: 10,
-        background: '#EDEBE5',
+        width: 84,
         flexShrink: 0,
-        overflow: 'hidden',
+        background: bg,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '0 8px',
       }}>
-        {reward.image_url && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={reward.image_url} alt={reward.product_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        )}
+        <span style={{
+          color: textColor,
+          fontSize: 11,
+          fontWeight: 900,
+          fontFamily: 'Archivo, sans-serif',
+          textTransform: 'uppercase',
+          letterSpacing: 1,
+          textAlign: 'center',
+          lineHeight: 1.3,
+          wordBreak: 'break-word',
+        }}>
+          {label}
+        </span>
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', gap: 6, marginBottom: 4 }}>
+
+      <div style={{ flex: 1, padding: '14px 12px', minWidth: 0 }}>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
           {reward.is_hot && <Tag color="#ef4444">HOT</Tag>}
           {reward.is_new && <Tag color="#22c55e">NEW</Tag>}
         </div>
-        <p style={{ fontSize: 12, color: '#8A8478', marginBottom: 2 }}>{reward.brand_name}</p>
-        <p style={{ fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', lineHeight: 1.2 }}>{reward.product_name}</p>
-        <p style={{ fontSize: 11, color: '#8A8478', marginTop: 2 }}>Retail ${reward.retail_value}</p>
+        <p style={{ fontSize: 11, color: '#8A8478', marginBottom: 2 }}>{reward.brand_name}</p>
+        <p style={{ fontSize: 15, fontWeight: 800, fontFamily: 'Archivo, sans-serif', lineHeight: 1.2, marginBottom: 4 }}>{reward.product_name}</p>
+        <p style={{ fontSize: 11, color: '#8A8478' }}>Retail ${reward.retail_value}</p>
       </div>
-      <div style={{ textAlign: 'right', flexShrink: 0 }}>
-        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14, fontWeight: 900, color: '#111110', marginBottom: 8 }}>
-          {reward.point_cost.toLocaleString()}<br />
+
+      <div style={{
+        padding: '14px 14px',
+        textAlign: 'right',
+        flexShrink: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-end',
+        justifyContent: 'space-between',
+      }}>
+        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14, fontWeight: 900, color: '#111110' }}>
+          {reward.point_cost.toLocaleString()}
+          <br />
           <span style={{ fontSize: 9, fontWeight: 500, color: '#8A8478' }}>pts</span>
         </p>
         <button
@@ -231,55 +282,69 @@ function RewardCardSmall({ reward, user, onRedeem, redeeming }: {
   redeeming: string | null
 }) {
   const canAfford = (user?.points_balance ?? 0) >= reward.point_cost
+  const bg = brandBg(reward.brand_name)
+  const textColor = brandTextColor(reward.brand_name)
+  const label = brandLabel(reward.brand_name)
 
   return (
     <div style={{
-      background: '#fff',
+      background: '#FDFCFA',
       border: '1.5px solid #E0D9CE',
       borderRadius: 14,
-      padding: 14,
+      overflow: 'hidden',
       display: 'flex',
       flexDirection: 'column',
     }}>
-      <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
-        {reward.is_hot && <Tag color="#ef4444">HOT</Tag>}
-        {reward.is_new && <Tag color="#22c55e">NEW</Tag>}
-      </div>
       <div style={{
-        height: 80,
-        borderRadius: 8,
-        background: '#EDEBE5',
-        marginBottom: 10,
-        overflow: 'hidden',
+        background: bg,
+        height: 64,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '0 10px',
       }}>
-        {reward.image_url && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={reward.image_url} alt={reward.product_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        )}
-      </div>
-      <p style={{ fontSize: 11, color: '#8A8478' }}>{reward.brand_name}</p>
-      <p style={{ fontSize: 13, fontWeight: 800, marginBottom: 8, lineHeight: 1.2 }}>{reward.product_name}</p>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-        <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 900 }}>
-          {reward.point_cost.toLocaleString()}
-          <span style={{ fontSize: 9, color: '#8A8478', fontWeight: 500 }}> pts</span>
+        <span style={{
+          color: textColor,
+          fontSize: 13,
+          fontWeight: 900,
+          fontFamily: 'Archivo, sans-serif',
+          textTransform: 'uppercase',
+          letterSpacing: 1,
+          textAlign: 'center',
+        }}>
+          {label}
         </span>
-        <button
-          onClick={() => onRedeem(reward)}
-          disabled={!canAfford || redeeming === reward.id}
-          style={{
-            padding: '6px 10px',
-            background: canAfford ? '#B5593C' : '#EDEBE5',
-            color: canAfford ? '#F5F0EA' : '#8A8478',
-            border: 'none',
-            borderRadius: 6,
-            fontSize: 11,
-            fontWeight: 800,
-            cursor: canAfford ? 'pointer' : 'not-allowed',
-          }}
-        >
-          {canAfford ? 'Redeem' : 'Need more'}
-        </button>
+      </div>
+
+      <div style={{ padding: '10px 12px 12px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 5 }}>
+          {reward.is_hot && <Tag color="#ef4444">HOT</Tag>}
+          {reward.is_new && <Tag color="#22c55e">NEW</Tag>}
+        </div>
+        <p style={{ fontSize: 10, color: '#8A8478', marginBottom: 2 }}>{reward.brand_name}</p>
+        <p style={{ fontSize: 12, fontWeight: 800, lineHeight: 1.2, marginBottom: 10, flex: 1 }}>{reward.product_name}</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 900 }}>
+            {reward.point_cost.toLocaleString()}
+            <span style={{ fontSize: 9, color: '#8A8478', fontWeight: 500 }}> pts</span>
+          </span>
+          <button
+            onClick={() => onRedeem(reward)}
+            disabled={!canAfford || redeeming === reward.id}
+            style={{
+              padding: '6px 10px',
+              background: canAfford ? '#B5593C' : '#EDEBE5',
+              color: canAfford ? '#F5F0EA' : '#8A8478',
+              border: 'none',
+              borderRadius: 6,
+              fontSize: 11,
+              fontWeight: 800,
+              cursor: canAfford ? 'pointer' : 'not-allowed',
+            }}
+          >
+            {canAfford ? 'Redeem' : 'Need more'}
+          </button>
+        </div>
       </div>
     </div>
   )
