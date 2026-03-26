@@ -13,33 +13,25 @@ const CATEGORIES = [
   { value: 'lifestyle', label: 'Lifestyle' },
 ]
 
-// simple-icons slug where available (cdn.simpleicons.org), otherwise icon.horse domain
-const BRAND_META: Record<string, { icon?: string; domain?: string; accent: string }> = {
-  'Amazon':           { icon: 'amazon',       accent: '#FF9900' },
+// icon.horse returns any brand's logo by domain — free, no auth
+const BRAND_META: Record<string, { domain: string; accent: string }> = {
+  'Amazon':           { domain: 'amazon.com',          accent: '#FF9900' },
   'Legion Athletics': { domain: 'legionathletics.com', accent: '#C8A96E' },
   'Momentous':        { domain: 'livemomentous.com',   accent: '#0D1B2A' },
   'Ten Thousand':     { domain: 'tenthousand.cc',      accent: '#1C1C1C' },
-  'Gymshark':         { icon: 'gymshark',     accent: '#111110' },
-  'Strava':           { icon: 'strava',       accent: '#FC4C02' },
-  'Nike':             { icon: 'nike',         accent: '#111110' },
-  'MyFitnessPal':     { icon: 'myfitnesspal', accent: '#0066FF' },
-  'Garmin':           { icon: 'garmin',       accent: '#007CC3' },
+  'Gymshark':         { domain: 'gymshark.com',        accent: '#111110' },
+  'Strava':           { domain: 'strava.com',          accent: '#FC4C02' },
+  'Nike':             { domain: 'nike.com',            accent: '#111110' },
+  'MyFitnessPal':     { domain: 'myfitnesspal.com',    accent: '#0066FF' },
+  'Garmin':           { domain: 'garmin.com',          accent: '#007CC3' },
   'Rogue':            { domain: 'roguefitness.com',    accent: '#C41E3A' },
 }
 
-function logoUrl(brandName: string): string | null {
+function logoUrl(brandName: string): string {
   const meta = BRAND_META[brandName]
-  if (!meta) return null
-  if (meta.icon) {
-    const hex = meta.accent.replace('#', '')
-    return 'https://cdn.simpleicons.org/' + meta.icon + '/' + hex
-  }
-  if (meta.domain) {
-    return 'https://icon.horse/icon/' + meta.domain
-  }
-  return null
+  const domain = meta?.domain ?? brandName.toLowerCase().replace(/\s+/g, '') + '.com'
+  return 'https://icon.horse/icon/' + domain
 }
-
 function accentColor(brandName: string): string {
   const meta = BRAND_META[brandName]
   if (meta) return meta.accent
