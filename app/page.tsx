@@ -75,7 +75,7 @@ export default function LandingPage() {
   return (
     <div style={{ minHeight: '100dvh', background: '#111110', display: 'flex', flexDirection: 'column' }}>
 
-      {/* ââ Hero âââââââââââââââââââââââââââââââââââââââââââââââââ */}
+      {/* -- Hero ------------------------------------------------- */}
       <div style={{ position: 'relative', minHeight: '72dvh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', overflow: 'hidden' }}>
         <img src={HERO_PHOTO} alt="Athlete training" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to bottom, rgba(17,17,16,0.25) 0%, rgba(17,17,16,0.7) 55%, #111110 100%)' }} />
@@ -105,7 +105,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ââ Photo strip ââââââââââââââââââââââââââââââââââââââââââ */}
+      {/* -- Photo strip ------------------------------------------ */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, margin: '2px 0 0' }}>
         {STRIP_PHOTOS.map(({ id, label }) => (
           <div key={id} style={{ position: 'relative', aspectRatio: '1', overflow: 'hidden' }}>
@@ -116,7 +116,7 @@ export default function LandingPage() {
         ))}
       </div>
 
-      {/* ââ How It Works âââââââââââââââââââââââââââââââââââââââââ */}
+      {/* -- How It Works ----------------------------------------- */}
       <div style={{ padding: '48px 20px 40px' }}>
         <p style={{ color: '#555', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 20, fontFamily: 'JetBrains Mono, monospace' }}>How it works</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -134,7 +134,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ââ Partner Brands âââââââââââââââââââââââââââââââââââââââ */}
+      {/* -- Partner Brands --------------------------------------- */}
       <div style={{ padding: '32px 20px 40px', borderTop: '1px solid #1f1f1e' }}>
         <p style={{ color: '#555', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 20, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>Earn rewards from</p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
@@ -147,7 +147,7 @@ export default function LandingPage() {
         <p style={{ textAlign: 'center', color: '#444', fontSize: 12, marginTop: 12, fontFamily: 'JetBrains Mono, monospace' }}>+ more brands coming soon</p>
       </div>
 
-      {      {/* ââ Works With ââââââââââââââââââââââââââââââ */}
+      {/* Works With */}
       <div style={{ padding: '40px 20px', background: '#111110', borderTop: '1px solid #1E1E1D' }}>
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase', color: '#6B6456', marginBottom: 24, textAlign: 'center', fontFamily: 'Archivo, sans-serif' }}>Syncs &amp; Works With</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', maxWidth: 480, margin: '0 auto' }}>
@@ -160,7 +160,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      /* ââ Social Proof Stats âââââââââââââââââââââââââââââââââââ */}
+      {/* -- Social Proof Stats ----------------------------------- */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, padding: '0 20px 40px' }}>
         {[
           { num: '100%', label: 'Free' },
@@ -174,7 +174,7 @@ export default function LandingPage() {
         ))}
       </div>
 
-      {/* ââ Tier preview âââââââââââââââââââââââââââââââââââââââââ */}
+      {/* -- Tier preview ----------------------------------------- */}
       <div style={{ padding: '0 20px 48px' }}>
         <p style={{ color: '#555', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 16, fontFamily: 'JetBrains Mono, monospace' }}>The more you show up</p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
@@ -188,7 +188,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ââ Email Capture ââââââââââââââââââââââââââââââââââââââââ */}
+      {/* -- Email Capture ---------------------------------------- */}
       <div style={{ padding: '32px 20px 48px', borderTop: '1px solid #1f1f1e' }}>
         <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 20, fontWeight: 800, color: '#F5F0EA', textAlign: 'center', marginBottom: 8 }}>
           Not ready to sign up yet?
@@ -226,7 +226,7 @@ export default function LandingPage() {
         )}
       </div>
 
-      {/* ââ Footer âââââââââââââââââââââââââââââââââââââââââââââââ */}
+      {/* -- Footer ----------------------------------------------- */}
       <div style={{ padding: '0 24px 32px', textAlign: 'center' }}>
         <p style={{ fontSize: 13, color: '#333', fontFamily: 'JetBrains Mono, monospace' }}>Track consistently. Earn more. Make it count.</p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginTop: 16 }}>
