@@ -83,7 +83,7 @@ export default function LandingPage() {
   return (
     <div style={{ minHeight: '100dvh', background: '#111110', display: 'flex', flexDirection: 'column' }}>
 
-      {/* ── Hero ─── full-height video, big centered brand name ── */}
+      {/* ── Hero ─── full-height video, centered brand + CTA ── */}
       <div style={{ position: 'relative', overflow: 'hidden', background: '#0E0D0C', height: '60vw', minHeight: 340, maxHeight: 560 }}>
         {/* Looping YouTube background video */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
@@ -93,7 +93,7 @@ export default function LandingPage() {
             style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '177.78vh', minWidth: '100%', height: '56.25vw', minHeight: '100%', border: 'none' }}
           />
         </div>
-        {/* Dark overlay for contrast */}
+        {/* Dark overlay */}
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,8,7,0.45)', zIndex: 1 }} />
         {/* Bottom fade into content */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 100, background: 'linear-gradient(to bottom, transparent, #111110)', zIndex: 1 }} />
@@ -105,26 +105,30 @@ export default function LandingPage() {
           </Link>
         </div>
 
-        {/* Big centered COUNT wordmark over the video */}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
+        {/* Centered content: logo + wordmark + CTA */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 0, padding: '0 24px' }}>
           {/* Tally icon */}
-          <div style={{ position: 'relative', width: 52, height: 44 }}>
+          <div style={{ position: 'relative', width: 52, height: 44, marginBottom: 14 }}>
             {[0, 13, 26].map(left => (
               <div key={left} style={{ position: 'absolute', top: 0, width: 5, height: 44, background: '#F5F0EA', borderRadius: 3, left }} />
             ))}
             <div style={{ position: 'absolute', top: 12, left: 4, width: 34, height: 4, background: '#B5593C', borderRadius: 2, transform: 'rotate(-30deg)' }} />
           </div>
           {/* Name */}
-          <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 'clamp(52px, 12vw, 96px)', fontWeight: 900, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#F5F0EA', lineHeight: 1, textShadow: '0 2px 24px rgba(0,0,0,0.6)' }}>
+          <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 'clamp(52px, 12vw, 96px)', fontWeight: 900, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#F5F0EA', lineHeight: 1, textShadow: '0 2px 24px rgba(0,0,0,0.6)', marginBottom: 10 }}>
             COUNT
           </span>
-          {/* Tagline under name */}
-          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 'clamp(10px, 2vw, 13px)', color: 'rgba(245,240,234,0.55)', letterSpacing: '0.25em', textTransform: 'uppercase' }}>
+          {/* Tagline */}
+          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 'clamp(10px, 2vw, 13px)', color: 'rgba(245,240,234,0.55)', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: 28 }}>
             make it count
           </span>
+          {/* Primary CTA */}
+          <Link href="/auth/signup" style={{ display: 'inline-block', padding: '16px 36px', background: '#B5593C', color: '#F5F0EA', textDecoration: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800, fontFamily: 'Archivo, sans-serif', letterSpacing: 0.3, textShadow: 'none', boxShadow: '0 4px 20px rgba(181,89,60,0.45)' }}>
+            Start earning &rarr;
+          </Link>
         </div>
 
-        {/* Cover YouTube channel watermark (bottom-right) */}
+        {/* Cover YouTube watermark (bottom-right) */}
         <div style={{ position: 'absolute', bottom: 0, right: 0, zIndex: 3, padding: '0 12px 14px 0' }}>
           <div style={{ width: 120, height: 36, background: 'rgba(10,8,7,0.7)', borderRadius: 6 }} />
         </div>
