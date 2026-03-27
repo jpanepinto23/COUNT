@@ -90,11 +90,13 @@ export default function RewardsPage() {
           <p style={{ color: '#8A8478', fontSize: 13, marginBottom: 24 }}>
             You spent <strong style={{ color: '#111110' }}>{successReward.point_cost.toLocaleString()} pts</strong>
           </p>
-          <a href={successReward.affiliate_url} target="_blank" rel="noopener noreferrer"
-            style={{ ...btnPrimary, display: 'inline-block', textDecoration: 'none', marginBottom: 12 }}>
-            Go to {successReward.brand_name} &rarr;
-          </a>
-          <br />
+          <div style={{ background: '#F0FAF0', border: '1px solid #B2DFB2', borderRadius: 12, padding: '16px 24px', marginBottom: 16, textAlign: 'left' }}>
+            <p style={{ color: '#2D6A2D', fontWeight: 700, marginBottom: 4, fontSize: 14 }}>🎁 Gift card incoming!</p>
+            <p style={{ color: '#2D6A2D', fontSize: 13, margin: 0 }}>
+              Your <strong>{successReward.product_name}</strong> code will be emailed to you within 24–48 hours.
+              Check your spam folder if you don't see it.
+            </p>
+          </div>
           <button onClick={() => setSuccessReward(null)} style={{ ...btnSecondary, width: 'auto', padding: '12px 24px' }}>
             Back to Shop
           </button>
