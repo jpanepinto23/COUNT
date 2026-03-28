@@ -35,7 +35,6 @@ export default function HomePage() {
       .limit(5)
       .then(({ data }) => { if (data) setRecentWorkouts(data) })
 
-    // Fetch referral count
     if (user.referral_code) {
       supabase
         .from('referrals')
@@ -67,7 +66,7 @@ export default function HomePage() {
     recentWorkouts.map(w => new Date(w.logged_at).toDateString())
   )
 
-  const referralLink = `https://count-fitness-app.vercel.app/auth/signup?ref=${user.referral_code ?? ''}`
+  const referralLink = `https://count-app-joe.vercel.app/auth/signup?ref=${user.referral_code ?? ''}`
 
   async function handleShare() {
     if (navigator.share) {
@@ -94,7 +93,7 @@ export default function HomePage() {
       </div>
 
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div>
           <p style={{ color: '#8A8478', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5 }}>
             {greeting()}
@@ -113,12 +112,38 @@ export default function HomePage() {
             </div>
           </Link>
           <Link href="/profile" style={{ textDecoration: 'none' }}>
-            <div style={{ width: 34, height: 34, borderRadius: '50%', background: tierColor + '18', border: `1.5px solid ${tierColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Archivo, sans-serif', fontSize: 13, fontWeight: 900, color: tierColor }}>
-              {user.name.charAt(0).toUpperCase()}
+            <div style={{
+              width: 40, height: 40, borderRadius: '50%',
+              border: user.avatar_url ? `2px solid ${tierColor}` : '2px dashed #C5B9AC',
+              background: user.avatar_url ? 'transparent' : tierColor + '18',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              overflow: 'hidden', flexShrink: 0,
+            }}>
+              {user.avatar_url
+                ? <img src={user.avatar_url} alt="you" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 14, fontWeight: 900, color: tierColor }}>{user.name.charAt(0).toUpperCase()}</span>
+              }
             </div>
           </Link>
         </div>
       </div>
+
+      {/* Add photo nudge — only shown until user uploads */}
+      {!user.avatar_url && (
+        <Link href="/profile" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
+          <div style={{
+            background: '#FFF8F5', border: '1.5px solid #F0D5C8', borderRadius: 12,
+            padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10,
+          }}>
+            <span style={{ fontSize: 20 }}>📸</span>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 13, fontWeight: 800, color: '#B5593C', marginBottom: 1 }}>Add your profile photo</p>
+              <p style={{ fontSize: 11, color: '#8A8478' }}>Make COUNT yours — tap to upload a photo</p>
+            </div>
+            <span style={{ color: '#C5B9AC', fontSize: 18 }}>›</span>
+          </div>
+        </Link>
+      )}
 
       {/* Points card */}
       <div style={{
@@ -131,87 +156,40 @@ export default function HomePage() {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,10,9,0.82)', borderRadius: 16 }} />
-        <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: '#B5593C', opacity: 0.12 }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,8,7,0.58)', borderRadius: 16 }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <p style={{ color: '#8A8478', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 }}>Points Balance</p>
-          <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 38, fontWeight: 900, color: '#F5F0EA', lineHeight: 1, marginBottom: 8 }}>
+          <p style={{ color: 'rgba(245,240,234,0.7)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 }}>Points Balance</p>
+          <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 38, fontWeight: 900, color: '#F5F0EA', lineHeight: 1, marginBottom: 4 }}>
             {user.points_balance.toLocaleString()}
           </p>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <p style={{ color: '#8A8478', fontSize: 12 }}>
-              {user.points_lifetime_earned.toLocaleString()} earned all time
-            </p>
-            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#B5593C', fontWeight: 700 }}>
-              {getTierMultiplier(tier)}x
-            </span>
-          </div>
+          <p style={{ color: 'rgba(245,240,234,0.6)', fontSize: 12 }}>
+            {user.points_lifetime_earned.toLocaleString()} earned lifetime · {getTierMultiplier(tier)}x multiplier
+          </p>
         </div>
       </div>
 
-      {/* Stats row */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
-        <StatCard label="Streak"   value={user.current_streak}    unit="days"  accent="#B5593C" />
-        <StatCard label="Sessions" value={user.lifetime_sessions}  unit="total" accent="#111110" />
-        <StatCard label="Best"     value={user.longest_streak}     unit="days"  accent="#111110" />
-      </div>
-
-      {/* ── INVITE A FRIEND ── prominent, dark card, same visual weight as Log */}
-      <div style={{ background: '#111110', borderRadius: 16, padding: '18px', marginBottom: 14, position: 'relative', overflow: 'hidden' }}>
-        {/* Rust accent blobs */}
-        <div style={{ position: 'absolute', top: -24, right: -24, width: 90, height: 90, borderRadius: '50%', background: '#B5593C', opacity: 0.18 }} />
-        <div style={{ position: 'absolute', bottom: -16, left: -16, width: 60, height: 60, borderRadius: '50%', background: '#B5593C', opacity: 0.10 }} />
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-            <div>
-              <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 3 }}>Invite a Friend</p>
-              <p style={{ fontSize: 16, fontWeight: 900, color: '#F5F0EA', fontFamily: 'Archivo, sans-serif', lineHeight: 1.2 }}>
-                Give 500 pts.<br />Get 500 pts.
-              </p>
-            </div>
-            <div style={{ background: '#B5593C', borderRadius: 10, padding: '6px 8px', fontSize: 18 }}>🔗</div>
-          </div>
-
-          {/* Referral code pill */}
-          <div style={{ background: 'rgba(245,240,234,0.07)', border: '1px solid rgba(245,240,234,0.12)', borderRadius: 10, padding: '10px 14px', marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 18, fontWeight: 900, color: '#F5F0EA', letterSpacing: 4 }}>
-              {user.referral_code ?? '------'}
-            </span>
-            <span style={{ fontSize: 11, color: '#8A8478', fontFamily: 'Archivo, sans-serif' }}>
-              {referralCount} {referralCount === 1 ? 'friend' : 'friends'} joined
-            </span>
-          </div>
-
-          {/* Share button */}
-          <button
-            onClick={handleShare}
-            style={{ width: '100%', padding: '12px', background: '#B5593C', color: '#F5F0EA', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: 'Archivo, sans-serif', letterSpacing: 0.3 }}
-          >
-            {copied ? '✓ Link Copied!' : 'Share Your Link →'}
-          </button>
-        </div>
-      </div>
-
-      {/* Weekly view */}
+      {/* Week streak */}
       <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <p style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1 }}>This Week</p>
-          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#B5593C', fontWeight: 700 }}>
-            🔥 {user.current_streak} streak
-          </span>
+          <p style={{ fontSize: 11, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5 }}>This Week</p>
+          <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700, color: '#B5593C' }}>
+            🔥 {user.current_streak} day streak
+          </p>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           {week.map((d, i) => {
-            const isToday  = d.toDateString() === today.toDateString()
-            const done     = workedOutDates.has(d.toDateString())
-            const isFuture = d > today
+            const hit = workedOutDates.has(d.toDateString())
+            const isToday = d.toDateString() === today.toDateString()
             return (
               <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                <span style={{ fontSize: 9, fontWeight: 700, color: isToday ? '#B5593C' : '#8A8478', textTransform: 'uppercase' }}>
-                  {DAY_LABELS[d.getDay()]}
-                </span>
-                <div style={{ width: '100%', aspectRatio: '1', borderRadius: 8, background: done ? '#B5593C' : isFuture ? '#EDEBE5' : '#FEE2E2', border: isToday && !done ? '1.5px dashed #B5593C' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {done && <span style={{ color: '#F5F0EA', fontSize: 10, fontWeight: 900 }}>✓</span>}
+                <span style={{ fontSize: 9, color: '#8A8478', fontWeight: 700 }}>{DAY_LABELS[d.getDay()]}</span>
+                <div style={{
+                  width: '100%', aspectRatio: '1', borderRadius: 6,
+                  background: hit ? tierColor : '#F5F0EA',
+                  border: isToday ? `1.5px solid ${tierColor}` : '1.5px solid transparent',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {hit && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff', opacity: 0.8 }} />}
                 </div>
               </div>
             )
@@ -220,57 +198,69 @@ export default function HomePage() {
       </div>
 
       {/* Tier progress */}
-      {next && (
+      <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <p style={{ fontSize: 11, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5 }}>Tier Progress</p>
+          <Link href="/rank" style={{ fontSize: 11, color: tierColor, fontWeight: 700, textDecoration: 'none' }}>View rank ›</Link>
+        </div>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
+          <StatCard label="Sessions" value={user.lifetime_sessions} unit="total" accent={tierColor} />
+          <StatCard label="Streak" value={user.current_streak} unit="days" accent={tierColor} />
+          <StatCard label="Best" value={user.longest_streak} unit="days" accent={tierColor} />
+        </div>
+        <div style={{ height: 6, background: '#F5F0EA', borderRadius: 99, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${Math.min(progress, 100)}%`, background: tierColor, borderRadius: 99, transition: 'width 0.6s ease' }} />
+        </div>
+        {next && (
+          <p style={{ fontSize: 11, color: '#8A8478', marginTop: 6 }}>
+            {sessionsNeeded} more sessions to <span style={{ color: tierColor, fontWeight: 700 }}>{next}</span>
+          </p>
+        )}
+      </div>
+
+      {/* Referral */}
+      {user.referral_code && (
         <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-            <p style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1 }}>Tier Progress</p>
-            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#8A8478' }}>
-              {sessionsNeeded} sessions to {getTierLabel(next)}
-            </span>
-          </div>
-          <div style={{ height: 6, background: '#EDEBE5', borderRadius: 3, overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${Math.min(progress, 100)}%`, background: tierColor, borderRadius: 3, transition: 'width 0.5s ease' }} />
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: '#8A8478' }}>
-              {getTierLabel(tier)}
-            </span>
-            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: TIER_COLORS[next] }}>
-              {getTierLabel(next)} {getTierMultiplier(next)}x
-            </span>
-          </div>
+          <p style={{ fontSize: 11, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 8 }}>Invite Friends</p>
+          <p style={{ fontSize: 13, color: '#5A5346', marginBottom: 10 }}>
+            You and a friend each get <span style={{ color: tierColor, fontWeight: 700 }}>500 bonus pts</span> when they sign up with your code.
+            {referralCount > 0 && <span style={{ color: '#8A8478' }}> ({referralCount} referred so far)</span>}
+          </p>
+          <button onClick={handleShare} style={{
+            width: '100%', padding: '12px', background: '#111110', color: '#F5F0EA',
+            border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 800,
+            fontFamily: 'Archivo, sans-serif', cursor: 'pointer',
+          }}>
+            {copied ? '✓ Link copied!' : `Share your code: ${user.referral_code}`}
+          </button>
         </div>
       )}
 
       {/* Recent workouts */}
-      <div style={{ marginBottom: 14 }}>
+      <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <p style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1 }}>Recent Sessions</p>
+          <p style={{ fontSize: 11, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5 }}>Recent</p>
+          <Link href="/log" style={{ fontSize: 11, color: '#B5593C', fontWeight: 700, textDecoration: 'none' }}>Log workout ›</Link>
         </div>
         {recentWorkouts.length === 0 ? (
-          <div style={{ background: '#fff', border: '1.5px dashed #E0D9CE', borderRadius: 14, padding: 24, textAlign: 'center' }}>
-            <p style={{ color: '#8A8478', fontSize: 14, marginBottom: 8 }}>No sessions yet.</p>
-            <Link href="/log" style={{ display: 'inline-block', background: '#B5593C', color: '#F5F0EA', padding: '10px 20px', borderRadius: 8, fontSize: 13, fontWeight: 800, textDecoration: 'none' }}>
-              Log Your First Session →
-            </Link>
+          <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '20px', textAlign: 'center' }}>
+            <p style={{ fontSize: 32, marginBottom: 6 }}>🏋️</p>
+            <p style={{ fontSize: 14, fontWeight: 800, color: '#111110', marginBottom: 4 }}>No workouts yet</p>
+            <p style={{ fontSize: 12, color: '#8A8478' }}>Log your first session to start earning points</p>
           </div>
         ) : (
-          <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, overflow: 'hidden' }}>
-            {recentWorkouts.map((w, i) => (
-              <div key={w.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderTop: i > 0 ? '1px solid #F0EDE6' : 'none' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 34, height: 34, borderRadius: 8, background: '#FDF5F1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'JetBrains Mono, monospace', fontSize: 9, fontWeight: 900, color: '#B5593C', textTransform: 'uppercase' }}>
-                    {workoutAbbr(w.type)}
-                  </div>
-                  <div>
-                    <p style={{ fontSize: 13, fontWeight: 700, textTransform: 'capitalize' }}>{w.type.replace('_', ' ')}</p>
-                    <p style={{ fontSize: 11, color: '#8A8478' }}>{w.duration_minutes}min · {formatDate(w.logged_at)}</p>
-                  </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {recentWorkouts.map(w => (
+              <div key={w.id} style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 36, height: 36, background: tierColor + '15', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, fontWeight: 900, color: tierColor }}>{workoutAbbr(w.type)}</span>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14, fontWeight: 900, color: '#B5593C' }}>
-                    +{w.total_points_earned}
-                  </p>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 13, fontWeight: 800, color: '#111110', marginBottom: 1 }}>{w.custom_name || w.type.replace('_', ' ')}</p>
+                  <p style={{ fontSize: 11, color: '#8A8478' }}>{formatDate(w.logged_at)} · {w.duration_minutes}min</p>
+                </div>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 900, color: tierColor }}>+{w.total_points_earned}</p>
                   <p style={{ fontSize: 10, color: w.verified ? '#22c55e' : '#f59e0b' }}>
                     {w.verified ? '✓ verified' : '⚠ unverified'}
                   </p>
