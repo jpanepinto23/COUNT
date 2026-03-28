@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
@@ -38,6 +38,13 @@ export default function ProfilePage() {
   const [localAge, setLocalAge] = useState<number | null | undefined>(undefined)
   const [localHeight, setLocalHeight] = useState<number | null | undefined>(undefined)
   const [localWeight, setLocalWeight] = useState<number | null | undefined>(undefined)
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (user?.avatar_url) setAvatarUrl(user.avatar_url)
+  }, [user?.avatar_url])
 
   useEffect(() => {
     if (!user) return
@@ -74,6 +81,21 @@ export default function ProfilePage() {
       window.history.replaceState({}, '', '/profile')
     }
   }, [user?.id]) // eslint-disable-line
+
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !user) return
+    setUploadingAvatar(true)
+    const ext = file.name.split('.').pop()
+    const path = `${user.id}/avatar.${ext}`
+    const { error: upErr } = await supabase.storage.from('avatars').upload(path, file, { upsert: true })
+    if (!upErr) {
+      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
+      await supabase.from('users').update({ avatar_url: publicUrl }).eq('id', user.id)
+      setAvatarUrl(publicUrl)
+    }
+    setUploadingAvatar(false)
+  }
 
   async function handleConnectStrava() {
     if (!user) return
@@ -177,13 +199,29 @@ export default function ProfilePage() {
       }}>
         <div style={{ position: 'absolute', top: -24, right: -24, width: 100, height: 100, borderRadius: '50%', background: tierColor, opacity: 0.18 }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
-          <div style={{
-            width: 56, height: 56, borderRadius: '50%', background: tierColor + '30',
-            border: `2px solid ${tierColor}`, display: 'flex', alignItems: 'center',
-            justifyContent: 'center', fontFamily: 'Archivo, sans-serif', fontSize: 22,
-            fontWeight: 900, color: tierColor, flexShrink: 0,
-          }}>
-            {user.name.charAt(0).toUpperCase()}
+          <div
+            onClick={() => avatarInputRef.current?.click()}
+            title="Tap to change photo"
+            style={{
+              width: 68, height: 68, borderRadius: '50%', flexShrink: 0, cursor: 'pointer',
+              border: `2.5px solid ${tierColor}`, position: 'relative',
+              background: avatarUrl ? 'transparent' : tierColor + '30',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              overflow: 'hidden',
+            }}>
+            {avatarUrl
+              ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 24, fontWeight: 900, color: tierColor }}>{user.name.charAt(0).toUpperCase()}</span>
+            }
+            <div style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0, height: 22,
+              background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ color: '#fff', fontSize: 8, fontWeight: 800, letterSpacing: 0.5 }}>
+                {uploadingAvatar ? '↑ …' : '📷 EDIT'}
+              </span>
+            </div>
+            <input ref={avatarInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarUpload} />
           </div>
           <div>
             <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 18, fontWeight: 900, color: '#F5F0EA', lineHeight: 1.1 }}>{user.name}</p>
