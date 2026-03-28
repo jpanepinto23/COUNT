@@ -87,3 +87,13 @@ export interface Redemption {
   redeemed_at?: string
   reward?: Reward
 }
+
+export interface LeaderboardEntry {
+  user_id: string
+  month: string
+  points_earned_this_month: number
+  rank: number
+  name: string
+  current_streak: number
+  tier: Tier
+}
