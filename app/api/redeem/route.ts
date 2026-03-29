@@ -35,7 +35,6 @@ export async function POST(req: NextRequest) {
       user_id,
       reward_id,
       points_spent,
-      status: 'pending',
     })
     if (insertError) {
       console.error('Redemption insert error:', insertError)
