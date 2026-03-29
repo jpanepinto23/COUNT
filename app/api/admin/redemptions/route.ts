@@ -19,22 +19,22 @@ export async function GET() {
     const rewardIds = [...new Set((redemptions ?? []).map((r: any) => r.reward_id))]
 
     const [{ data: users }, { data: rewards }] = await Promise.all([
-      supabaseAdmin.from('users').select('id, name, email').in('id', userIds),
-      supabaseAdmin.from('rewards').select('id, name, product_name, brand_name, retail_value').in('id', rewardIds),
+      supabaseAdmin.from('users').select('*').in('id', userIds),
+      supabaseAdmin.from('rewards').select('*').in('id', rewardIds),
     ])
 
-    const userMap: Record<string, any> = Object.fromEntries((users ?? []).map((u: any) => [u.id, u]))
-    const rewardMap: Record<string, any> = Object.fromEntries((rewards ?? []).map((r: any) => [r.id, r]))
+    const userMap: Record<string, any> = Object.fromEntries((users ?? []).map((u: any) => [String(u.id), u]))
+    const rewardMap: Record<string, any> = Object.fromEntries((rewards ?? []).map((r: any) => [String(r.id), r]))
 
     const enriched = (redemptions ?? []).map((r: any) => ({
       id: r.id,
       redeemed_at: r.redeemed_at,
       points_spent: r.points_spent,
-      user_name: userMap[r.user_id]?.name ?? 'Unknown',
-      user_email: userMap[r.user_id]?.email ?? 'Unknown',
-      product_name: rewardMap[r.reward_id]?.product_name ?? rewardMap[r.reward_id]?.name ?? 'Unknown',
-      brand_name: rewardMap[r.reward_id]?.brand_name ?? '',
-      retail_value: rewardMap[r.reward_id]?.retail_value ?? 0,
+      user_name: userMap[String(r.user_id)]?.name ?? userMap[String(r.user_id)]?.full_name ?? 'Unknown',
+      user_email: userMap[String(r.user_id)]?.email ?? 'Unknown',
+      product_name: rewardMap[String(r.reward_id)]?.name ?? rewardMap[String(r.reward_id)]?.product_name ?? 'Unknown',
+      brand_name: rewardMap[String(r.reward_id)]?.brand_name ?? '',
+      retail_value: rewardMap[String(r.reward_id)]?.retail_value ?? 0,
     }))
 
     return NextResponse.json(enriched)
