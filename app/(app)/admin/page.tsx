@@ -76,7 +76,7 @@ export default function AdminPage() {
                     {isNew && <span style={{ background: '#B5593C', color: 'white', borderRadius: 4, padding: '1px 7px', fontSize: 10, fontWeight: 700 }}>NEW</span>}
                   </div>
                   <div style={{ color: '#8A8478', fontSize: 13 }}>
-                    {r.brand_name}{r.retail_value > 0 ? ` \u00b7 $${r.retail_value} value` : ''} \u00b7 {r.points_spent.toLocaleString()} pts
+                    {r.brand_name}{r.retail_value > 0 ? ` \u00b7 $${r.retail_value} value` : ''}{' · '}{r.points_spent.toLocaleString()} pts
                   </div>
                   <div style={{ marginTop: 8, fontSize: 14 }}>
                     <span style={{ fontWeight: 500 }}>{r.user_name}</span>
