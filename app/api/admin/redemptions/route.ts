@@ -27,14 +27,15 @@ export async function GET() {
     const rewardMap: Record<string, any> = Object.fromEntries((rewards ?? []).map((r: any) => [String(r.id), r]))
 
     const enriched = (redemptions ?? []).map((r: any) => ({
-      id: r.id,
-      redeemed_at: r.redeemed_at,
-      points_spent: r.points_spent,
+      ...r,
       user_name: userMap[String(r.user_id)]?.name ?? userMap[String(r.user_id)]?.full_name ?? 'Unknown',
       user_email: userMap[String(r.user_id)]?.email ?? 'Unknown',
       product_name: rewardMap[String(r.reward_id)]?.name ?? rewardMap[String(r.reward_id)]?.product_name ?? 'Unknown',
       brand_name: rewardMap[String(r.reward_id)]?.brand_name ?? '',
       retail_value: rewardMap[String(r.reward_id)]?.retail_value ?? 0,
+      reward_type: rewardMap[String(r.reward_id)]?.reward_type ?? 'gift_card',
+      fulfillment_value: rewardMap[String(r.reward_id)]?.fulfillment_value ?? null,
+      affiliate_url: rewardMap[String(r.reward_id)]?.affiliate_url ?? null,
     }))
 
     return NextResponse.json(enriched)
