@@ -7,15 +7,15 @@ import { calculatePoints, getTier, getTierLabel, getReferralPoints } from '@/lib
 import type { WorkoutType, Tier } from '@/lib/types'
 
 const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string }[] = [
-  { value: 'push',      label: 'Push',      photo: '4488764' },
-  { value: 'pull',      label: 'Pull',      photo: '6922157' },
-  { value: 'legs',      label: 'Legs',      photo: '583722' },
-  { value: 'upper',     label: 'Upper',     photo: '3916766' },
-  { value: 'lower',     label: 'Lower',     photo: '4944435' },
+  { value: 'push', label: 'Push', photo: '4488764' },
+  { value: 'pull', label: 'Pull', photo: '6922157' },
+  { value: 'legs', label: 'Legs', photo: '583722' },
+  { value: 'upper', label: 'Upper', photo: '3916766' },
+  { value: 'lower', label: 'Lower', photo: '4944435' },
   { value: 'full_body', label: 'Full Body', photo: '6628962' },
-  { value: 'cardio',    label: 'Cardio',    photo: '5327545' },
-  { value: 'hiit',      label: 'HIIT',      photo: '2261481' },
-  { value: 'custom',    label: 'Custom',    photo: '3999606' },
+  { value: 'cardio', label: 'Cardio', photo: '5327545' },
+  { value: 'hiit', label: 'HIIT', photo: '2261481' },
+  { value: 'custom', label: 'Custom', photo: '3999606' },
 ]
 
 const DURATIONS = [30, 45, 60, 75, 90]
@@ -43,6 +43,7 @@ export default function LogPage() {
     freeUnverifiedRemaining: user.free_unverified_remaining,
     lifetimeSessions: user.lifetime_sessions,
   })
+
   const verifiedPoints = calculatePoints({
     durationMinutes: duration,
     verified: true,
@@ -57,6 +58,7 @@ export default function LogPage() {
 
     const todayStart = new Date()
     todayStart.setHours(0, 0, 0, 0)
+
     const { data: todaySession } = await supabase
       .from('workouts')
       .select('id')
@@ -87,13 +89,13 @@ export default function LogPage() {
       verified = true
       const provider = terraActivity[0].provider?.toUpperCase()
       verificationMethod =
-        provider === 'APPLE'   ? 'apple_health' :
-        provider === 'GARMIN'  ? 'garmin'       :
-        provider === 'FITBIT'  ? 'fitbit'        :
-        provider === 'GOOGLE'  ? 'google_fit'    :
+        provider === 'APPLE' ? 'apple_health' :
+        provider === 'GARMIN' ? 'garmin' :
+        provider === 'FITBIT' ? 'fitbit' :
+        provider === 'GOOGLE' ? 'google_fit' :
         provider?.toLowerCase() ?? 'unverified'
       heartRateAvg = terraActivity[0].heart_rate_avg
-      calories     = terraActivity[0].calories
+      calories = terraActivity[0].calories
     }
 
     // Strava auto-verify
@@ -103,6 +105,7 @@ export default function LogPage() {
         .select('access_token, token_expires_at')
         .eq('user_id', user.id)
         .single()
+
       if (stravaConn && new Date(stravaConn.token_expires_at) > new Date()) {
         try {
           const _today = new Date()
@@ -123,6 +126,7 @@ export default function LogPage() {
         } catch { /* strava check is best-effort */ }
       }
     }
+
     let gpsDenied = false
     if (!verified) {
       try {
@@ -133,8 +137,7 @@ export default function LogPage() {
             { timeout: 15000, enableHighAccuracy: false }
           )
         })
-      } catch {
-        // no geolocation
+      } catch { // no geolocation
       }
     }
 
@@ -153,17 +156,17 @@ export default function LogPage() {
     })
 
     const { error: workoutError } = await supabase.from('workouts').insert({
-      user_id:              user.id,
-      type:                 workoutType,
-      custom_name:          workoutType === 'custom' ? customName : null,
-      duration_minutes:     duration,
-      verification_method:  verificationMethod,
+      user_id: user.id,
+      type: workoutType,
+      custom_name: workoutType === 'custom' ? customName : null,
+      duration_minutes: duration,
+      verification_method: verificationMethod,
       verified,
-      heart_rate_avg:       heartRateAvg,
+      heart_rate_avg: heartRateAvg,
       calories,
-      base_points:          pts.base,
-      multiplier_applied:   pts.multiplier,
-      total_points_earned:  pts.total,
+      base_points: pts.base,
+      multiplier_applied: pts.multiplier,
+      total_points_earned: pts.total,
     })
 
     if (workoutError) { setError(workoutError.message); setLoading(false); return }
@@ -183,20 +186,18 @@ export default function LogPage() {
       .lt('logged_at', new Date(new Date().setHours(0,0,0,0)).toISOString())
       .limit(1)
 
-    const newStreak  = (yesterdaySession && yesterdaySession.length > 0) ? user.current_streak + 1 : 1
+    const newStreak = (yesterdaySession && yesterdaySession.length > 0) ? user.current_streak + 1 : 1
     const newLongest = Math.max(user.longest_streak, newStreak)
-    const newFreeUnverified = !verified
-      ? Math.max(0, user.free_unverified_remaining - 1)
-      : user.free_unverified_remaining
+    const newFreeUnverified = !verified ? Math.max(0, user.free_unverified_remaining - 1) : user.free_unverified_remaining
 
     await supabase.from('users').update({
-      lifetime_sessions:      newSessions,
-      tier:                   newTier,
-      multiplier:             tierMultipliers[newTier],
-      points_balance:         user.points_balance + pts.total,
+      lifetime_sessions: newSessions,
+      tier: newTier,
+      multiplier: tierMultipliers[newTier],
+      points_balance: user.points_balance + pts.total,
       points_lifetime_earned: user.points_lifetime_earned + pts.total,
-      current_streak:         newStreak,
-      longest_streak:         newLongest,
+      current_streak: newStreak,
+      longest_streak: newLongest,
       free_unverified_remaining: newFreeUnverified,
     }).eq('id', user.id)
 
@@ -207,14 +208,17 @@ export default function LogPage() {
         .select('id, points_balance, points_lifetime_earned, tier')
         .eq('id', user.referred_by)
         .single()
+
       if (referrer) {
         await supabase.from('users').update({
-          points_balance:         referrer.points_balance + getReferralPoints(referrer.tier as Tier),
+          points_balance: referrer.points_balance + getReferralPoints(referrer.tier as Tier),
           points_lifetime_earned: referrer.points_lifetime_earned + getReferralPoints(referrer.tier as Tier),
         }).eq('id', referrer.id)
+
         await supabase.from('users').update({
           referral_bonus_claimed: true,
         }).eq('id', user.id)
+
         await supabase.from('referrals')
           .update({ bonus_awarded: true, bonus_awarded_at: new Date().toISOString() })
           .eq('referred_id', user.id)
@@ -230,12 +234,12 @@ export default function LogPage() {
 
   const VERIFICATION_LABELS: Record<string, string> = {
     apple_health: '🍎 Apple Health',
-    garmin:       '⌚ Garmin',
-    fitbit:       '💚 Fitbit',
-    google_fit:   '🏃 Google Fit',
-    gps:          '📍 GPS',
-    gps_denied:   '⚠️ GPS Blocked',
-    strava:       '🏊 Strava',
+    garmin: '⌚ Garmin',
+    fitbit: '💚 Fitbit',
+    google_fit: '🏃 Google Fit',
+    gps: '📍 GPS',
+    gps_denied: '⚠️ GPS Blocked',
+    strava: '🏊 Strava',
   }
 
   if (step === 'success') {
@@ -278,51 +282,78 @@ export default function LogPage() {
       {step === 'type' && (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 24 }}>
-            {WORKOUT_TYPES.map(t => (
-              <button
-                key={t.value}
-                onClick={() => setWorkoutType(t.value)}
-                style={{
-                  position: 'relative',
-                  height: 90,
-                  backgroundImage: `url(https://images.pexels.com/photos/${t.photo}/pexels-photo-${t.photo}.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2)`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  border: workoutType === t.value ? '2.5px solid #B5593C' : '2px solid transparent',
-                  borderRadius: 12,
-                  cursor: 'pointer',
-                  overflow: 'hidden',
-                  padding: 0,
-                  outline: 'none',
-                }}
-              >
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: workoutType === t.value
-                    ? 'linear-gradient(to top, rgba(181,89,60,0.50) 0%, rgba(0,0,0,0.30) 50%, rgba(0,0,0,0.15) 100%)'
-                    : 'linear-gradient(to top, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.18) 55%, rgba(0,0,0,0.08) 100%)',
-                  borderRadius: 10,
-                  transition: 'background 0.15s',
-                }} />
-                <span style={{
-                  position: 'absolute',
-                  bottom: 8,
-                  left: 0,
-                  right: 0,
-                  textAlign: 'center',
-                  fontSize: 10,
-                  fontWeight: 900,
-                  color: '#FFFFFF',
-                  fontFamily: 'Archivo, sans-serif',
-                  letterSpacing: 1,
-                  textTransform: 'uppercase',
-                  textShadow: '0 1px 4px rgba(0,0,0,0.6)',
-                }}>
-                  {t.label}
-                </span>
-              </button>
-            ))}
+            {WORKOUT_TYPES.map(t => {
+              const isSelected = workoutType === t.value
+              return (
+                <button
+                  key={t.value}
+                  onClick={() => setWorkoutType(t.value)}
+                  style={{
+                    position: 'relative',
+                    height: 90,
+                    backgroundImage: `url(https://images.pexels.com/photos/${t.photo}/pexels-photo-${t.photo}.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2)`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    border: isSelected ? '2.5px solid #B5593C' : '2px solid transparent',
+                    borderRadius: 12,
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    padding: 0,
+                    outline: 'none',
+                    transform: isSelected ? 'scale(1.04)' : 'scale(1)',
+                    transition: 'transform 0.15s ease, border-color 0.15s ease',
+                    boxShadow: isSelected ? '0 4px 16px rgba(181,89,60,0.35)' : 'none',
+                    zIndex: isSelected ? 1 : 0,
+                  }}
+                >
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: isSelected
+                      ? 'linear-gradient(to top, rgba(181,89,60,0.65) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0.10) 100%)'
+                      : 'linear-gradient(to top, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.20) 60%, rgba(0,0,0,0.08) 100%)',
+                    borderRadius: 10,
+                    transition: 'background 0.15s',
+                  }} />
+                  {isSelected && (
+                    <div style={{
+                      position: 'absolute',
+                      top: 6,
+                      right: 6,
+                      width: 18,
+                      height: 18,
+                      borderRadius: '50%',
+                      background: '#B5593C',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 10,
+                      color: 'white',
+                      fontWeight: 900,
+                      lineHeight: 1,
+                    }}>
+                      ✓
+                    </div>
+                  )}
+                  <span style={{
+                    position: 'absolute',
+                    bottom: 8,
+                    left: 0,
+                    right: 0,
+                    textAlign: 'center',
+                    fontSize: 10,
+                    fontWeight: 900,
+                    color: '#FFFFFF',
+                    fontFamily: 'Archivo, sans-serif',
+                    letterSpacing: 1,
+                    textTransform: 'uppercase',
+                    textShadow: '0 1px 4px rgba(0,0,0,0.6)',
+                  }}>
+                    {t.label}
+                  </span>
+                </button>
+              )
+            })}
           </div>
 
           {workoutType === 'custom' && (
