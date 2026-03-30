@@ -79,6 +79,7 @@ export interface Reward {
   retail_value: number
   reward_type?: RewardType
   fulfillment_value?: string
+  coming_soon?: boolean
 }
 
 export interface Redemption {
