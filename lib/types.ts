@@ -19,6 +19,8 @@ export type VerificationMethod =
 
 export type Tier = 'bronze' | 'silver' | 'gold' | 'platinum'
 
+export type RewardType = 'gift_card' | 'discount_code' | 'affiliate_link'
+
 export interface User {
   id: string
   email: string
@@ -71,10 +73,12 @@ export interface Reward {
   is_active: boolean
   is_featured?: boolean
   category: string
-  affiliate_url: string
+  affiliate_url?: string
   is_hot?: boolean
   is_new?: boolean
   retail_value: number
+  reward_type?: RewardType
+  fulfillment_value?: string
 }
 
 export interface Redemption {
