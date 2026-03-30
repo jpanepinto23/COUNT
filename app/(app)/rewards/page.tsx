@@ -1,5 +1,4 @@
 'use client'
-
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
@@ -11,6 +10,7 @@ const CATEGORY_EMOJI: Record<string, string> = {
   gift_cards: '🎁',
   lifestyle: '✨',
 }
+
 const CATEGORY_COLOR: Record<string, string> = {
   supplements: '#22c55e',
   gear: '#3b82f6',
@@ -43,7 +43,7 @@ export default function RewardsPage() {
   if (!user) return null
 
   async function handleRedeem(reward: Reward) {
-    if (!user || user.points_balance < reward.point_cost || redeeming) return
+    if (!user || user.points_balance < reward.point_cost || redeeming || reward.coming_soon) return
     setRedeeming(reward.id)
     setError(null)
     try {
@@ -117,10 +117,7 @@ export default function RewardsPage() {
                 {copied ? '✓ Copied!' : 'Copy Code'}
               </button>
               {successReward.affiliate_url && (
-                <a
-                  href={successReward.affiliate_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <a href={successReward.affiliate_url} target="_blank" rel="noopener noreferrer"
                   style={{ display: 'block', marginTop: 10, color: '#B5593C', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}
                 >
                   Shop {successReward.brand_name} →
@@ -131,10 +128,7 @@ export default function RewardsPage() {
 
           {reward_type === 'affiliate_link' && affiliate_url && (
             <div style={{ marginBottom: 20 }}>
-              <a
-                href={affiliate_url}
-                target="_blank"
-                rel="noopener noreferrer"
+              <a href={affiliate_url} target="_blank" rel="noopener noreferrer"
                 style={{ display: 'block', background: '#111110', color: 'white', borderRadius: 12, padding: '16px 24px', fontSize: 15, fontWeight: 800, textDecoration: 'none', marginBottom: 10 }}
               >
                 Claim Your {successReward.brand_name} Reward →
@@ -214,23 +208,50 @@ function RewardCard({ reward, userBalance, redeeming, onRedeem }: {
   redeeming: string | null
   onRedeem: (r: Reward) => void
 }) {
+  const isComingSoon = !!reward.coming_soon
   const canAfford = userBalance >= reward.point_cost
   const isRedeeming = redeeming === reward.id
   const emoji = { supplements: '💪', gear: '👟', gift_cards: '🎁', lifestyle: '✨' }[reward.category] ?? '🎯'
   const accent = { supplements: '#22c55e', gear: '#3b82f6', gift_cards: '#f59e0b', lifestyle: '#a855f7' }[reward.category] ?? '#B5593C'
-  const typeLabel = reward.reward_type === 'discount_code' ? '🏷️ Code' : reward.reward_type === 'affiliate_link' ? '🔗 Link' : null
+
+  const typeLabel = isComingSoon
+    ? null
+    : reward.reward_type === 'discount_code'
+      ? '🏷️ Code'
+      : reward.reward_type === 'affiliate_link'
+        ? '🔗 Link'
+        : null
 
   return (
-    <div style={{ background: '#fff', border: `1.5px solid ${canAfford ? '#E0D9CE' : '#F0EDE6'}`, borderRadius: 14, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, opacity: canAfford ? 1 : 0.65 }}>
-      <div style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0, background: accent + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>
+    <div style={{
+      background: '#fff',
+      border: `1.5px solid ${isComingSoon ? '#F0EDE6' : canAfford ? '#E0D9CE' : '#F0EDE6'}`,
+      borderRadius: 14,
+      padding: '14px 16px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      opacity: isComingSoon ? 0.7 : canAfford ? 1 : 0.65,
+    }}>
+      <div style={{
+        width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+        background: accent + '18',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
+      }}>
         {emoji}
       </div>
+
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
           <p style={{ fontSize: 14, fontWeight: 800, color: '#111110', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {reward.product_name}
           </p>
-          {(reward.is_hot || reward.is_new) && (
+          {isComingSoon && (
+            <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 20, background: '#F5F0EA', color: '#8A8478', flexShrink: 0, whiteSpace: 'nowrap' }}>
+              🕐 Soon
+            </span>
+          )}
+          {!isComingSoon && (reward.is_hot || reward.is_new) && (
             <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 20, background: reward.is_hot ? '#FEF3C7' : '#EDE9FE', color: reward.is_hot ? '#92400E' : '#5B21B6', flexShrink: 0 }}>
               {reward.is_hot ? '🔥 Hot' : '✨ New'}
             </span>
@@ -244,17 +265,49 @@ function RewardCard({ reward, userBalance, redeeming, onRedeem }: {
         <p style={{ fontSize: 12, color: '#8A8478', margin: 0 }}>
           {reward.brand_name}{reward.retail_value > 0 ? ' · $' + reward.retail_value + ' value' : reward.description ? ' · ' + reward.description : ''}
         </p>
-        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 700, color: accent, margin: '3px 0 0' }}>
+        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 700, color: isComingSoon ? '#C4BFBA' : accent, margin: '3px 0 0' }}>
           {reward.point_cost.toLocaleString()} pts
         </p>
       </div>
-      <button
-        onClick={() => onRedeem(reward)}
-        disabled={!canAfford || !!redeeming}
-        style={{ padding: '9px 14px', background: canAfford && !redeeming ? '#111110' : '#EDEBE5', color: canAfford && !redeeming ? '#F5F0EA' : '#8A8478', border: 'none', borderRadius: 9, fontSize: 12, fontWeight: 800, cursor: canAfford && !redeeming ? 'pointer' : 'not-allowed', flexShrink: 0, fontFamily: 'Archivo, sans-serif', minWidth: 68 }}
-      >
-        {isRedeeming ? '...' : canAfford ? 'Redeem' : 'Need ' + (reward.point_cost - userBalance).toLocaleString() + ' more'}
-      </button>
+
+      {isComingSoon ? (
+        <div style={{
+          padding: '9px 10px',
+          background: '#F5F0EA',
+          color: '#C4BFBA',
+          border: '1.5px solid #E0D9CE',
+          borderRadius: 9,
+          fontSize: 11,
+          fontWeight: 800,
+          flexShrink: 0,
+          textAlign: 'center',
+          lineHeight: 1.3,
+          fontFamily: 'Archivo, sans-serif',
+          minWidth: 68,
+        }}>
+          Coming<br />Soon
+        </div>
+      ) : (
+        <button
+          onClick={() => onRedeem(reward)}
+          disabled={!canAfford || !!redeeming}
+          style={{
+            padding: '9px 14px',
+            background: canAfford && !redeeming ? '#111110' : '#EDEBE5',
+            color: canAfford && !redeeming ? '#F5F0EA' : '#8A8478',
+            border: 'none',
+            borderRadius: 9,
+            fontSize: 12,
+            fontWeight: 800,
+            cursor: canAfford && !redeeming ? 'pointer' : 'not-allowed',
+            flexShrink: 0,
+            fontFamily: 'Archivo, sans-serif',
+            minWidth: 68,
+          }}
+        >
+          {isRedeeming ? '...' : canAfford ? 'Redeem' : 'Need ' + (reward.point_cost - userBalance).toLocaleString() + ' more'}
+        </button>
+      )}
     </div>
   )
 }
