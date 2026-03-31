@@ -1,4 +1,5 @@
 'use client'
+
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
@@ -20,6 +21,15 @@ const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string }[] = [
 
 const DURATIONS = [30, 45, 60, 75, 90]
 
+const MILESTONES: Record<number, { emoji: string; title: string; message: string }> = {
+  1:   { emoji: '🌱', title: 'First session!',       message: "Every legend starts somewhere. You just took your first step." },
+  5:   { emoji: '🔥', title: '5 sessions strong!',   message: "You're building a habit. Keep showing up." },
+  10:  { emoji: '💪', title: '10 sessions down!',    message: "Double digits. You're officially consistent." },
+  25:  { emoji: '🏅', title: '25 sessions!',         message: "A quarter century of workouts. You're in the top tier of commitment." },
+  50:  { emoji: '⚡', title: '50 sessions!',         message: "Fifty sessions. Most people quit at 5. You didn't." },
+  100: { emoji: '🏆', title: '100 sessions!',        message: "One hundred. You are a COUNT legend. Truly elite." },
+}
+
 export default function LogPage() {
   const { user, refreshUser } = useAuth()
   const router = useRouter()
@@ -33,6 +43,7 @@ export default function LogPage() {
   const [error, setError] = useState('')
   const [earnedPoints, setEarnedPoints] = useState(0)
   const [verificationSource, setVerificationSource] = useState<string | null>(null)
+  const [newSessionCount, setNewSessionCount] = useState(0)
 
   if (!user) return null
 
@@ -43,7 +54,6 @@ export default function LogPage() {
     freeUnverifiedRemaining: user.free_unverified_remaining,
     lifetimeSessions: user.lifetime_sessions,
   })
-
   const verifiedPoints = calculatePoints({
     durationMinutes: duration,
     verified: true,
@@ -188,7 +198,9 @@ export default function LogPage() {
 
     const newStreak = (yesterdaySession && yesterdaySession.length > 0) ? user.current_streak + 1 : 1
     const newLongest = Math.max(user.longest_streak, newStreak)
-    const newFreeUnverified = !verified ? Math.max(0, user.free_unverified_remaining - 1) : user.free_unverified_remaining
+    const newFreeUnverified = !verified
+      ? Math.max(0, user.free_unverified_remaining - 1)
+      : user.free_unverified_remaining
 
     await supabase.from('users').update({
       lifetime_sessions: newSessions,
@@ -201,24 +213,19 @@ export default function LogPage() {
       free_unverified_remaining: newFreeUnverified,
     }).eq('id', user.id)
 
-    // ── Referral bonus: award tier-scaled pts to referrer on first workout ──
+    // ── Referral bonus ──
     if (user.lifetime_sessions === 0 && user.referred_by && !user.referral_bonus_claimed) {
       const { data: referrer } = await supabase
         .from('users')
         .select('id, points_balance, points_lifetime_earned, tier')
         .eq('id', user.referred_by)
         .single()
-
       if (referrer) {
         await supabase.from('users').update({
           points_balance: referrer.points_balance + getReferralPoints(referrer.tier as Tier),
           points_lifetime_earned: referrer.points_lifetime_earned + getReferralPoints(referrer.tier as Tier),
         }).eq('id', referrer.id)
-
-        await supabase.from('users').update({
-          referral_bonus_claimed: true,
-        }).eq('id', user.id)
-
+        await supabase.from('users').update({ referral_bonus_claimed: true }).eq('id', user.id)
         await supabase.from('referrals')
           .update({ bonus_awarded: true, bonus_awarded_at: new Date().toISOString() })
           .eq('referred_id', user.id)
@@ -226,6 +233,7 @@ export default function LogPage() {
     }
 
     setEarnedPoints(pts.total)
+    setNewSessionCount(newSessions)
     setVerificationSource(verified ? verificationMethod : gpsDenied ? 'gps_denied' : null)
     await refreshUser()
     setLoading(false)
@@ -243,13 +251,37 @@ export default function LogPage() {
   }
 
   if (step === 'success') {
+    const milestone = MILESTONES[newSessionCount]
     return (
       <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#FAF8F4' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 56, marginBottom: 16 }}>🏆</div>
-          <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, marginBottom: 8, fontFamily: 'Archivo, sans-serif' }}>Session logged!</h2>
-          <p style={{ color: '#8A8478', marginBottom: 24 }}>You showed up. That&apos;s what counts.</p>
-          <div style={{ background: '#111110', borderRadius: 16, padding: '20px 32px', marginBottom: verificationSource ? 12 : 28, display: 'inline-block' }}>
+        <div style={{ textAlign: 'center', width: '100%', maxWidth: 360 }}>
+
+          {/* Milestone celebration */}
+          {milestone && (
+            <div style={{ background: 'linear-gradient(135deg, #B5593C 0%, #D97706 100%)', borderRadius: 16, padding: '20px 24px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: -20, right: -20, fontSize: 80, opacity: 0.15, lineHeight: 1 }}>
+                {milestone.emoji}
+              </div>
+              <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2, color: 'rgba(255,255,255,0.75)', marginBottom: 6 }}>
+                Milestone Unlocked
+              </p>
+              <p style={{ fontSize: 32, marginBottom: 6 }}>{milestone.emoji}</p>
+              <p style={{ fontSize: 22, fontWeight: 900, color: '#fff', fontFamily: 'Archivo, sans-serif', marginBottom: 6 }}>
+                {milestone.title}
+              </p>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', lineHeight: 1.4 }}>
+                {milestone.message}
+              </p>
+            </div>
+          )}
+
+          <div style={{ fontSize: milestone ? 40 : 56, marginBottom: 12 }}>🏆</div>
+          <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, marginBottom: 8, fontFamily: 'Archivo, sans-serif' }}>
+            Session logged!
+          </h2>
+          <p style={{ color: '#8A8478', marginBottom: 20 }}>You showed up. That&apos;s what counts.</p>
+
+          <div style={{ background: '#111110', borderRadius: 16, padding: '20px 32px', marginBottom: verificationSource ? 12 : 24, display: 'inline-block', width: '100%' }}>
             <p style={{ color: '#8A8478', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 }}>Points Earned</p>
             <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 44, fontWeight: 900, color: '#B5593C', lineHeight: 1 }}>
               +{earnedPoints}
@@ -258,14 +290,26 @@ export default function LogPage() {
               {getTierLabel(tier)} tier · {multiplier}x multiplier
             </p>
           </div>
+
           {verificationSource && (
-            <div style={{ background: '#F0FDF4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 16px', marginBottom: 28, fontSize: 12, color: '#166534', fontWeight: 700 }}>
+            <div style={{ background: '#F0FDF4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 16px', marginBottom: 20, fontSize: 12, color: '#166534', fontWeight: 700 }}>
               ✓ Verified via {VERIFICATION_LABELS[verificationSource] ?? verificationSource}
             </div>
           )}
+
           <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={() => router.push('/home')} style={{ flex: 1, padding: 15, background: '#111110', color: '#F5F0EA', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}>Back to Home</button>
-            <button onClick={() => router.push('/rewards')} style={{ flex: 1, padding: 15, background: '#FDF5F1', color: '#B5593C', border: '1.5px solid #B5593C', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}>Shop Rewards</button>
+            <button
+              onClick={() => router.push('/home')}
+              style={{ flex: 1, padding: 15, background: '#111110', color: '#F5F0EA', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}
+            >
+              Back to Home
+            </button>
+            <button
+              onClick={() => router.push('/rewards')}
+              style={{ flex: 1, padding: 15, background: '#FDF5F1', color: '#B5593C', border: '1.5px solid #B5593C', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}
+            >
+              Shop Rewards
+            </button>
           </div>
         </div>
       </div>
@@ -307,8 +351,7 @@ export default function LogPage() {
                   }}
                 >
                   <div style={{
-                    position: 'absolute',
-                    inset: 0,
+                    position: 'absolute', inset: 0,
                     background: isSelected
                       ? 'linear-gradient(to top, rgba(181,89,60,0.65) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0.10) 100%)'
                       : 'linear-gradient(to top, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.20) 60%, rgba(0,0,0,0.08) 100%)',
@@ -317,36 +360,18 @@ export default function LogPage() {
                   }} />
                   {isSelected && (
                     <div style={{
-                      position: 'absolute',
-                      top: 6,
-                      right: 6,
-                      width: 18,
-                      height: 18,
-                      borderRadius: '50%',
+                      position: 'absolute', top: 6, right: 6,
+                      width: 18, height: 18, borderRadius: '50%',
                       background: '#B5593C',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 10,
-                      color: 'white',
-                      fontWeight: 900,
-                      lineHeight: 1,
-                    }}>
-                      ✓
-                    </div>
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 10, color: 'white', fontWeight: 900, lineHeight: 1,
+                    }}>✓</div>
                   )}
                   <span style={{
-                    position: 'absolute',
-                    bottom: 8,
-                    left: 0,
-                    right: 0,
-                    textAlign: 'center',
-                    fontSize: 10,
-                    fontWeight: 900,
-                    color: '#FFFFFF',
-                    fontFamily: 'Archivo, sans-serif',
-                    letterSpacing: 1,
-                    textTransform: 'uppercase',
+                    position: 'absolute', bottom: 8, left: 0, right: 0,
+                    textAlign: 'center', fontSize: 10, fontWeight: 900,
+                    color: '#FFFFFF', fontFamily: 'Archivo, sans-serif',
+                    letterSpacing: 1, textTransform: 'uppercase',
                     textShadow: '0 1px 4px rgba(0,0,0,0.6)',
                   }}>
                     {t.label}
@@ -401,15 +426,11 @@ export default function LogPage() {
                   key={d}
                   onClick={() => setDuration(d)}
                   style={{
-                    flex: 1,
-                    padding: '14px 0',
+                    flex: 1, padding: '14px 0',
                     background: duration === d ? '#B5593C' : '#fff',
                     border: `1.5px solid ${duration === d ? '#B5593C' : '#E0D9CE'}`,
-                    borderRadius: 10,
-                    cursor: 'pointer',
-                    fontFamily: 'JetBrains Mono, monospace',
-                    fontSize: 13,
-                    fontWeight: 700,
+                    borderRadius: 10, cursor: 'pointer',
+                    fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700,
                     color: duration === d ? '#F5F0EA' : '#111110',
                   }}
                 >
