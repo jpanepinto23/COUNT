@@ -138,6 +138,16 @@ export default function HomePage() {
           <Link href="/log" style={{ textDecoration: 'none' }}>
             <span style={{ fontSize: 12, fontWeight: 800, color: '#B5593C', whiteSpace: 'nowrap' }}>Log now →</span>
           </Link>
+          {isFrozen ? (
+            <p style={{ fontSize: 11, color: '#92400e', fontWeight: 700, marginTop: 8 }}>🧊 Streak frozen — safe through tonight!</p>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <p style={{ fontSize: 11, color: '#92400e' }}>Protect it · {FREEZE_COST} pts</p>
+              <button onClick={handleFreezeStreak} disabled={freezing || user.points_balance < FREEZE_COST} style={{ background: '#F97316', border: 'none', borderRadius: 8, padding: '5px 12px', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', opacity: (freezing || user.points_balance < FREEZE_COST) ? 0.5 : 1 }}>
+                {freezing ? '...' : freezeSuccess ? '🧊 Done!' : '🧊 Freeze'}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
