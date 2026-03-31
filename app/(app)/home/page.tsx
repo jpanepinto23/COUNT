@@ -17,34 +17,80 @@ const TIER_COLORS: Record<string, string> = {
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 const POINTS_CARD_PHOTO = 'https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop'
 const WEEKLY_GOAL = 4
+const MONTHLY_GOAL = 12
 
 export default function HomePage() {
   const { user, refreshUser } = useAuth()
   const [recentWorkouts, setRecentWorkouts] = useState<Workout[]>([])
   const [referralCount, setReferralCount] = useState(0)
   const [copied, setCopied] = useState(false)
+  const [monthlyCount, setMonthlyCount] = useState(0)
+  const [userRank, setUserRank] = useState<number | null>(null)
+  const [pointsToPassAbove, setPointsToPassAbove] = useState<number | null>(null)
+  const [nextReward, setNextReward] = useState<{ name: string; points_cost: number } | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
     if (!user) return
+
+    // Recent workouts
     supabase
       .from('workouts')
       .select('*')
       .eq('user_id', user.id)
       .order('logged_at', { ascending: false })
       .limit(10)
-      .then(({ data }) => {
-        if (data) setRecentWorkouts(data)
-      })
+      .then(({ data }) => { if (data) setRecentWorkouts(data) })
+
+    // Referral count
     if (user.referral_code) {
       supabase
         .from('referrals')
         .select('id', { count: 'exact' })
         .eq('referrer_id', user.id)
-        .then(({ count }) => {
-          if (count !== null) setReferralCount(count)
-        })
+        .then(({ count }) => { if (count !== null) setReferralCount(count) })
     }
+
+    // Monthly workout count
+    const monthStart = new Date()
+    monthStart.setDate(1)
+    monthStart.setHours(0, 0, 0, 0)
+    supabase
+      .from('workouts')
+      .select('id', { count: 'exact' })
+      .eq('user_id', user.id)
+      .gte('logged_at', monthStart.toISOString())
+      .then(({ count }) => { if (count !== null) setMonthlyCount(count) })
+
+    // Leaderboard rank: count users with more lifetime points
+    supabase
+      .from('users')
+      .select('id', { count: 'exact' })
+      .gt('points_lifetime_earned', user.points_lifetime_earned)
+      .then(({ count }) => { if (count !== null) setUserRank(count + 1) })
+
+    // Points gap to person just above
+    supabase
+      .from('users')
+      .select('points_lifetime_earned')
+      .gt('points_lifetime_earned', user.points_lifetime_earned)
+      .order('points_lifetime_earned', { ascending: true })
+      .limit(1)
+      .then(({ data }) => {
+        if (data && data[0]) {
+          setPointsToPassAbove(data[0].points_lifetime_earned - user.points_lifetime_earned)
+        }
+      })
+
+    // Next attainable reward (cheapest one user can't yet afford)
+    supabase
+      .from('rewards')
+      .select('name, points_cost')
+      .gt('points_cost', user.points_balance)
+      .order('points_cost', { ascending: true })
+      .limit(1)
+      .then(({ data }) => { if (data && data[0]) setNextReward(data[0]) })
+
     refreshUser()
   }, [user?.id]) // eslint-disable-line
 
@@ -55,8 +101,7 @@ export default function HomePage() {
   const { next, sessionsNeeded, threshold } = getNextTierSessions(user.lifetime_sessions)
   const progress = next
     ? ((user.lifetime_sessions - (threshold - sessionsNeeded - (tier === 'bronze' ? 0 : tier === 'silver' ? 30 : tier === 'gold' ? 60 : 120))) /
-        (threshold - (tier === 'bronze' ? 0 : tier === 'silver' ? 30 : tier === 'gold' ? 60 : 120))) *
-      100
+        (threshold - (tier === 'bronze' ? 0 : tier === 'silver' ? 30 : tier === 'gold' ? 60 : 120))) * 100
     : 100
 
   const today = new Date()
@@ -66,13 +111,15 @@ export default function HomePage() {
     return d
   })
 
-  const workedOutDates = new Set(
-    recentWorkouts.map(w => new Date(w.logged_at).toDateString())
-  )
-
+  const workedOutDates = new Set(recentWorkouts.map(w => new Date(w.logged_at).toDateString()))
   const hasLoggedToday = workedOutDates.has(today.toDateString())
   const streakAtRisk = user.current_streak > 0 && !hasLoggedToday
   const weekSessionCount = week.filter(d => workedOutDates.has(d.toDateString())).length
+
+  // Monthly challenge helpers
+  const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
+  const daysLeft = daysInMonth - today.getDate()
+  const monthName = today.toLocaleDateString('en-US', { month: 'long' })
 
   const referralLink = `https://count-app-joe.vercel.app/auth/signup?ref=${user.referral_code ?? ''}`
 
@@ -94,6 +141,7 @@ export default function HomePage() {
 
   return (
     <div style={{ padding: '20px 16px', paddingBottom: 8 }}>
+
       {/* Logo */}
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
         <TallyLogo size={0.8} />
@@ -129,7 +177,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Add photo nudge */}
+      {/* Photo nudge */}
       {!user.avatar_url && (
         <Link href="/profile" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
           <div style={{ background: '#FFF8F5', border: '1.5px solid #F0D5C8', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -143,17 +191,13 @@ export default function HomePage() {
         </Link>
       )}
 
-      {/* Streak at risk warning */}
+      {/* Streak at risk */}
       {streakAtRisk && (
         <div style={{ background: '#FFF7ED', border: '1.5px solid #F97316', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
           <span style={{ fontSize: 22 }}>⚠️</span>
           <div style={{ flex: 1 }}>
-            <p style={{ fontSize: 13, fontWeight: 800, color: '#C2410C', marginBottom: 1 }}>
-              Streak at risk!
-            </p>
-            <p style={{ fontSize: 11, color: '#9A3412' }}>
-              Log a workout today to keep your {user.current_streak}-day streak alive 🔥
-            </p>
+            <p style={{ fontSize: 13, fontWeight: 800, color: '#C2410C', marginBottom: 1 }}>Streak at risk!</p>
+            <p style={{ fontSize: 11, color: '#9A3412' }}>Log a workout today to keep your {user.current_streak}-day streak alive 🔥</p>
           </div>
           <Link href="/log" style={{ textDecoration: 'none' }}>
             <span style={{ fontSize: 12, fontWeight: 800, color: '#B5593C', whiteSpace: 'nowrap' }}>Log now →</span>
@@ -216,6 +260,100 @@ export default function HomePage() {
             : `${WEEKLY_GOAL - weekSessionCount} more session${WEEKLY_GOAL - weekSessionCount === 1 ? '' : 's'} to hit your goal this week`}
         </p>
       </div>
+
+      {/* Monthly challenge */}
+      <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5 }}>
+              {monthName} Challenge
+            </p>
+          </div>
+          <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700, color: monthlyCount >= MONTHLY_GOAL ? '#16a34a' : tierColor }}>
+            {monthlyCount} / {MONTHLY_GOAL} sessions
+          </p>
+        </div>
+        <div style={{ height: 8, background: '#F5F0EA', borderRadius: 99, overflow: 'hidden', marginBottom: 6 }}>
+          <div style={{ height: '100%', width: `${Math.min((monthlyCount / MONTHLY_GOAL) * 100, 100)}%`, background: monthlyCount >= MONTHLY_GOAL ? '#16a34a' : tierColor, borderRadius: 99, transition: 'width 0.6s ease' }} />
+        </div>
+        <p style={{ fontSize: 11, color: monthlyCount >= MONTHLY_GOAL ? '#16a34a' : '#8A8478' }}>
+          {monthlyCount >= MONTHLY_GOAL
+            ? `🏆 Challenge complete! You logged ${monthlyCount} sessions this month.`
+            : daysLeft <= 5 && daysLeft > 0
+              ? `⚡ ${MONTHLY_GOAL - monthlyCount} to go — only ${daysLeft} day${daysLeft === 1 ? '' : 's'} left!`
+              : `${MONTHLY_GOAL - monthlyCount} more session${MONTHLY_GOAL - monthlyCount === 1 ? '' : 's'} to complete the ${monthName} challenge`}
+        </p>
+      </div>
+
+      {/* Leaderboard rank teaser */}
+      {userRank !== null && (
+        <Link href="/leaderboard" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
+          <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+              <p style={{ fontSize: 11, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5 }}>Your Rank</p>
+              <span style={{ fontSize: 11, color: tierColor, fontWeight: 700 }}>View board ›</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ textAlign: 'center', minWidth: 64 }}>
+                <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 36, fontWeight: 900, color: tierColor, lineHeight: 1 }}>
+                  #{userRank}
+                </p>
+                <p style={{ fontSize: 10, color: '#8A8478', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Global</p>
+              </div>
+              <div style={{ flex: 1 }}>
+                {pointsToPassAbove !== null && pointsToPassAbove > 0 ? (
+                  <>
+                    <p style={{ fontSize: 13, fontWeight: 800, color: '#111110', marginBottom: 4 }}>
+                      <span style={{ color: tierColor, fontFamily: 'JetBrains Mono, monospace' }}>{pointsToPassAbove.toLocaleString()} pts</span> from #{userRank - 1}
+                    </p>
+                    <div style={{ height: 6, background: '#F5F0EA', borderRadius: 99, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${Math.max(5, 100 - Math.min((pointsToPassAbove / Math.max(user.points_lifetime_earned, 1)) * 200, 95))}%`, background: tierColor, borderRadius: 99 }} />
+                    </div>
+                    <p style={{ fontSize: 10, color: '#8A8478', marginTop: 4 }}>Keep logging to climb the board</p>
+                  </>
+                ) : (
+                  <p style={{ fontSize: 13, fontWeight: 800, color: '#16a34a' }}>🥇 You&apos;re at the top! Keep it up.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </Link>
+      )}
+
+      {/* Points to next reward */}
+      {nextReward && (
+        <Link href="/rewards" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
+          <div style={{ background: '#FDF5F1', border: '1.5px solid #E8C9BA', borderRadius: 14, padding: '14px 16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <p style={{ fontSize: 11, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5 }}>Next Reward</p>
+              <span style={{ fontSize: 11, color: tierColor, fontWeight: 700 }}>Shop rewards ›</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+              <span style={{ fontSize: 28 }}>🎁</span>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: 14, fontWeight: 800, color: '#111110', marginBottom: 2 }}>{nextReward.name}</p>
+                <p style={{ fontSize: 12, color: '#8A8478' }}>
+                  <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color: tierColor }}>
+                    {(nextReward.points_cost - user.points_balance).toLocaleString()}
+                  </span> more points needed
+                </p>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 15, fontWeight: 900, color: tierColor }}>
+                  {nextReward.points_cost.toLocaleString()}
+                </p>
+                <p style={{ fontSize: 9, color: '#8A8478', fontWeight: 700, textTransform: 'uppercase' }}>pts needed</p>
+              </div>
+            </div>
+            <div style={{ height: 6, background: '#E8C9BA', borderRadius: 99, overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${Math.min((user.points_balance / nextReward.points_cost) * 100, 100)}%`, background: tierColor, borderRadius: 99, transition: 'width 0.6s ease' }} />
+            </div>
+            <p style={{ fontSize: 10, color: '#8A8478', marginTop: 4, textAlign: 'right' }}>
+              {user.points_balance.toLocaleString()} / {nextReward.points_cost.toLocaleString()} pts
+            </p>
+          </div>
+        </Link>
+      )}
 
       {/* Tier progress */}
       <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
