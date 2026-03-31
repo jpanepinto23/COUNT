@@ -10,6 +10,15 @@ const TIERS = [
   { key: 'platinum', label: 'Platinum', range: '120+ sessions', multiplier: '3.0x', color: '#7C3AED', perks: ['3.0x point multiplier', 'Platinum-only rewards', 'Top 3 leaderboard bonus'] },
 ]
 
+const MILESTONES = [
+  { sessions: 1,   emoji: '🌱', label: 'First Rep',      color: '#4ADE80' },
+  { sessions: 5,   emoji: '🔥', label: 'On Fire',        color: '#FB923C' },
+  { sessions: 10,  emoji: '💪', label: 'Getting Strong', color: '#B5593C' },
+  { sessions: 25,  emoji: '🏅', label: 'Dedicated',      color: '#D97706' },
+  { sessions: 50,  emoji: '⚡', label: 'Powerhouse',     color: '#6B7280' },
+  { sessions: 100, emoji: '🏆', label: 'Legend',         color: '#7C3AED' },
+]
+
 export default function RankPage() {
   const { user } = useAuth()
 
@@ -181,7 +190,23 @@ export default function RankPage() {
         <div style={{ width: 1, background: '#E0D9CE' }} />
         <Stat label="Balance" value={user.points_balance.toLocaleString() + ' pts'} accent="#B5593C" />
       </div>
-    </div>
+  
+      {/* Trophy Room */}
+      <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 12, marginTop: 20 }}>Trophy Room</p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+        {MILESTONES.map(m => {
+          const unlocked = user.lifetime_sessions >= m.sessions
+          return (
+            <div key={m.sessions} style={{ background: unlocked ? '#111110' : 'rgba(255,255,255,0.03)', borderRadius: 14, padding: '14px 10px', textAlign: 'center', border: `1.5px solid ${unlocked ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)'}`, opacity: unlocked ? 1 : 0.5, position: 'relative', overflow: 'hidden' }}>
+              {unlocked && <div style={{ position: 'absolute', top: -12, right: -12, width: 48, height: 48, borderRadius: '50%', background: m.color, opacity: 0.2 }} />}
+              <span style={{ fontSize: 28, filter: unlocked ? 'none' : 'grayscale(1)' }}>{m.emoji}</span>
+              <p style={{ fontFamily: "'Archivo', sans-serif", fontSize: 11, fontWeight: 900, color: unlocked ? '#F5F0EA' : '#8A8478', marginTop: 6, lineHeight: 1.2 }}>{m.label}</p>
+              <p style={{ fontSize: 9, color: unlocked ? m.color : '#8A8478', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 4 }}>{m.sessions} sessions</p>
+            </div>
+          )
+        })}
+      </div>
+  </div>
   )
 }
 
