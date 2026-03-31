@@ -1,4 +1,5 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
@@ -8,15 +9,14 @@ import type { Workout } from '@/lib/types'
 import TallyLogo from '@/components/TallyLogo'
 
 const TIER_COLORS: Record<string, string> = {
-  bronze:   '#B5593C',
-  silver:   '#6B7280',
-  gold:     '#D97706',
+  bronze: '#B5593C',
+  silver: '#6B7280',
+  gold: '#D97706',
   platinum: '#7C3AED',
 }
-
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-
 const POINTS_CARD_PHOTO = 'https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop'
+const WEEKLY_GOAL = 4
 
 export default function HomePage() {
   const { user, refreshUser } = useAuth()
@@ -32,17 +32,19 @@ export default function HomePage() {
       .select('*')
       .eq('user_id', user.id)
       .order('logged_at', { ascending: false })
-      .limit(5)
-      .then(({ data }) => { if (data) setRecentWorkouts(data) })
-
+      .limit(10)
+      .then(({ data }) => {
+        if (data) setRecentWorkouts(data)
+      })
     if (user.referral_code) {
       supabase
         .from('referrals')
         .select('id', { count: 'exact' })
         .eq('referrer_id', user.id)
-        .then(({ count }) => { if (count !== null) setReferralCount(count) })
+        .then(({ count }) => {
+          if (count !== null) setReferralCount(count)
+        })
     }
-
     refreshUser()
   }, [user?.id]) // eslint-disable-line
 
@@ -53,7 +55,8 @@ export default function HomePage() {
   const { next, sessionsNeeded, threshold } = getNextTierSessions(user.lifetime_sessions)
   const progress = next
     ? ((user.lifetime_sessions - (threshold - sessionsNeeded - (tier === 'bronze' ? 0 : tier === 'silver' ? 30 : tier === 'gold' ? 60 : 120))) /
-       (threshold - (tier === 'bronze' ? 0 : tier === 'silver' ? 30 : tier === 'gold' ? 60 : 120))) * 100
+        (threshold - (tier === 'bronze' ? 0 : tier === 'silver' ? 30 : tier === 'gold' ? 60 : 120))) *
+      100
     : 100
 
   const today = new Date()
@@ -62,9 +65,14 @@ export default function HomePage() {
     d.setDate(today.getDate() - (6 - i))
     return d
   })
+
   const workedOutDates = new Set(
     recentWorkouts.map(w => new Date(w.logged_at).toDateString())
   )
+
+  const hasLoggedToday = workedOutDates.has(today.toDateString())
+  const streakAtRisk = user.current_streak > 0 && !hasLoggedToday
+  const weekSessionCount = week.filter(d => workedOutDates.has(d.toDateString())).length
 
   const referralLink = `https://count-app-joe.vercel.app/auth/signup?ref=${user.referral_code ?? ''}`
 
@@ -86,7 +94,6 @@ export default function HomePage() {
 
   return (
     <div style={{ padding: '20px 16px', paddingBottom: 8 }}>
-
       {/* Logo */}
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
         <TallyLogo size={0.8} />
@@ -112,13 +119,7 @@ export default function HomePage() {
             </div>
           </Link>
           <Link href="/profile" style={{ textDecoration: 'none' }}>
-            <div style={{
-              width: 40, height: 40, borderRadius: '50%',
-              border: user.avatar_url ? `2px solid ${tierColor}` : '2px dashed #C5B9AC',
-              background: user.avatar_url ? 'transparent' : tierColor + '18',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              overflow: 'hidden', flexShrink: 0,
-            }}>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', border: user.avatar_url ? `2px solid ${tierColor}` : '2px dashed #C5B9AC', background: user.avatar_url ? 'transparent' : tierColor + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
               {user.avatar_url
                 ? <img src={user.avatar_url} alt="you" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 : <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 14, fontWeight: 900, color: tierColor }}>{user.name.charAt(0).toUpperCase()}</span>
@@ -128,13 +129,10 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Add photo nudge — only shown until user uploads */}
+      {/* Add photo nudge */}
       {!user.avatar_url && (
         <Link href="/profile" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
-          <div style={{
-            background: '#FFF8F5', border: '1.5px solid #F0D5C8', borderRadius: 12,
-            padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10,
-          }}>
+          <div style={{ background: '#FFF8F5', border: '1.5px solid #F0D5C8', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 20 }}>📸</span>
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 13, fontWeight: 800, color: '#B5593C', marginBottom: 1 }}>Add your profile photo</p>
@@ -145,17 +143,26 @@ export default function HomePage() {
         </Link>
       )}
 
+      {/* Streak at risk warning */}
+      {streakAtRisk && (
+        <div style={{ background: '#FFF7ED', border: '1.5px solid #F97316', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+          <span style={{ fontSize: 22 }}>⚠️</span>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 13, fontWeight: 800, color: '#C2410C', marginBottom: 1 }}>
+              Streak at risk!
+            </p>
+            <p style={{ fontSize: 11, color: '#9A3412' }}>
+              Log a workout today to keep your {user.current_streak}-day streak alive 🔥
+            </p>
+          </div>
+          <Link href="/log" style={{ textDecoration: 'none' }}>
+            <span style={{ fontSize: 12, fontWeight: 800, color: '#B5593C', whiteSpace: 'nowrap' }}>Log now →</span>
+          </Link>
+        </div>
+      )}
+
       {/* Points card */}
-      <div style={{
-        backgroundImage: `url(${POINTS_CARD_PHOTO})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center 40%',
-        borderRadius: 16,
-        padding: '20px',
-        marginBottom: 14,
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
+      <div style={{ backgroundImage: `url(${POINTS_CARD_PHOTO})`, backgroundSize: 'cover', backgroundPosition: 'center 40%', borderRadius: 16, padding: '20px', marginBottom: 14, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,8,7,0.58)', borderRadius: 16 }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
           <p style={{ color: 'rgba(245,240,234,0.7)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 }}>Points Balance</p>
@@ -183,18 +190,31 @@ export default function HomePage() {
             return (
               <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                 <span style={{ fontSize: 9, color: '#8A8478', fontWeight: 700 }}>{DAY_LABELS[d.getDay()]}</span>
-                <div style={{
-                  width: '100%', aspectRatio: '1', borderRadius: 6,
-                  background: hit ? tierColor : '#F5F0EA',
-                  border: isToday ? `1.5px solid ${tierColor}` : '1.5px solid transparent',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
+                <div style={{ width: '100%', aspectRatio: '1', borderRadius: 6, background: hit ? tierColor : '#F5F0EA', border: isToday ? `1.5px solid ${tierColor}` : '1.5px solid transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {hit && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff', opacity: 0.8 }} />}
                 </div>
               </div>
             )
           })}
         </div>
+      </div>
+
+      {/* Weekly goal */}
+      <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <p style={{ fontSize: 11, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5 }}>Weekly Goal</p>
+          <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700, color: weekSessionCount >= WEEKLY_GOAL ? '#16a34a' : tierColor }}>
+            {weekSessionCount} / {WEEKLY_GOAL} sessions
+          </p>
+        </div>
+        <div style={{ height: 8, background: '#F5F0EA', borderRadius: 99, overflow: 'hidden', marginBottom: 6 }}>
+          <div style={{ height: '100%', width: `${Math.min((weekSessionCount / WEEKLY_GOAL) * 100, 100)}%`, background: weekSessionCount >= WEEKLY_GOAL ? '#16a34a' : tierColor, borderRadius: 99, transition: 'width 0.6s ease' }} />
+        </div>
+        <p style={{ fontSize: 11, color: weekSessionCount >= WEEKLY_GOAL ? '#16a34a' : '#8A8478' }}>
+          {weekSessionCount >= WEEKLY_GOAL
+            ? '🎉 Weekly goal crushed! Keep the momentum going.'
+            : `${WEEKLY_GOAL - weekSessionCount} more session${WEEKLY_GOAL - weekSessionCount === 1 ? '' : 's'} to hit your goal this week`}
+        </p>
       </div>
 
       {/* Tier progress */}
@@ -226,11 +246,10 @@ export default function HomePage() {
             You and a friend each get <span style={{ color: tierColor, fontWeight: 700 }}>500 bonus pts</span> when they sign up with your code.
             {referralCount > 0 && <span style={{ color: '#8A8478' }}> ({referralCount} referred so far)</span>}
           </p>
-          <button onClick={handleShare} style={{
-            width: '100%', padding: '12px', background: '#111110', color: '#F5F0EA',
-            border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 800,
-            fontFamily: 'Archivo, sans-serif', cursor: 'pointer',
-          }}>
+          <button
+            onClick={handleShare}
+            style={{ width: '100%', padding: '12px', background: '#111110', color: '#F5F0EA', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}
+          >
             {copied ? '✓ Link copied!' : `Share your code: ${user.referral_code}`}
           </button>
         </div>
@@ -250,7 +269,7 @@ export default function HomePage() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {recentWorkouts.map(w => (
+            {recentWorkouts.slice(0, 5).map(w => (
               <div key={w.id} style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 36, height: 36, background: tierColor + '15', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, fontWeight: 900, color: tierColor }}>{workoutAbbr(w.type)}</span>
@@ -270,7 +289,6 @@ export default function HomePage() {
           </div>
         )}
       </div>
-
     </div>
   )
 }
@@ -295,8 +313,8 @@ function TierIcon({ tier, color }: { tier: string; color: string }) {
 
 function workoutAbbr(type: string) {
   const map: Record<string, string> = {
-    push: 'PSH', pull: 'PUL', legs: 'LEG', upper: 'UPR',
-    lower: 'LWR', full_body: 'FBD', cardio: 'CDO', hiit: 'HIT', custom: 'CST',
+    push: 'PSH', pull: 'PUL', legs: 'LEG', upper: 'UPR', lower: 'LWR',
+    full_body: 'FBD', cardio: 'CDO', hiit: 'HIT', custom: 'CST',
   }
   return map[type] ?? type.slice(0, 3).toUpperCase()
 }
