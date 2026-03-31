@@ -236,8 +236,23 @@ export default function ProfilePage() {
           <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 13, fontWeight: 800, color: tierColor, textTransform: 'uppercase', letterSpacing: 1 }}>
             {getTierLabel(tier)}
           </span>
-          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#8A8478' }}>· {getTierMultiplier(tier)}x multiplier</span>
+          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#8A8478' }}>· {getTierMultiplier(tier)}x</span>
         </div>
+    {/* Streak stats */}
+    <div style={{ display: 'flex', gap: 20, marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+      <div>
+        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 20, fontWeight: 900, color: '#F5F0EA', lineHeight: 1 }}>{user.current_streak}</p>
+        <p style={{ fontSize: 9, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 }}>🔥 streak</p>
+      </div>
+      <div>
+        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 20, fontWeight: 900, color: '#F5F0EA', lineHeight: 1 }}>{user.longest_streak}</p>
+        <p style={{ fontSize: 9, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 }}>⚡ best</p>
+      </div>
+      <div>
+        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 20, fontWeight: 900, color: '#B5593C', lineHeight: 1 }}>{user.points_balance.toLocaleString()}</p>
+        <p style={{ fontSize: 9, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 }}>💰 balance</p>
+      </div>
+    </div>
       </div>
 
       {/* Stats grid */}
