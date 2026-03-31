@@ -14,7 +14,7 @@ const TIER_COLORS: Record<string, string> = {
   gold: '#D97706',
   platinum: '#7C3AED',
 }
-const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const POINTS_CARD_PHOTO = 'https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop'
 const WEEKLY_GOAL = 4
 const MONTHLY_GOAL = 12
@@ -167,7 +167,8 @@ export default function HomePage() {
             const isToday = d.toDateString() === today.toDateString()
             return (
               <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-                <span style={{ fontSize: 8, color: isToday ? tierColor : '#B0A898', fontWeight: 800 }}>{DAY_LABELS[d.getDay()]}</span>
+                <span style={{ fontSize: 8, color: isToday ? tierColor : '#B0A898', fontWeight: 700, letterSpacing: 0.5 }}>{DAY_LABELS[d.getDay()]}</span>
+                <span style={{ fontSize: 11, color: isToday ? '#FFFFFF' : '#9CA3AF', fontWeight: isToday ? 800 : 500, fontFamily: "'JetBrains Mono', monospace" }}>{d.getDate()}</span>
                 <div style={{ width: '100%', height: 6, borderRadius: 3, background: hit ? tierColor : isToday ? tierColor + '30' : '#F0ECE6' }} />
               </div>
             )
