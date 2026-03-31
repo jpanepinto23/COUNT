@@ -7,16 +7,16 @@ import { createClient } from '@/lib/supabase'
 import { calculatePoints, getTier, getTierLabel, getReferralPoints } from '@/lib/points'
 import type { WorkoutType, Tier } from '@/lib/types'
 
-const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string }[] = [
-  { value: 'push', label: 'Push', photo: '4488764' },
-  { value: 'pull', label: 'Pull', photo: '6922157' },
-  { value: 'legs', label: 'Legs', photo: '583722' },
-  { value: 'upper', label: 'Upper', photo: '3916766' },
-  { value: 'lower', label: 'Lower', photo: '4944435' },
-  { value: 'full_body', label: 'Full Body', photo: '6628962' },
-  { value: 'cardio', label: 'Cardio', photo: '5327545' },
-  { value: 'hiit', label: 'HIIT', photo: '2261481' },
-  { value: 'custom', label: 'Custom', photo: '3999606' },
+const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string; emoji: string }[] = [
+  { value: 'push', label: 'Push', photo: '4488764', emoji: '🤜' },
+  { value: 'pull', label: 'Pull', photo: '6922157', emoji: '💪' },
+  { value: 'legs', label: 'Legs', photo: '583722', emoji: '🦵' },
+  { value: 'upper', label: 'Upper', photo: '3916766', emoji: '🏋️' },
+  { value: 'lower', label: 'Lower', photo: '4944435', emoji: '🚴' },
+  { value: 'full_body', label: 'Full Body', photo: '6628962', emoji: '⚡' },
+  { value: 'cardio', label: 'Cardio', photo: '5327545', emoji: '🏃' },
+  { value: 'hiit', label: 'HIIT', photo: '2261481', emoji: '🔥' },
+  { value: 'custom', label: 'Custom', photo: '3999606', emoji: '✏️' },
 ]
 
 const DURATIONS = [30, 45, 60, 75, 90]
@@ -334,7 +334,7 @@ export default function LogPage() {
                   onClick={() => setWorkoutType(t.value)}
                   style={{
                     position: 'relative',
-                    height: 90,
+                    height: 120,
                     backgroundImage: `url(https://images.pexels.com/photos/${t.photo}/pexels-photo-${t.photo}.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2)`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
@@ -367,12 +367,15 @@ export default function LogPage() {
                       fontSize: 10, color: 'white', fontWeight: 900, lineHeight: 1,
                     }}>✓</div>
                   )}
-                  <span style={{
+                  <div style={{ position: 'absolute', top: 8, left: 8 }}>
+                <span style={{ fontSize: 20, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))' }}>{t.emoji}</span>
+              </div>
+              <span style={{
                     position: 'absolute', bottom: 8, left: 0, right: 0,
-                    textAlign: 'center', fontSize: 10, fontWeight: 900,
+                    textAlign: 'center', fontSize: 11, fontWeight: 900,
                     color: '#FFFFFF', fontFamily: 'Archivo, sans-serif',
-                    letterSpacing: 1, textTransform: 'uppercase',
-                    textShadow: '0 1px 4px rgba(0,0,0,0.6)',
+                    letterSpacing: 0.5, textTransform: 'uppercase',
+                    textShadow: '0 1px 4px rgba(0,0,0,0.7)',
                   }}>
                     {t.label}
                   </span>
