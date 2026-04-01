@@ -253,7 +253,7 @@ export default function LogPage() {
   if (step === 'success') {
     const milestone = MILESTONES[newSessionCount]
     return (
-      <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#FAF8F4' }}>
+      <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#0E0E0D' }}>
         <div style={{ textAlign: 'center', width: '100%', maxWidth: 360 }}>
 
           {/* Milestone celebration */}
@@ -279,7 +279,7 @@ export default function LogPage() {
           <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, marginBottom: 8, fontFamily: 'Archivo, sans-serif' }}>
             Session logged!
           </h2>
-          <p style={{ color: '#8A8478', marginBottom: 20 }}>You showed up. That&apos;s what counts.</p>
+          <p style={{ color: 'rgba(245,240,234,0.5)', marginBottom: 20 }}>You showed up. That&apos;s what counts.</p>
 
           <div style={{ background: '#111110', borderRadius: 16, padding: '20px 32px', marginBottom: verificationSource ? 12 : 24, display: 'inline-block', width: '100%' }}>
             <p style={{ color: '#8A8478', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 }}>Points Earned</p>
@@ -306,7 +306,7 @@ export default function LogPage() {
             </button>
             <button
               onClick={() => router.push('/rewards')}
-              style={{ flex: 1, padding: 15, background: '#FDF5F1', color: '#B5593C', border: '1.5px solid #B5593C', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}
+              style={{ flex: 1, padding: 15, background: 'transparent', color: '#B5593C', border: '1.5px solid #B5593C', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}
             >
               Shop Rewards
             </button>
@@ -317,10 +317,10 @@ export default function LogPage() {
   }
 
   return (
-    <div style={{ padding: '20px 16px' }}>
+    <div style={{ padding: '20px 16px', minHeight: '100dvh' }}>
       <div style={{ marginBottom: 24 }}>
         <p style={{ color: '#8A8478', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5 }}>Log Workout</p>
-        <h1 style={{ fontSize: 24, fontWeight: 900, letterSpacing: -0.5, fontFamily: 'Archivo, sans-serif' }}>What did you do?</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 900, letterSpacing: -0.5, fontFamily: 'Archivo, sans-serif', color: '#F5F0EA' }}>What did you do?</h1>
       </div>
 
       {step === 'type' && (
@@ -395,24 +395,24 @@ export default function LogPage() {
 
           <button onClick={() => setStep('details')} style={btnPrimary}>Next →</button>
 
-          <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '14px 16px', marginTop: 12 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: '#94A3B8', marginBottom: 10 }}>How it works</p>
+          <div style={{ background: '#111110', border: '1px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '14px 16px', marginTop: 12 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(245,240,234,0.4)', marginBottom: 10 }}>How it works</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                 <span>🏆</span>
-                <span style={{ fontSize: 12, color: '#334155' }}><strong>Earn points every session</strong> — each workout adds to your score and moves you up the leaderboard.</span>
+                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Earn points every session</strong> — each workout adds to your score and moves you up the leaderboard.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                 <span>📍</span>
-                <span style={{ fontSize: 12, color: '#334155' }}><strong>Verify with GPS or a wearable</strong> (Apple Health, Garmin, Fitbit, Google Fit) to earn <strong>100% of your points</strong>.</span>
+                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Verify with GPS or a wearable</strong> (Apple Health, Garmin, Fitbit, Google Fit) to earn <strong>100% of your points</strong>.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                 <span>✅</span>
-                <span style={{ fontSize: 12, color: '#334155' }}><strong>Unverified sessions still count</strong> — you earn fewer points, but every workout matters.</span>
+                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Unverified sessions still count</strong> — you earn fewer points, but every workout matters.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                 <span>⚖️</span>
-                <span style={{ fontSize: 12, color: '#334155' }}><strong>Why verify?</strong> It keeps the leaderboard fair and honest for everyone competing.</span>
+                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Why verify?</strong> It keeps the leaderboard fair and honest for everyone competing.</span>
               </div>
             </div>
           </div>
@@ -430,11 +430,11 @@ export default function LogPage() {
                   onClick={() => setDuration(d)}
                   style={{
                     flex: 1, padding: '14px 0',
-                    background: duration === d ? '#B5593C' : '#fff',
-                    border: `1.5px solid ${duration === d ? '#B5593C' : '#E0D9CE'}`,
+                    background: duration === d ? '#B5593C' : '#1A1A18',
+                    border: `1.5px solid ${duration === d ? '#B5593C' : 'rgba(245,240,234,0.1)'}`,
                     borderRadius: 10, cursor: 'pointer',
                     fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700,
-                    color: duration === d ? '#F5F0EA' : '#111110',
+                    color: '#F5F0EA',
                   }}
                 >
                   {d}
@@ -444,8 +444,8 @@ export default function LogPage() {
             <p style={{ color: '#8A8478', fontSize: 11, marginTop: 6 }}>minutes</p>
           </div>
 
-          <div style={{ background: '#FDF5F1', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: 16, marginBottom: 20 }}>
-            <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10, color: '#8A8478' }}>Points Preview</p>
+          <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: 16, marginBottom: 20 }}>
+            <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10, color: 'rgba(245,240,234,0.4)' }}>Points Preview</p>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
               <span style={{ fontSize: 13, color: '#8A8478' }}>Base ({duration}min)</span>
               <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700 }}>{verifiedPoints.base} pts</span>
@@ -468,17 +468,17 @@ export default function LogPage() {
 
           {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12 }}>{error}</p>}
 
-          <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: 12, padding: '12px 14px', marginBottom: 16 }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: '#0369A1', marginBottom: 8 }}>🔒 Verify your workout for full points</p>
+          <div style={{ background: '#111110', border: '1px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '12px 14px', marginBottom: 16 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#F5F0EA', fontWeight: 700, marginBottom: 8 }}>🔒 Verify your workout for full points</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: '#0C4A6E' }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: 'rgba(245,240,234,0.7)' }}>
                 <span>📍</span><span><strong>GPS</strong> — allow location access when prompted</span>
               </div>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: '#0C4A6E' }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: 'rgba(245,240,234,0.7)' }}>
                 <span>⌚</span><span><strong>Wearable</strong> — Apple Health, Garmin, Fitbit, or Google Fit</span>
               </div>
             </div>
-            <p style={{ fontSize: 11, color: '#0369A1', marginTop: 8, marginBottom: 0 }}>Verified sessions earn <strong>100% of your points</strong>. Unverified sessions still count for less.</p>
+            <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.5)', marginTop: 8, marginBottom: 0 }}>Verified sessions earn <strong>100% of your points</strong>. Unverified sessions still count for less.</p>
           </div>
 
           <div style={{ display: 'flex', gap: 10 }}>
