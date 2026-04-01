@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase'
 import { getTierLabel, getTierMultiplier, getNextTierSessions } from '@/lib/points'
 import type { Workout } from '@/lib/types'
 import TallyLogo from '@/components/TallyLogo'
+import { subscribeToPush, isPushSubscribed } from '@/lib/push'
 
 const TIER_COLORS: Record<string, string> = {
   bronze: '#B5593C',
@@ -24,6 +25,7 @@ export default function HomePage() {
   const [recentWorkouts, setRecentWorkouts] = useState<Workout[]>([])
   const [referralCount, setReferralCount] = useState(0)
   const [copied, setCopied] = useState(false)
+  const [pushEnabled, setPushEnabled] = useState(false)
   const [monthlyCount, setMonthlyCount] = useState(0)
   const [userRank, setUserRank] = useState<number | null>(null)
   const [pointsToPassAbove, setPointsToPassAbove] = useState<number | null>(null)
@@ -79,6 +81,28 @@ export default function HomePage() {
     } else {
       await navigator.clipboard.writeText(referralLink)
       setCopied(true); setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+
+  useEffect(() => {
+    isPushSubscribed().then(setPushEnabled)
+  }, [])
+
+  async function handleEnablePush() {
+    if (!user) return
+    const ok = await subscribeToPush(user.id)
+    if (ok) setPushEnabled(true)
+  }
+
+  async function handleShareStats() {
+    if (!user) return
+    const tier = user.tier ?? 'bronze'
+    const ogUrl = `https://count-fitness-app.vercel.app/api/og?name=${encodeURIComponent(user.name)}&tier=${tier}&streak=${user.current_streak}&sessions=${user.lifetime_sessions}&points=${user.points_balance}`
+    if (navigator.share) {
+      await navigator.share({ title: 'My COUNT Stats', text: `${user.current_streak}-day streak · ${user.lifetime_sessions} sessions on COUNT 💪`, url: ogUrl })
+    } else {
+      await navigator.clipboard.writeText(ogUrl)
     }
   }
 
@@ -151,6 +175,16 @@ export default function HomePage() {
         </div>
       )}
 
+      {!pushEnabled && (
+        <button onClick={handleEnablePush} style={{ width: '100%', background: '#111110', border: 'none', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, cursor: 'pointer', textAlign: 'left' }}>
+          <span style={{ fontSize: 20 }}>🔔</span>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 13, fontWeight: 800, color: '#F5F0EA', marginBottom: 1 }}>Enable streak reminders</p>
+            <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.5)' }}>Get notified before your streak breaks</p>
+          </div>
+          <span style={{ color: 'rgba(245,240,234,0.3)', fontSize: 18 }}>›</span>
+        </button>
+      )}
       {/* Points card */}
       <div style={{ backgroundImage: `url(${POINTS_CARD_PHOTO})`, backgroundSize: 'cover', backgroundPosition: 'center 40%', borderRadius: 16, padding: '20px', marginBottom: 14, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,8,7,0.60)', borderRadius: 16 }} />
@@ -342,6 +376,16 @@ export default function HomePage() {
           </div>
         )}
       </div>
+      {/* Share stats */}
+      <button onClick={handleShareStats} style={{ width: '100%', background: 'linear-gradient(135deg, #111110 0%, #1e1e1c 100%)', border: '1.5px solid #333', borderRadius: 14, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', marginTop: 6 }}>
+        <span style={{ fontSize: 24 }}>📊</span>
+        <div style={{ flex: 1, textAlign: 'left' }}>
+          <p style={{ fontSize: 14, fontWeight: 800, color: '#F5F0EA', fontFamily: 'Archivo, sans-serif', marginBottom: 2 }}>Share your stats</p>
+          <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.45)' }}>Show off your streak &amp; progress</p>
+        </div>
+        <span style={{ fontSize: 18, color: 'rgba(245,240,234,0.3)' }}>›</span>
+      </button>
+
     </div>
   )
 }
