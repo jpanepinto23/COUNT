@@ -140,11 +140,11 @@ export default function HomePage() {
       {/* Photo nudge */}
       {!user.avatar_url && (
         <Link href="/profile" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
-          <div style={{ background: '#FFF8F5', border: '1.5px solid #F0D5C8', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ background: '#1A1A18', border: '1.5px solid rgba(181,89,60,0.3)', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 20 }}>📸</span>
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 13, fontWeight: 800, color: '#B5593C', marginBottom: 1 }}>Add your profile photo</p>
-              <p style={{ fontSize: 11, color: '#8A8478' }}>Make COUNT yours — tap to upload a photo</p>
+              <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.45)' }}>Make COUNT yours — tap to upload a photo</p>
             </div>
             <span style={{ color: '#C5B9AC', fontSize: 18 }}>›</span>
           </div>
@@ -153,7 +153,7 @@ export default function HomePage() {
 
       {/* Streak at risk */}
       {streakAtRisk && (
-        <div style={{ background: '#FFF7ED', border: '1.5px solid #F97316', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+        <div style={{ background: 'rgba(249,115,22,0.12)', border: '1.5px solid rgba(249,115,22,0.4)', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
           <span style={{ fontSize: 22 }}>⚠️</span>
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 13, fontWeight: 800, color: '#C2410C', marginBottom: 1 }}>Streak at risk!</p>
@@ -176,7 +176,7 @@ export default function HomePage() {
       )}
 
       {!pushEnabled && (
-        <button onClick={handleEnablePush} style={{ width: '100%', background: '#111110', border: 'none', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, cursor: 'pointer', textAlign: 'left' }}>
+        <button onClick={handleEnablePush} style={{ width: '100%', background: '#1A1A18', border: '1px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, cursor: 'pointer', textAlign: 'left' }}>
           <span style={{ fontSize: 20 }}>🔔</span>
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 13, fontWeight: 800, color: '#F5F0EA', marginBottom: 1 }}>Enable streak reminders</p>
@@ -200,9 +200,9 @@ export default function HomePage() {
       </div>
 
       {/* ── Compact week strip ── */}
-      <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 12, padding: '10px 14px', marginBottom: 14 }}>
+      <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '10px 14px', marginBottom: 14 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 7 }}>
-          <p style={{ fontSize: 10, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5 }}>This Week</p>
+          <p style={{ fontSize: 10, fontWeight: 800, color: 'rgba(245,240,234,0.4)', textTransform: 'uppercase', letterSpacing: 1.5 }}>This Week</p>
           <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fontWeight: 700, color: '#B5593C' }}>🔥 {user.current_streak} day streak</p>
         </div>
         <div style={{ display: 'flex', gap: 4 }}>
@@ -213,7 +213,7 @@ export default function HomePage() {
               <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
                 <span style={{ fontSize: 8, color: isToday ? tierColor : '#B0A898', fontWeight: 700, letterSpacing: 0.5 }}>{DAY_LABELS[d.getDay()]}</span>
                 <span style={{ fontSize: 11, color: isToday ? '#FFFFFF' : '#9CA3AF', fontWeight: isToday ? 800 : 500, fontFamily: "'JetBrains Mono', monospace" }}>{d.getDate()}</span>
-                <div style={{ width: '100%', height: 6, borderRadius: 3, background: hit ? tierColor : isToday ? tierColor + '30' : '#F0ECE6' }} />
+                <div style={{ width: '100%', height: 6, borderRadius: 3, background: hit ? tierColor : isToday ? tierColor + '30' : 'rgba(245,240,234,0.08)' }} />
               </div>
             )
           })}
@@ -238,7 +238,7 @@ export default function HomePage() {
         </div>
 
         {/* Monthly challenge */}
-        <div style={{ background: monthlyCount >= MONTHLY_GOAL ? '#F0FDF4' : tierColor + '12', border: `1.5px solid ${monthlyCount >= MONTHLY_GOAL ? '#86efac' : tierColor + '40'}`, borderRadius: 14, padding: '14px 14px' }}>
+        <div style={{ background: monthlyCount >= MONTHLY_GOAL ? '#F0FDF4' : tierColor + '12', border: `1.5px solid ${monthlyCount >= MONTHLY_GOAL ? 'rgba(134,239,172,0.3)' : tierColor + '30'}`, borderRadius: 14, padding: '14px 14px' }}>
           <p style={{ fontSize: 9, fontWeight: 800, color: monthlyCount >= MONTHLY_GOAL ? '#16a34a' : tierColor, textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 4 }}>{monthName}</p>
           <p style={{ fontFamily: 'JetBrains Mono, monospace', lineHeight: 1, marginBottom: 8 }}>
             <span style={{ fontSize: 34, fontWeight: 900, color: monthlyCount >= MONTHLY_GOAL ? '#16a34a' : tierColor }}>{monthlyCount}</span>
@@ -310,7 +310,7 @@ export default function HomePage() {
       )}
 
       {/* ── Tier progress ── */}
-      <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
+      <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <p style={{ fontSize: 10, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5 }}>Tier Progress</p>
           <Link href="/rank" style={{ fontSize: 11, color: tierColor, fontWeight: 700, textDecoration: 'none' }}>View rank ›</Link>
@@ -332,9 +332,9 @@ export default function HomePage() {
 
       {/* Referral */}
       {user.referral_code && (
-        <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
+        <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
           <p style={{ fontSize: 10, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 8 }}>Invite Friends</p>
-          <p style={{ fontSize: 13, color: '#5A5346', marginBottom: 10 }}>
+          <p style={{ fontSize: 13, color: 'rgba(245,240,234,0.6)', marginBottom: 10 }}>
             You and a friend each get <span style={{ color: tierColor, fontWeight: 700 }}>500 bonus pts</span> when they sign up with your code.
             {referralCount > 0 && <span style={{ color: '#8A8478' }}> ({referralCount} referred)</span>}
           </p>
@@ -351,20 +351,20 @@ export default function HomePage() {
           <Link href="/log" style={{ fontSize: 11, color: '#B5593C', fontWeight: 700, textDecoration: 'none' }}>Log workout ›</Link>
         </div>
         {recentWorkouts.length === 0 ? (
-          <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '20px', textAlign: 'center' }}>
+          <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '20px', textAlign: 'center' }}>
             <p style={{ fontSize: 32, marginBottom: 6 }}>🏋️</p>
-            <p style={{ fontSize: 14, fontWeight: 800, color: '#111110', marginBottom: 4 }}>No workouts yet</p>
+            <p style={{ fontSize: 14, fontWeight: 800, color: '#F5F0EA', marginBottom: 4 }}>No workouts yet</p>
             <p style={{ fontSize: 12, color: '#8A8478' }}>Log your first session to start earning points</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {recentWorkouts.slice(0, 5).map(w => (
-              <div key={w.id} style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div key={w.id} style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 36, height: 36, background: tierColor + '15', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, fontWeight: 900, color: tierColor }}>{workoutAbbr(w.type)}</span>
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 13, fontWeight: 800, color: '#111110', marginBottom: 1 }}>{w.custom_name || w.type.replace('_', ' ')}</p>
+                  <p style={{ fontSize: 13, fontWeight: 800, color: '#F5F0EA', marginBottom: 1 }}>{w.custom_name || w.type.replace('_', ' ')}</p>
                   <p style={{ fontSize: 11, color: '#8A8478' }}>{formatDate(w.logged_at)} · {w.duration_minutes}min</p>
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
@@ -392,7 +392,7 @@ export default function HomePage() {
 
 function StatCard({ label, value, unit, accent }: { label: string; value: number; unit: string; accent: string }) {
   return (
-    <div style={{ flex: 1, background: '#FAFAF9', border: '1.5px solid #E0D9CE', borderRadius: 10, padding: '10px 8px', textAlign: 'center' }}>
+    <div style={{ flex: 1, background: '#1A1A18', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 10, padding: '10px 8px', textAlign: 'center' }}>
       <p style={{ fontSize: 9, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3 }}>{label}</p>
       <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 20, fontWeight: 900, color: accent, lineHeight: 1 }}>{value}</p>
       <p style={{ fontSize: 9, color: '#8A8478', marginTop: 2 }}>{unit}</p>
