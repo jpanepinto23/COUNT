@@ -22,7 +22,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#FAF8F4',
+        background: '#0E0E0D',
       }}>
         <div style={{ textAlign: 'center' }}>
           <TallyLogo />
@@ -35,7 +35,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
   if (!session) return null
 
   return (
-    <div style={{ minHeight: '100dvh', background: '#FAF8F4', paddingBottom: 72 }}>
+    <div style={{ minHeight: '100dvh', background: '#0E0E0D', paddingBottom: 72 }}>
       {children}
       <BottomNav />
     </div>
@@ -47,11 +47,11 @@ function TallyLogo() {
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
       <div style={{ position: 'relative', width: 44, height: 36 }}>
         {[6, 14, 22, 30].map((left, i) => (
-          <div key={i} style={{ position: 'absolute', left, top: 4, width: 4, height: 28, background: '#111110', borderRadius: 2 }} />
+          <div key={i} style={{ position: 'absolute', left, top: 4, width: 4, height: 28, background: '#F5F0EA', borderRadius: 2 }} />
         ))}
         <div style={{ position: 'absolute', top: 16, left: -2, width: 48, height: 3.5, background: '#B5593C', borderRadius: 2, transform: 'rotate(-30deg)' }} />
       </div>
-      <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 20, fontWeight: 900, letterSpacing: 6, textTransform: 'uppercase', color: '#111110' }}>COUNT</span>
+      <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 20, fontWeight: 900, letterSpacing: 6, textTransform: 'uppercase', color: '#F5F0EA' }}>COUNT</span>
     </div>
   )
 }
