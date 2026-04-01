@@ -263,9 +263,9 @@ export default function ProfilePage() {
       </div>
 
       {/* Body stats */}
-      <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
+      <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', margin: 0 }}>Body Stats</p>
+          <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: 'rgba(245,240,234,0.45)', margin: 0 }}>Body Stats</p>
           <button onClick={() => {
             const h = localHeight !== undefined ? localHeight : u.height
             setStatsForm({
@@ -285,7 +285,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Connect Fitness Trackers */}
-      <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
+      <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
         <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 4 }}>Fitness Trackers</p>
         <p style={{ fontSize: 12, color: '#8A8478', marginBottom: 14 }}>
           Connect a tracker to auto-verify your workouts and earn 25% bonus points.
@@ -318,7 +318,7 @@ export default function ProfilePage() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <span style={{ fontSize: 22 }}>{info.emoji}</span>
                   <div>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: '#111110' }}>{info.label}</p>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>{info.label}</p>
                     <p style={{ fontSize: 11, color: '#8A8478' }}>
                       {isConnected ? '✓ Connected — workouts auto-verified' : 'Tap to connect'}
                     </p>
@@ -366,7 +366,7 @@ export default function ProfilePage() {
         }}>
           <span style={{ fontSize: 20 }}>📍</span>
           <div>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#111110' }}>GPS Check-in</p>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>GPS Check-in</p>
             <p style={{ fontSize: 11, color: '#8A8478' }}>✓ Always active — auto-used when logging</p>
           </div>
         </div>
@@ -374,7 +374,7 @@ export default function ProfilePage() {
 
       {/* Connected devices history */}
       {devices.filter(d => !['gps'].includes(d.type)).length > 0 && (
-        <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
+        <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
           <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 12 }}>Connected Devices</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {devices.filter(d => d.type !== 'gps').map((d, i) => (
@@ -382,7 +382,7 @@ export default function ProfilePage() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <span style={{ fontSize: 20 }}>{DEVICE_INFO[d.type]?.emoji ?? '📱'}</span>
                   <div>
-                    <p style={{ fontSize: 13, fontWeight: 700 }}>{DEVICE_INFO[d.type]?.label ?? d.type}</p>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>{DEVICE_INFO[d.type]?.label ?? d.type}</p>
                     <p style={{ fontSize: 11, color: '#8A8478' }}>
                       Connected {new Date(d.connected_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
@@ -403,21 +403,21 @@ export default function ProfilePage() {
       )}
 
       {/* Redemption history */}
-      <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
+      <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
         <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 12 }}>Redemption History</p>
         {redemptions.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '16px 0' }}>
-            <p style={{ color: '#8A8478', fontSize: 13 }}>No redemptions yet.</p>
+            <p style={{ color: 'rgba(245,240,234,0.4)', fontSize: 13 }}>No redemptions yet.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {redemptions.map((r, i) => (
               <div key={r.id} style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '10px 0', borderTop: i > 0 ? '1px solid #F0EDE6' : 'none',
+                padding: '10px 0', borderTop: i > 0 ? '1px solid rgba(245,240,234,0.06)' : 'none',
               }}>
                 <div>
-                  <p style={{ fontSize: 13, fontWeight: 700 }}>{r.reward?.product_name ?? 'Reward'}</p>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>{r.reward?.product_name ?? 'Reward'}</p>
                   <p style={{ fontSize: 11, color: '#8A8478' }}>
                     {r.reward?.brand_name} · {new Date(r.redeemed_at ?? r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
@@ -448,20 +448,20 @@ export default function ProfilePage() {
       {editingStats && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
           onClick={() => setEditingStats(false)}>
-          <div style={{ background: '#fff', borderRadius: '20px 20px 0 0', padding: 24, width: '100%', maxWidth: 480 }}
+          <div style={{ background: '#111110', borderRadius: '20px 20px 0 0', padding: 24, width: '100%', maxWidth: 480 }}
             onClick={e => e.stopPropagation()}>
             <p style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 20 }}>Edit Body Stats</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <label style={{ fontSize: 11, fontWeight: 700, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1 }}>
                 Age
                 <input type="number" value={statsForm.age} onChange={e => setStatsForm(f => ({ ...f, age: e.target.value }))}
-                  placeholder="35" style={{ display: 'block', width: '100%', marginTop: 4, padding: '10px 12px', border: '1.5px solid #E0D9CE', borderRadius: 8, fontSize: 15, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, boxSizing: 'border-box' as const }} />
+                  placeholder="35" style={{ display: 'block', width: '100%', marginTop: 4, padding: '10px 12px', border: '1.5px solid rgba(245,240,234,0.12)', borderRadius: 8, fontSize: 15, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, background: '#1A1A18', color: '#F5F0EA', boxSizing: 'border-box' as const }} />
               </label>
               <label style={{ fontSize: 11, fontWeight: 700, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1 }}>
                 Height
                 <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
                   <input type="number" value={statsForm.heightFt} onChange={e => setStatsForm(f => ({ ...f, heightFt: e.target.value }))}
-                    placeholder="6" style={{ flex: 1, padding: '10px 12px', border: '1.5px solid #E0D9CE', borderRadius: 8, fontSize: 15, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700 }} />
+                    placeholder="6" style={{ flex: 1, padding: '10px 12px', border: '1.5px solid rgba(245,240,234,0.12)', borderRadius: 8, fontSize: 15, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, background: '#1A1A18', color: '#F5F0EA' }} />
                   <span style={{ alignSelf: 'center', fontSize: 13, color: '#8A8478' }}>ft</span>
                   <input type="number" value={statsForm.heightIn} onChange={e => setStatsForm(f => ({ ...f, heightIn: e.target.value }))}
                     placeholder="0" min="0" max="11" style={{ flex: 1, padding: '10px 12px', border: '1.5px solid #E0D9CE', borderRadius: 8, fontSize: 15, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700 }} />
@@ -476,7 +476,7 @@ export default function ProfilePage() {
             </div>
             <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
               <button onClick={() => setEditingStats(false)}
-                style={{ flex: 1, padding: 14, background: 'transparent', border: '1.5px solid #E0D9CE', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                style={{ flex: 1, padding: 14, background: 'transparent', border: '1.5px solid rgba(245,240,234,0.12)', borderRadius: 10, fontSize: 14, fontWeight: 700, color: '#F5F0EA', cursor: 'pointer' }}>
                 Cancel
               </button>
               <button onClick={handleSaveStats} disabled={savingStats}
@@ -493,7 +493,7 @@ export default function ProfilePage() {
 
 function StatCard({ label, value, unit, accent }: { label: string; value: string | number; unit: string; accent?: string }) {
   return (
-    <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 12, padding: '12px 10px', textAlign: 'center' }}>
+    <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '12px 10px', textAlign: 'center' }}>
       <p style={{ fontSize: 9, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>{label}</p>
       <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 16, fontWeight: 900, color: accent ?? '#111110', lineHeight: 1 }}>{value}</p>
       <p style={{ fontSize: 9, color: '#8A8478', marginTop: 3 }}>{unit}</p>
@@ -505,7 +505,7 @@ function StatInline({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p style={{ fontSize: 10, fontWeight: 700, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 2 }}>{label}</p>
-      <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14, fontWeight: 900 }}>{value}</p>
+      <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14, fontWeight: 900, color: '#F5F0EA' }}>{value}</p>
     </div>
   )
 }
