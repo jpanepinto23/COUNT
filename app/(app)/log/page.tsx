@@ -469,7 +469,7 @@ export default function LogPage() {
           {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12 }}>{error}</p>}
 
           <div style={{ background: '#111110', border: '1px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '12px 14px', marginBottom: 16 }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: '#F5F0EA', fontWeight: 700, marginBottom: 8 }}>🔒 Verify your workout for full points</p>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#F5F0EA', marginBottom: 8 }}>🔒 Verify your workout for full points</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: 'rgba(245,240,234,0.7)' }}>
                 <span>📍</span><span><strong>GPS</strong> — allow location access when prompted</span>
