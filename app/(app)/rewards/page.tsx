@@ -4,18 +4,25 @@ import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import type { Reward, RewardType } from '@/lib/types'
 
-const CATEGORY_EMOJI: Record<string, string> = {
-  supplements: '💪',
-  gear: '👟',
-  gift_cards: '🎁',
-  lifestyle: '✨',
+function getStreakMultiplier(streak: number): { multiplier: string; color: string } {
+  if (streak >= 14) return { multiplier: '2x', color: '#7c3aed' }
+  if (streak >= 7) return { multiplier: '1.5x', color: '#dc2626' }
+  if (streak >= 3) return { multiplier: '1.2x', color: '#ea580c' }
+  return { multiplier: '1x', color: '#8A8478' }
 }
 
-const CATEGORY_COLOR: Record<string, string> = {
-  supplements: '#22c55e',
-  gear: '#3b82f6',
-  gift_cards: '#f59e0b',
-  lifestyle: '#a855f7',
+function getNextStreakMilestone(streak: number): { days: number; multiplier: string } | null {
+  if (streak < 3) return { days: 3, multiplier: '1.2x' }
+  if (streak < 7) return { days: 7, multiplier: '1.5x' }
+  if (streak < 14) return { days: 14, multiplier: '2x' }
+  return null
+}
+
+function getNextMilestone(sessions: number): { target: number; bonus: number } | null {
+  if (sessions < 10) return { target: 10, bonus: 50 }
+  if (sessions < 25) return { target: 25, bonus: 150 }
+  if (sessions < 50) return { target: 50, bonus: 400 }
+  return null
 }
 
 interface FulfillmentData {
@@ -32,12 +39,27 @@ export default function RewardsPage() {
   const [successReward, setSuccessReward] = useState<Reward | null>(null)
   const [fulfillmentData, setFulfillmentData] = useState<FulfillmentData | null>(null)
   const [copied, setCopied] = useState(false)
+  const [weeklyWorkouts, setWeeklyWorkouts] = useState(0)
   const supabase = createClient()
 
   useEffect(() => {
     supabase.from('rewards').select('*').eq('is_active', true).order('point_cost').then(({ data }) => {
       if (data) setRewards(data)
     })
+    if (user) {
+      const now = new Date()
+      const dayOfWeek = now.getDay()
+      const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+      const monday = new Date(now)
+      monday.setDate(now.getDate() - daysFromMonday)
+      monday.setHours(0, 0, 0, 0)
+      supabase
+        .from('workouts')
+        .select('id', { count: 'exact' })
+        .eq('user_id', user.id)
+        .gte('logged_at', monday.toISOString())
+        .then(({ count }) => { setWeeklyWorkouts(count ?? 0) })
+    }
   }, []) // eslint-disable-line
 
   if (!user) return null
@@ -94,61 +116,43 @@ export default function RewardsPage() {
     return (
       <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#FAF8F4' }}>
         <div style={{ width: '100%', maxWidth: 380, textAlign: 'center' }}>
-          <p style={{ fontSize: 56, marginBottom: 8 }}>{reward_type === 'gift_card' ? '🎁' : reward_type === 'discount_code' ? '🏷️' : '🔗'}</p>
+          <p style={{ fontSize: 56, marginBottom: 8 }}>{reward_type === 'gift_card' ? 'ð' : reward_type === 'discount_code' ? 'ð·ï¸' : 'ð'}</p>
           <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, fontFamily: 'Archivo, sans-serif', marginBottom: 8 }}>
             {reward_type === 'gift_card' ? 'Redemption confirmed!' : 'Your reward is ready!'}
           </h2>
           <p style={{ color: '#8A8478', fontSize: 14, marginBottom: 20 }}>
-            You spent <strong>{successReward.point_cost.toLocaleString()} pts</strong> on {successReward.product_name}
+            You spent <strong>{successReward.point_cost.toLocaleString()} coins</strong> on {successReward.product_name}
           </p>
-
           {reward_type === 'discount_code' && fulfillment_value && (
             <div style={{ background: '#F0FAF0', border: '1.5px solid #B2DFB2', borderRadius: 14, padding: '20px 20px', marginBottom: 20 }}>
-              <p style={{ color: '#166534', fontSize: 11, fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 10 }}>
-                Your Promo Code
-              </p>
-              <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 26, fontWeight: 900, letterSpacing: 4, color: '#111110', margin: '0 0 14px' }}>
-                {fulfillment_value}
-              </p>
-              <button
-                onClick={() => handleCopy(fulfillment_value)}
-                style={{ background: copied ? '#16a34a' : '#111110', color: 'white', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', width: '100%' }}
-              >
-                {copied ? '✓ Copied!' : 'Copy Code'}
+              <p style={{ color: '#166534', fontSize: 11, fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 10 }}>Your Promo Code</p>
+              <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 26, fontWeight: 900, letterSpacing: 4, color: '#111110', margin: '0 0 14px' }}>{fulfillment_value}</p>
+              <button onClick={() => handleCopy(fulfillment_value)} style={{ background: copied ? '#16a34a' : '#111110', color: 'white', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', width: '100%' }}>
+                {copied ? 'â Copied!' : 'C/py Code'}
               </button>
               {successReward.affiliate_url && (
-                <a href={successReward.affiliate_url} target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'block', marginTop: 10, color: '#B5593C', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}
-                >
-                  Shop {successReward.brand_name} →
+                <a href={successReward.affiliate_url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', marginTop: 10, color: '#B5593C', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
+                  Shop {successReward.brand_name} â
                 </a>
               )}
             </div>
           )}
-
           {reward_type === 'affiliate_link' && affiliate_url && (
             <div style={{ marginBottom: 20 }}>
-              <a href={affiliate_url} target="_blank" rel="noopener noreferrer"
-                style={{ display: 'block', background: '#111110', color: 'white', borderRadius: 12, padding: '16px 24px', fontSize: 15, fontWeight: 800, textDecoration: 'none', marginBottom: 10 }}
-              >
-                Claim Your {successReward.brand_name} Reward →
+              <a href={affiliate_url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', background: '#111110', color: 'white', borderRadius: 12, padding: '16px 24px', fontSize: 15, fontWeight: 800, textDecoration: 'none', marginBottom: 10 }}>
+                Claim Your {successReward.brand_name} Reward â
               </a>
-              <p style={{ color: '#8A8478', fontSize: 12 }}>
-                This link is exclusive to you. It will also be sent to your email.
-              </p>
+              <p style={{ color: '#8A8478', fontSize: 12 }}>This link is exclusive to you. It will also be sent to your email.</p>
             </div>
           )}
-
           {reward_type === 'gift_card' && (
             <div style={{ background: '#F0FAF0', border: '1px solid #B2DFB2', borderRadius: 12, padding: '16px 20px', marginBottom: 20, textAlign: 'left' }}>
-              <p style={{ color: '#2D6A2D', fontWeight: 700, marginBottom: 4, fontSize: 14 }}>📬 Gift card incoming!</p>
+              <p style={{ color: '#2D6A2D', fontWeight: 700, marginBottom: 4, fontSize: 14 }}>ð¬ Gift card incoming!</p>
               <p style={{ color: '#2D6A2D', fontSize: 13, margin: 0 }}>
-                Your <strong>{successReward.product_name}</strong> code will be emailed to{' '}
-                <strong>{user?.email}</strong> within 24-48 hours. Check your spam folder too.
+                Your <strong>{successReward.product_name}</strong> code will be emailed to <strong>{user?.email}</strong> within 24-48 hours. Check your spam folder too.
               </p>
             </div>
           )}
-
           <button
             onClick={() => { setSuccessReward(null); setFulfillmentData(null); setCopied(false) }}
             style={{ background: '#F5F0EA', color: '#111110', border: '1.5px solid #E0D9CE', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', padding: '12px 28px' }}
@@ -160,44 +164,206 @@ export default function RewardsPage() {
     )
   }
 
+  const streakInfo = getStreakMultiplier(user.current_streak)
+  const nextStreak = getNextStreakMilestone(user.current_streak)
+  const nextMilestone = getNextMilestone(user.lifetime_sessions)
   const featured = rewards.filter(r => r.is_featured)
   const rest = rewards.filter(r => !r.is_featured)
 
+  const weeklyGoal = weeklyWorkouts >= 5 ? 5 : 3
+  const weeklyBonus = weeklyGoal === 5 ? 50 : 20
+  const weeklyProgress = Math.min(weeklyWorkouts / weeklyGoal, 1)
+  const weeklyDone = weeklyWorkouts >= weeklyGoal
+
+  const milestoneProgress = nextMilestone
+    ? (() => {
+        const prev = nextMilestone.target === 10 ? 0 : nextMilestone.target === 25 ? 10 : 25
+        return Math.min((user.lifetime_sessions - prev) / (nextMilestone.target - prev), 1)
+      })()
+    : 1
+
+  const cheapestUnaffordable = rewards.find(r => !r.coming_soon && r.point_cost > user.points_balance)
+  const coinsToNextReward = cheapestUnaffordable ? cheapestUnaffordable.point_cost - user.points_balance : null
+
   return (
-    <div style={{ padding: '20px 16px', paddingBottom: 24 }}>
-      {/* Header */}
-      <p style={{ color: '#8A8478', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 2 }}>Rewards Shop</p>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 4 }}>
-        <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 36, fontWeight: 900, color: '#B5593C', lineHeight: 1 }}>
+    <div style={{ padding: '20px 16px', paddingBottom: 32, background: '#FAF8F4', minHeight: '100dvh' }}>
+
+      {/* ââ HEADER ââ */}
+      <p style={{ color: '#8A8478', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 }}>
+        COUNT Coins
+      </p>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 2 }}>
+        <span style={{ fontSize: 18, lineHeight: 1 }}>ðª</span>
+        <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 42, fontWeight: 900, color: '#B5593C', lineHeight: 1 }}>
           {user.points_balance.toLocaleString()}
         </span>
-        <span style={{ fontSize: 14, color: '#8A8478', fontWeight: 700 }}>pts available</span>
       </div>
-      <p style={{ color: '#8A8478', fontSize: 12, marginBottom: 20 }}>Redeem points for real rewards from top fitness brands.</p>
+      {coinsToNextReward !== null ? (
+        <p style={{ color: '#8A8478', fontSize: 13, marginBottom: 0 }}>
+          {coinsToNextReward.toLocaleString()} more coins until your next reward
+        </p>
+      ) : (
+        <p style={{ color: '#16a34a', fontSize: 13, fontWeight: 700, marginBottom: 0 }}>
+          â You can redeem rewards now
+        </p>
+      )}
+
+      {/* ââ STREAK BANNER ââ */}
+      <div style={{
+        marginTop: 16,
+        background: user.current_streak >= 3 ? '#111110' : '#F5F0EA',
+        borderRadius: 14,
+        padding: '14px 16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}>
+        <div>
+          <p style={{ fontFamily: 'Archivo, sans-serif', fontWeight: 900, fontSize: 16, color: user.current_streak >= 3 ? '#fff' : '#111110', margin: 0 }}>
+            {user.current_streak >= 14
+              ? `${user.current_streak} Day Grind ðª`
+              : user.current_streak >= 1
+              ? `${user.current_streak} Day Streak ð¥`
+              : 'No active streak'}
+          </p>
+          <p style={{ fontSize: 12, color: user.current_streak >= 3 ? '#aaa' : '#8A8478', margin: '2px 0 0' }}>
+            {user.current_streak >= 3
+              ? `${streakInfo.multiplier} coin multiplier active`
+              : 'Log 3 days in a row to earn bonus coins'}
+          </p>
+        </div>
+        <div style={{ background: user.current_streak >= 3 ? '#B5593C' : '#E0D9CE', borderRadius: 10, padding: '6px 14px', textAlign: 'center' }}>
+          <p style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 900, fontSize: 20, color: '#fff', margin: 0 }}>
+            {streakInfo.multiplier}
+          </p>
+          <p style={{ fontSize: 9, fontWeight: 800, color: user.current_streak >= 3 ? '#f5c09a' : '#8A8478', margin: 0, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            COINS
+          </p>
+        </div>
+      </div>
+
+      {/* Loss aversion warning */}
+      {user.current_streak >= 3 && (
+        <div style={{ background: '#FEF3C7', border: '1px solid #FDE68A', borderRadius: 10, padding: '8px 14px', marginTop: 8, fontSize: 12, color: '#92400E', fontWeight: 600 }}>
+          â ï¸ Don&apos;t lose your streak â log a workout today to keep your {streakInfo.multiplier} bonus
+        </div>
+      )}
+
+      {/* Next streak milestone progress */}
+      {nextStreak && (
+        <div style={{ background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 12, padding: '12px 14px', marginTop: 8 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#111110', margin: 0 }}>
+              ð¯ {nextStreak.days - user.current_streak} more days â {nextStreak.multiplier} coins
+            </p>
+            <p style={{ fontSize: 11, color: '#8A8478', margin: 0 }}>{user.current_streak}/{nextStreak.days}</p>
+          </div>
+          <div style={{ background: '#F0EDE6', borderRadius: 99, height: 6, overflow: 'hidden' }}>
+            <div style={{ width: `${(user.current_streak / nextStreak.days) * 100}%`, height: '100%', background: '#B5593C', borderRadius: 99, transition: 'width 0.5s ease' }} />
+          </div>
+        </div>
+      )}
+
+      {/* ââ WEEKLY BONUS ââ */}
+      <div style={{ marginTop: 12, background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 12, padding: '14px 16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+          <div>
+            <p style={{ fontSize: 13, fontWeight: 800, color: '#111110', margin: 0 }}>
+              {weeklyDone ? 'â Weekly bonus earned!' : `Weekly Bonus â +${weeklyBonus} coins`}
+            </p>
+            <p style={{ fontSize: 11, color: '#8A8478', margin: '2px 0 0' }}>
+              {weeklyDone
+                ? `You hit ${weeklyGoal} workouts this week`
+                : `${weeklyGoal - weeklyWorkouts} more workout${weeklyGoal - weeklyWorkouts !== 1 ? 's' : ''} to earn +${weeklyBonus} coins`}
+            </p>
+          </div>
+          <p style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 900, fontSize: 14, color: weeklyDone ? '#16a34a' : '#B5593C', margin: 0 }}>
+            {weeklyWorkouts}/{weeklyGoal}
+          </p>
+        </div>
+        <div style={{ background: '#F0EDE6', borderRadius: 99, height: 6, overflow: 'hidden' }}>
+          <div style={{ width: `${weeklyProgress * 100}%`, height: '100%', background: weeklyDone ? '#16a34a' : '#B5593C', borderRadius: 99, transition: 'width 0.5s ease' }} />
+        </div>
+        {!weeklyDone && weeklyWorkouts < 5 && (
+          <p style={{ fontSize: 11, color: '#8A8478', marginTop: 6, marginBottom: 0 }}>
+            Hit 5 workouts this week for +50 coins instead
+          </p>
+        )}
+      </div>
+
+      {/* ââ MILESTONE REWARD ââ */}
+      {nextMilestone && (
+        <div style={{ marginTop: 12, background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 12, padding: '14px 16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 800, color: '#111110', margin: 0 }}>
+                ð Milestone: +{nextMilestone.bonus} coins at {nextMilestone.target} workouts
+              </p>
+              <p style={{ fontSize: 11, color: '#8A8478', margin: '2px 0 0' }}>
+                {nextMilestone.target - user.lifetime_sessions} workouts away
+              </p>
+            </div>
+            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 900, fontSize: 14, color: '#B5593C', margin: 0 }}>
+              {user.lifetime_sessions}/{nextMilestone.target}
+            </p>
+          </div>
+          <div style={{ background: '#F0EDE6', borderRadius: 99, height: 6, overflow: 'hidden' }}>
+            <div style={{ width: `${milestoneProgress * 100}%`, height: '100%', background: '#B5593C', borderRadius: 99, transition: 'width 0.5s ease' }} />
+          </div>
+        </div>
+      )}
+
+      {/* ââ HOW YOU EARN ââ */}
+      <div style={{ marginTop: 20 }}>
+        <p style={{ fontSize: 11, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 10 }}>How You Earn</p>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {[
+            { label: '+10 ðª', sub: 'per workout' },
+            { label: '+5 ðª', sub: 'same-day log' },
+            { label: 'Up to 2x', sub: '14-day streak' },
+          ].map(item => (
+            <div key={item.label} style={{ flex: 1, background: '#fff', border: '1.5px solid #E0D9CE', borderRadius: 12, padding: '10px 10px', textAlign: 'center' }}>
+              <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 900, color: '#B5593C', margin: 0 }}>{item.label}</p>
+              <p style={{ fontSize: 10, color: '#8A8478', margin: '2px 0 0', fontWeight: 600 }}>{item.sub}</p>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {error && (
-        <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#DC2626' }}>
+        <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 10, padding: '10px 14px', marginTop: 16, fontSize: 13, color: '#DC2626' }}>
           {error}
         </div>
       )}
 
-      {featured.length > 0 && (
-        <>
-          <p style={{ fontSize: 11, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 10 }}>Featured</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
-            {featured.map(r => <RewardCard key={r.id} reward={r} userBalance={user.points_balance} redeeming={redeeming} onRedeem={handleRedeem} />)}
-          </div>
-        </>
-      )}
+      {/* ââ REWARDS STORE ââ */}
+      <div style={{ marginTop: 24 }}>
+        <p style={{ fontSize: 11, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 10 }}>
+          Rewards Store
+        </p>
 
-      {rest.length > 0 && (
-        <>
-          <p style={{ fontSize: 11, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 10 }}>All Rewards</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {rest.map(r => <RewardCard key={r.id} reward={r} userBalance={user.points_balance} redeeming={redeeming} onRedeem={handleRedeem} />)}
-          </div>
-        </>
-      )}
+        {featured.length > 0 && (
+          <>
+            <p style={{ fontSize: 10, fontWeight: 700, color: '#B5593C', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>â­ Featured</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+              {featured.map(r => (
+                <RewardCard key={r.id} reward={r} userBalance={user.points_balance} redeeming={redeeming} onRedeem={handleRedeem} />
+              ))}
+            </div>
+          </>
+        )}
+
+        {rest.length > 0 && (
+          <>
+            <p style={{ fontSize: 10, fontWeight: 700, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>All Rewards</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {rest.map(r => (
+                <RewardCard key={r.id} reward={r} userBalance={user.points_balance} redeeming={redeeming} onRedeem={handleRedeem} />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }
@@ -211,102 +377,93 @@ function RewardCard({ reward, userBalance, redeeming, onRedeem }: {
   const isComingSoon = !!reward.coming_soon
   const canAfford = userBalance >= reward.point_cost
   const isRedeeming = redeeming === reward.id
-  const emoji = { supplements: '💪', gear: '👟', gift_cards: '🎁', lifestyle: '✨' }[reward.category] ?? '🎯'
+  const coinsNeeded = reward.point_cost - userBalance
+  const affordProgress = Math.min(userBalance / reward.point_cost, 1)
+
+  const emoji = { supplements: 'ðª', gear: 'ð', gift_cards: 'ð', lifestyle: 'â¨' }[reward.category] ?? 'ð¯'
   const accent = { supplements: '#22c55e', gear: '#3b82f6', gift_cards: '#f59e0b', lifestyle: '#a855f7' }[reward.category] ?? '#B5593C'
 
-  const typeLabel = isComingSoon
-    ? null
-    : reward.reward_type === 'discount_code'
-      ? '🏷️ Code'
-      : reward.reward_type === 'affiliate_link'
-        ? '🔗 Link'
-        : null
+  const typeLabel = isComingSoon ? null
+    : reward.reward_type === 'discount_code' ? 'ð·ï¸ Code'
+    : reward.reward_type === 'affiliate_link' ? 'ð Link'
+    : null
 
   return (
     <div style={{
       background: '#fff',
-      border: `1.5px solid ${isComingSoon ? '#F0EDE6' : canAfford ? '#E0D9CE' : '#F0EDE6'}`,
+      border: `1.5px solid ${canAfford && !isComingSoon ? '#B5593C40' : '#F0EDE6'}`,
       borderRadius: 14,
       padding: '14px 16px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: 12,
-      opacity: isComingSoon ? 0.7 : canAfford ? 1 : 0.65,
+      opacity: isComingSoon ? 0.7 : 1,
     }}>
-      <div style={{
-        width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-        background: accent + '18',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
-      }}>
-        {emoji}
-      </div>
-
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-          <p style={{ fontSize: 14, fontWeight: 800, color: '#111110', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {reward.product_name}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: (!canAfford && !isComingSoon) ? 10 : 0 }}>
+        <div style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0, background: accent + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>
+          {emoji}
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+            <p style={{ fontSize: 14, fontWeight: 800, color: '#111110', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {reward.product_name}
+            </p>
+            {isComingSoon && (
+              <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 20, background: '#F5F0EA', color: '#8A8478', flexShrink: 0 }}>ð Soon</span>
+            )}
+            {!isComingSoon && (reward.is_hot || reward.is_new) && (
+              <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 20, background: reward.is_hot ? '#FEF3C7' : '#EDE9FE', color: reward.is_hot ? '#92400E' : '#5B21B6', flexShrink: 0 }}>
+                {reward.is_hot ? 'ð¥ Hot' : 'â¨ New'}
+              </span>
+            )}
+            {typeLabel && (
+              <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 20, background: '#F0F9FF', color: '#0369a1', flexShrink: 0 }}>
+                {typeLabel}
+              </span>
+            )}
+          </div>
+          <p style={{ fontSize: 12, color: '#8A8478', margin: 0 }}>
+            {reward.brand_name}{reward.retail_value > 0 ? ' Â· $' + reward.retail_value + ' value' : reward.description ? ' Â· ' + reward.description : ''}
           </p>
-          {isComingSoon && (
-            <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 20, background: '#F5F0EA', color: '#8A8478', flexShrink: 0, whiteSpace: 'nowrap' }}>
-              🕐 Soon
-            </span>
-          )}
-          {!isComingSoon && (reward.is_hot || reward.is_new) && (
-            <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 20, background: reward.is_hot ? '#FEF3C7' : '#EDE9FE', color: reward.is_hot ? '#92400E' : '#5B21B6', flexShrink: 0 }}>
-              {reward.is_hot ? '🔥 Hot' : '✨ New'}
-            </span>
-          )}
-          {typeLabel && (
-            <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 20, background: '#F0F9FF', color: '#0369a1', flexShrink: 0 }}>
-              {typeLabel}
-            </span>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
+            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 700, color: isComingSoon ? '#C4BFBA' : accent, margin: 0 }}>
+              ðª {reward.point_cost.toLocaleString()}
+            </p>
+            {canAfford && !isComingSoon && (
+              <span style={{ fontSize: 10, fontWeight: 700, color: '#16a34a' }}>â You can redeem this</span>
+            )}
+          </div>
         </div>
-        <p style={{ fontSize: 12, color: '#8A8478', margin: 0 }}>
-          {reward.brand_name}{reward.retail_value > 0 ? ' · $' + reward.retail_value + ' value' : reward.description ? ' · ' + reward.description : ''}
-        </p>
-        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 700, color: isComingSoon ? '#C4BFBA' : accent, margin: '3px 0 0' }}>
-          {reward.point_cost.toLocaleString()} pts
-        </p>
+        {isComingSoon ? (
+          <div style={{ padding: '9px 10px', background: '#F5F0EA', color: '#C4BFBA', border: '1.5px solid #E0D9CE', borderRadius: 9, fontSize: 11, fontWeight: 800, flexShrink: 0, textAlign: 'center', lineHeight: 1.3, minWidth: 68 }}>
+            Coming<br />Soon
+          </div>
+        ) : (
+          <button
+            onClick={() => onRedeem(reward)}
+            disabled={!canAfford || !!redeeming}
+            style={{
+              padding: '9px 14px',
+              background: canAfford && !redeeming ? '#111110' : '#EDEBE5',
+              color: canAfford && !redeeming ? '#F5F0EA' : '#8A8478',
+              border: 'none', borderRadius: 9, fontSize: 12, fontWeight: 800,
+              cursor: canAfford && !redeeming ? 'pointer' : 'not-allowed',
+              flexShrink: 0, fontFamily: 'Archivo, sans-serif', minWidth: 68,
+            }}
+          >
+            {isRedeeming ? '...' : canAfford ? 'Redeem' : 'Locked'}
+          </button>
+        )}
       </div>
 
-      {isComingSoon ? (
-        <div style={{
-          padding: '9px 10px',
-          background: '#F5F0EA',
-          color: '#C4BFBA',
-          border: '1.5px solid #E0D9CE',
-          borderRadius: 9,
-          fontSize: 11,
-          fontWeight: 800,
-          flexShrink: 0,
-          textAlign: 'center',
-          lineHeight: 1.3,
-          fontFamily: 'Archivo, sans-serif',
-          minWidth: 68,
-        }}>
-          Coming<br />Soon
+      {/* Progress bar toward affording this reward */}
+      {!canAfford && !isComingSoon && (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+            <p style={{ fontSize: 11, color: '#8A8478', margin: 0 }}>Need {coinsNeeded.toLocaleString()} more coins</p>
+            <p style={{ fontSize: 11, color: '#8A8478', margin: 0 }}>{Math.round(affordProgress * 100)}%</p>
+          </div>
+          <div style={{ background: '#F0EDE6', borderRadius: 99, height: 4, overflow: 'hidden' }}>
+            <div style={{ width: `${affordProgress * 100}%`, height: '100%', background: accent, borderRadius: 99, transition: 'width 0.5s ease' }} />
+          </div>
         </div>
-      ) : (
-        <button
-          onClick={() => onRedeem(reward)}
-          disabled={!canAfford || !!redeeming}
-          style={{
-            padding: '9px 14px',
-            background: canAfford && !redeeming ? '#111110' : '#EDEBE5',
-            color: canAfford && !redeeming ? '#F5F0EA' : '#8A8478',
-            border: 'none',
-            borderRadius: 9,
-            fontSize: 12,
-            fontWeight: 800,
-            cursor: canAfford && !redeeming ? 'pointer' : 'not-allowed',
-            flexShrink: 0,
-            fontFamily: 'Archivo, sans-serif',
-            minWidth: 68,
-          }}
-        >
-          {isRedeeming ? '...' : canAfford ? 'Redeem' : 'Need ' + (reward.point_cost - userBalance).toLocaleString() + ' more'}
-        </button>
       )}
     </div>
   )
