@@ -8,7 +8,7 @@ const tabs = [
     href: '/home',
     label: 'Home',
     icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? '#B5593C' : 'none'} stroke={active ? '#B5593C' : '#8A8478'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? '#B5593C' : 'none'} stroke={active ? '#B5593C' : 'rgba(245,240,234,0.4)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
         <polyline points="9,22 9,12 15,12 15,22"/>
       </svg>
@@ -18,7 +18,7 @@ const tabs = [
     href: '/log',
     label: 'Log',
     icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#B5593C' : '#8A8478'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#B5593C' : 'rgba(245,240,234,0.4)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10"/>
         <line x1="12" y1="8" x2="12" y2="16"/>
         <line x1="8" y1="12" x2="16" y2="12"/>
@@ -30,7 +30,7 @@ const tabs = [
     href: '/rewards',
     label: 'Rewards',
     icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? '#B5593C' : 'none'} stroke={active ? '#B5593C' : '#8A8478'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? '#B5593C' : 'none'} stroke={active ? '#B5593C' : 'rgba(245,240,234,0.4)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20 12v10H4V12"/>
         <path d="M22 7H2v5h20V7z"/>
         <path d="M12 22V7"/>
@@ -43,7 +43,7 @@ const tabs = [
     href: '/leaderboard',
     label: 'Board',
     icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#B5593C' : '#8A8478'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#B5593C' : 'rgba(245,240,234,0.4)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <line x1="18" y1="20" x2="18" y2="10"/>
         <line x1="12" y1="20" x2="12" y2="4"/>
         <line x1="6" y1="20" x2="6" y2="14"/>
@@ -54,7 +54,7 @@ const tabs = [
     href: '/history',
     label: 'History',
     icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#B5593C' : '#8A8478'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#B5593C' : 'rgba(245,240,234,0.4)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
         <line x1="16" y1="2" x2="16" y2="6"/>
         <line x1="8" y1="2" x2="8" y2="6"/>
@@ -75,8 +75,8 @@ export default function BottomNav() {
         transform: 'translateX(-50%)',
         width: '100%',
         maxWidth: '448px',
-        background: '#FAF8F4',
-        borderTop: '1.5px solid #E0D9CE',
+        background: '#0E0E0D',
+        borderTop: '1px solid rgba(245,240,234,0.08)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         zIndex: 50,
       }}
@@ -100,17 +100,19 @@ export default function BottomNav() {
               }}
             >
               {tab.center ? (
-                <div style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: '50%',
-                  background: '#B5593C',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginTop: -20,
-                  boxShadow: '0 4px 12px rgba(181,89,60,0.35)',
-                }}>
+                <div
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: '50%',
+                    background: '#B5593C',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: -20,
+                    boxShadow: '0 4px 16px rgba(181,89,60,0.45)',
+                  }}
+                >
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F5F0EA" strokeWidth="2.5" strokeLinecap="round">
                     <line x1="12" y1="5" x2="12" y2="19"/>
                     <line x1="5" y1="12" x2="19" y2="12"/>
@@ -119,14 +121,16 @@ export default function BottomNav() {
               ) : (
                 tab.icon(active)
               )}
-              <span style={{
-                fontSize: 10,
-                fontWeight: 700,
-                color: active ? '#B5593C' : '#8A8478',
-                letterSpacing: '0.5px',
-                textTransform: 'uppercase',
-                fontFamily: 'Archivo, sans-serif',
-              }}>
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: active ? '#B5593C' : 'rgba(245,240,234,0.35)',
+                  letterSpacing: '0.5px',
+                  textTransform: 'uppercase',
+                  fontFamily: 'Archivo, sans-serif',
+                }}
+              >
                 {tab.label}
               </span>
             </Link>
