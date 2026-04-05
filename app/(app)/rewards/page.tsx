@@ -56,7 +56,7 @@ export default function RewardsPage() {
   const supabase = createClient()
 
   useEffect(() => {
-    supabase.from('rewards').select('*').eq('is_active', true).order('point_cost').then(({ data }) => {
+    supabase.from('rewards').select('*').eq('is_active', true).neq('category', 'gift_cards').order('point_cost').then(({ data }) => {
       if (data) setRewards(data)
     })
     if (user) {
