@@ -70,6 +70,7 @@ export default function InvitePage() {
   }
 
   async function handleCopyCode() {
+    if (!user) return
     await navigator.clipboard.writeText(user.referral_code ?? '')
     setCodeCopied(true)
     setTimeout(() => setCodeCopied(false), 2000)
