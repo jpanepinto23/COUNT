@@ -1,33 +1,47 @@
 @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
-
 @import "tailwindcss";
 
 :root {
   --black: #111110;
   --copper: #B5593C;
   --copper-light: #C97B5A;
-  --copper-bg: #FDF5F1;
+  --copper-bg: #1A110D;
   --white: #F5F0EA;
   --off-white: #FAF8F4;
   --stone: #8A8478;
-  --border: #E0D9CE;
+  --border: rgba(245,240,234,0.08);
   --charcoal: #2A2A28;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
-html { height: 100%; }
+html {
+  height: 100%;
+}
 
 body {
   font-family: 'Archivo', 'Helvetica Neue', sans-serif;
-  background: var(--off-white);
-  color: var(--black);
+  background: #0E0E0D;
+  color: #F5F0EA;
   -webkit-font-smoothing: antialiased;
   min-height: 100%;
 }
 
-.mono { font-family: 'JetBrains Mono', 'SF Mono', monospace; }
+.mono {
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+}
 
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(245,240,234,0.12);
+  border-radius: 2px;
+}
