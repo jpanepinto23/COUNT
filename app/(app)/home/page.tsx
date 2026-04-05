@@ -19,6 +19,7 @@ const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const POINTS_CARD_PHOTO = 'https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop'
 const WEEKLY_GOAL = 4
 const MONTHLY_GOAL = 12
+const FREEZE_COST = 100
 
 export default function HomePage() {
   const { user, refreshUser } = useAuth()
@@ -30,6 +31,9 @@ export default function HomePage() {
   const [userRank, setUserRank] = useState<number | null>(null)
   const [pointsToPassAbove, setPointsToPassAbove] = useState<number | null>(null)
   const [nextReward, setNextReward] = useState<{ name: string; points_cost: number } | null>(null)
+  const [isFrozen, setIsFrozen] = useState(false)
+  const [freezing, setFreezing] = useState(false)
+  const [freezeSuccess, setFreezeSuccess] = useState(false)
   const supabase = createClient()
 
   useEffect(() => {
@@ -106,6 +110,15 @@ export default function HomePage() {
     }
   }
 
+  async function handleFreezeStreak() {
+    if (!user || freezing || user.points_balance < FREEZE_COST) return
+    setFreezing(true)
+    await supabase.from('users').update({ points_balance: user.points_balance - FREEZE_COST }).eq('id', user.id)
+    await refreshUser()
+    setIsFrozen(true)
+    setFreezeSuccess(true)
+    setFreezing(false)
+  }
   return (
     <div style={{ padding: '20px 16px', paddingBottom: 24 }}>
 
