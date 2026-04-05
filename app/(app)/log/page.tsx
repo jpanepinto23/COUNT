@@ -8,26 +8,26 @@ import { calculatePoints, getTier, getTierLabel, getReferralPoints } from '@/lib
 import type { WorkoutType, Tier } from '@/lib/types'
 
 const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string; emoji: string }[] = [
-  { value: 'push', label: 'Push', photo: '4488764', emoji: '🤜' },
-  { value: 'pull', label: 'Pull', photo: '6922157', emoji: '💪' },
-  { value: 'legs', label: 'Legs', photo: '583722', emoji: '🦵' },
-  { value: 'upper', label: 'Upper', photo: '3916766', emoji: '🏋️' },
-  { value: 'lower', label: 'Lower', photo: '4944435', emoji: '🚴' },
+  { value: 'push',      label: 'Push',      photo: '4488764', emoji: '🤜' },
+  { value: 'pull',      label: 'Pull',      photo: '6922157', emoji: '💪' },
+  { value: 'legs',      label: 'Legs',      photo: '583722',  emoji: '🦵' },
+  { value: 'upper',     label: 'Upper',     photo: '3916766', emoji: '🏋️' },
+  { value: 'lower',     label: 'Lower',     photo: '4944435', emoji: '🚴' },
   { value: 'full_body', label: 'Full Body', photo: '6628962', emoji: '⚡' },
-  { value: 'cardio', label: 'Cardio', photo: '5327545', emoji: '🏃' },
-  { value: 'hiit', label: 'HIIT', photo: '2261481', emoji: '🔥' },
-  { value: 'custom', label: 'Custom', photo: '3999606', emoji: '✏️' },
+  { value: 'cardio',    label: 'Cardio',    photo: '5327545', emoji: '🏃' },
+  { value: 'hiit',      label: 'HIIT',      photo: '2261481', emoji: '🔥' },
+  { value: 'custom',    label: 'Custom',    photo: '3999606', emoji: '✏️' },
 ]
 
 const DURATIONS = [30, 45, 60, 75, 90]
 
 const MILESTONES: Record<number, { emoji: string; title: string; message: string }> = {
-  1:   { emoji: '🌱', title: 'First session!',       message: "Every legend starts somewhere. You just took your first step." },
-  5:   { emoji: '🔥', title: '5 sessions strong!',   message: "You're building a habit. Keep showing up." },
-  10:  { emoji: '💪', title: '10 sessions down!',    message: "Double digits. You're officially consistent." },
-  25:  { emoji: '🏅', title: '25 sessions!',         message: "A quarter century of workouts. You're in the top tier of commitment." },
+  1:   { emoji: '🌱', title: 'First session!',     message: "Every legend starts somewhere. You just took your first step." },
+  5:   { emoji: '🔥', title: '5 sessions strong!', message: "You're building a habit. Keep showing up." },
+  10:  { emoji: '💪', title: '10 sessions down!',  message: "Double digits. You're officially consistent." },
+  25:  { emoji: '🏅', title: '25 sessions!',        message: "A quarter century of workouts. You're in the top tier of commitment." },
   50:  { emoji: '⚡', title: '50 sessions!',         message: "Fifty sessions. Most people quit at 5. You didn't." },
-  100: { emoji: '🏆', title: '100 sessions!',        message: "One hundred. You are a COUNT legend. Truly elite." },
+  100: { emoji: '🏆', title: '100 sessions!',       message: "One hundred. You are a COUNT legend. Truly elite." },
 }
 
 export default function LogPage() {
@@ -68,7 +68,6 @@ export default function LogPage() {
 
     const todayStart = new Date()
     todayStart.setHours(0, 0, 0, 0)
-
     const { data: todaySession } = await supabase
       .from('workouts')
       .select('id')
@@ -99,16 +98,15 @@ export default function LogPage() {
       verified = true
       const provider = terraActivity[0].provider?.toUpperCase()
       verificationMethod =
-        provider === 'APPLE' ? 'apple_health' :
+        provider === 'APPLE'  ? 'apple_health' :
         provider === 'GARMIN' ? 'garmin' :
         provider === 'FITBIT' ? 'fitbit' :
         provider === 'GOOGLE' ? 'google_fit' :
         provider?.toLowerCase() ?? 'unverified'
       heartRateAvg = terraActivity[0].heart_rate_avg
-      calories = terraActivity[0].calories
+      calories     = terraActivity[0].calories
     }
 
-    // Strava auto-verify
     if (!verified) {
       const { data: stravaConn } = await supabase
         .from('strava_connections')
@@ -118,10 +116,8 @@ export default function LogPage() {
 
       if (stravaConn && new Date(stravaConn.token_expires_at) > new Date()) {
         try {
-          const _today = new Date()
-          const _after = Math.floor(
-            new Date(_today.getFullYear(), _today.getMonth(), _today.getDate()).getTime() / 1000
-          )
+          const _today  = new Date()
+          const _after  = Math.floor(new Date(_today.getFullYear(), _today.getMonth(), _today.getDate()).getTime() / 1000)
           const _stravaRes = await fetch(
             `https://www.strava.com/api/v3/athlete/activities?after=${_after}&before=${_after + 86400}&per_page=1`,
             { headers: { Authorization: `Bearer ${stravaConn.access_token}` } }
@@ -147,8 +143,7 @@ export default function LogPage() {
             { timeout: 15000, enableHighAccuracy: false }
           )
         })
-      } catch { // no geolocation
-      }
+      } catch { /* no geolocation */ }
     }
 
     if (verified && verificationMethod === 'gps') {
@@ -166,16 +161,16 @@ export default function LogPage() {
     })
 
     const { error: workoutError } = await supabase.from('workouts').insert({
-      user_id: user.id,
-      type: workoutType,
-      custom_name: workoutType === 'custom' ? customName : null,
-      duration_minutes: duration,
+      user_id:             user.id,
+      type:                workoutType,
+      custom_name:         workoutType === 'custom' ? customName : null,
+      duration_minutes:    duration,
       verification_method: verificationMethod,
       verified,
-      heart_rate_avg: heartRateAvg,
+      heart_rate_avg:      heartRateAvg,
       calories,
-      base_points: pts.base,
-      multiplier_applied: pts.multiplier,
+      base_points:         pts.base,
+      multiplier_applied:  pts.multiplier,
       total_points_earned: pts.total,
     })
 
@@ -196,24 +191,21 @@ export default function LogPage() {
       .lt('logged_at', new Date(new Date().setHours(0,0,0,0)).toISOString())
       .limit(1)
 
-    const newStreak = (yesterdaySession && yesterdaySession.length > 0) ? user.current_streak + 1 : 1
+    const newStreak  = (yesterdaySession && yesterdaySession.length > 0) ? user.current_streak + 1 : 1
     const newLongest = Math.max(user.longest_streak, newStreak)
-    const newFreeUnverified = !verified
-      ? Math.max(0, user.free_unverified_remaining - 1)
-      : user.free_unverified_remaining
+    const newFreeUnverified = !verified ? Math.max(0, user.free_unverified_remaining - 1) : user.free_unverified_remaining
 
     await supabase.from('users').update({
-      lifetime_sessions: newSessions,
-      tier: newTier,
-      multiplier: tierMultipliers[newTier],
-      points_balance: user.points_balance + pts.total,
-      points_lifetime_earned: user.points_lifetime_earned + pts.total,
-      current_streak: newStreak,
-      longest_streak: newLongest,
+      lifetime_sessions:         newSessions,
+      tier:                      newTier,
+      multiplier:                tierMultipliers[newTier],
+      points_balance:            user.points_balance + pts.total,
+      points_lifetime_earned:    user.points_lifetime_earned + pts.total,
+      current_streak:            newStreak,
+      longest_streak:            newLongest,
       free_unverified_remaining: newFreeUnverified,
     }).eq('id', user.id)
 
-    // ── Referral bonus ──
     if (user.lifetime_sessions === 0 && user.referred_by && !user.referral_bonus_claimed) {
       const { data: referrer } = await supabase
         .from('users')
@@ -222,7 +214,7 @@ export default function LogPage() {
         .single()
       if (referrer) {
         await supabase.from('users').update({
-          points_balance: referrer.points_balance + getReferralPoints(referrer.tier as Tier),
+          points_balance:         referrer.points_balance + getReferralPoints(referrer.tier as Tier),
           points_lifetime_earned: referrer.points_lifetime_earned + getReferralPoints(referrer.tier as Tier),
         }).eq('id', referrer.id)
         await supabase.from('users').update({ referral_bonus_claimed: true }).eq('id', user.id)
@@ -242,12 +234,12 @@ export default function LogPage() {
 
   const VERIFICATION_LABELS: Record<string, string> = {
     apple_health: '🍎 Apple Health',
-    garmin: '⌚ Garmin',
-    fitbit: '💚 Fitbit',
-    google_fit: '🏃 Google Fit',
-    gps: '📍 GPS',
-    gps_denied: '⚠️ GPS Blocked',
-    strava: '🏊 Strava',
+    garmin:       '⌚ Garmin',
+    fitbit:       '💚 Fitbit',
+    google_fit:   '🏃 Google Fit',
+    gps:          '📍 GPS',
+    gps_denied:   '⚠️ GPS Blocked',
+    strava:       '🏊 Strava',
   }
 
   if (step === 'success') {
@@ -255,61 +247,31 @@ export default function LogPage() {
     return (
       <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#0E0E0D' }}>
         <div style={{ textAlign: 'center', width: '100%', maxWidth: 360 }}>
-
-          {/* Milestone celebration */}
           {milestone && (
             <div style={{ background: 'linear-gradient(135deg, #B5593C 0%, #D97706 100%)', borderRadius: 16, padding: '20px 24px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: -20, right: -20, fontSize: 80, opacity: 0.15, lineHeight: 1 }}>
-                {milestone.emoji}
-              </div>
-              <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2, color: 'rgba(255,255,255,0.75)', marginBottom: 6 }}>
-                Milestone Unlocked
-              </p>
+              <div style={{ position: 'absolute', top: -20, right: -20, fontSize: 80, opacity: 0.15, lineHeight: 1 }}>{milestone.emoji}</div>
+              <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2, color: 'rgba(255,255,255,0.75)', marginBottom: 6 }}>Milestone Unlocked</p>
               <p style={{ fontSize: 32, marginBottom: 6 }}>{milestone.emoji}</p>
-              <p style={{ fontSize: 22, fontWeight: 900, color: '#fff', fontFamily: 'Archivo, sans-serif', marginBottom: 6 }}>
-                {milestone.title}
-              </p>
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', lineHeight: 1.4 }}>
-                {milestone.message}
-              </p>
+              <p style={{ fontSize: 22, fontWeight: 900, color: '#fff', fontFamily: 'Archivo, sans-serif', marginBottom: 6 }}>{milestone.title}</p>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', lineHeight: 1.4 }}>{milestone.message}</p>
             </div>
           )}
-
           <div style={{ fontSize: milestone ? 40 : 56, marginBottom: 12 }}>🏆</div>
-          <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, marginBottom: 8, fontFamily: 'Archivo, sans-serif' }}>
-            Session logged!
-          </h2>
+          <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, marginBottom: 8, fontFamily: 'Archivo, sans-serif' }}>Session logged!</h2>
           <p style={{ color: 'rgba(245,240,234,0.5)', marginBottom: 20 }}>You showed up. That&apos;s what counts.</p>
-
           <div style={{ background: '#111110', borderRadius: 16, padding: '20px 32px', marginBottom: verificationSource ? 12 : 24, display: 'inline-block', width: '100%' }}>
             <p style={{ color: '#8A8478', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 }}>Points Earned</p>
-            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 44, fontWeight: 900, color: '#B5593C', lineHeight: 1 }}>
-              +{earnedPoints}
-            </p>
-            <p style={{ color: '#8A8478', fontSize: 12, marginTop: 4 }}>
-              {getTierLabel(tier)} tier · {multiplier}x multiplier
-            </p>
+            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 44, fontWeight: 900, color: '#B5593C', lineHeight: 1 }}>+{earnedPoints}</p>
+            <p style={{ color: '#8A8478', fontSize: 12, marginTop: 4 }}>{getTierLabel(tier)} tier &middot; {multiplier}x multiplier</p>
           </div>
-
           {verificationSource && (
-            <div style={{ background: '#F0FDF4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 16px', marginBottom: 20, fontSize: 12, color: '#166534', fontWeight: 700 }}>
+            <div style={{ background: 'rgba(22,163,74,0.12)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 10, padding: '8px 16px', marginBottom: 20, fontSize: 12, color: '#4ade80', fontWeight: 700 }}>
               ✓ Verified via {VERIFICATION_LABELS[verificationSource] ?? verificationSource}
             </div>
           )}
-
           <div style={{ display: 'flex', gap: 10 }}>
-            <button
-              onClick={() => router.push('/home')}
-              style={{ flex: 1, padding: 15, background: '#111110', color: '#F5F0EA', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}
-            >
-              Back to Home
-            </button>
-            <button
-              onClick={() => router.push('/rewards')}
-              style={{ flex: 1, padding: 15, background: 'transparent', color: '#B5593C', border: '1.5px solid #B5593C', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}
-            >
-              Shop Rewards
-            </button>
+            <button onClick={() => router.push('/home')} style={{ flex: 1, padding: 15, background: '#111110', color: '#F5F0EA', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}>Back to Home</button>
+            <button onClick={() => router.push('/rewards')} style={{ flex: 1, padding: 15, background: 'transparent', color: '#B5593C', border: '1.5px solid #B5593C', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}>Shop Rewards</button>
           </div>
         </div>
       </div>
@@ -317,7 +279,7 @@ export default function LogPage() {
   }
 
   return (
-    <div style={{ padding: '20px 16px', minHeight: '100dvh' }}>
+    <div style={{ padding: '20px 16px', minHeight: '100dvh', background: '#0E0E0D' }}>
       <div style={{ marginBottom: 24 }}>
         <p style={{ color: '#8A8478', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5 }}>Log Workout</p>
         <h1 style={{ fontSize: 24, fontWeight: 900, letterSpacing: -0.5, fontFamily: 'Archivo, sans-serif', color: '#F5F0EA' }}>What did you do?</h1>
@@ -329,68 +291,32 @@ export default function LogPage() {
             {WORKOUT_TYPES.map(t => {
               const isSelected = workoutType === t.value
               return (
-                <button
-                  key={t.value}
-                  onClick={() => setWorkoutType(t.value)}
-                  style={{
-                    position: 'relative',
-                    height: 120,
-                    backgroundImage: `url(https://images.pexels.com/photos/${t.photo}/pexels-photo-${t.photo}.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2)`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    border: isSelected ? '2.5px solid #B5593C' : '2px solid transparent',
-                    borderRadius: 12,
-                    cursor: 'pointer',
-                    overflow: 'hidden',
-                    padding: 0,
-                    outline: 'none',
-                    transform: isSelected ? 'scale(1.04)' : 'scale(1)',
-                    transition: 'transform 0.15s ease, border-color 0.15s ease',
-                    boxShadow: isSelected ? '0 4px 16px rgba(181,89,60,0.35)' : 'none',
-                    zIndex: isSelected ? 1 : 0,
-                  }}
-                >
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    background: isSelected
-                      ? 'linear-gradient(to top, rgba(181,89,60,0.65) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0.10) 100%)'
-                      : 'linear-gradient(to top, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.20) 60%, rgba(0,0,0,0.08) 100%)',
-                    borderRadius: 10,
-                    transition: 'background 0.15s',
-                  }} />
+                <button key={t.value} onClick={() => setWorkoutType(t.value)} style={{
+                  position: 'relative', height: 120,
+                  backgroundImage: `url(https://images.pexels.com/photos/${t.photo}/pexels-photo-${t.photo}.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2)`,
+                  backgroundSize: 'cover', backgroundPosition: 'center',
+                  border: isSelected ? '2.5px solid #B5593C' : '2px solid transparent',
+                  borderRadius: 12, cursor: 'pointer', overflow: 'hidden', padding: 0, outline: 'none',
+                  transform: isSelected ? 'scale(1.04)' : 'scale(1)',
+                  transition: 'transform 0.15s ease, border-color 0.15s ease',
+                  boxShadow: isSelected ? '0 4px 16px rgba(181,89,60,0.35)' : 'none',
+                  zIndex: isSelected ? 1 : 0,
+                }}>
+                  <div style={{ position: 'absolute', inset: 0, background: isSelected ? 'linear-gradient(to top, rgba(181,89,60,0.65) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0.10) 100%)' : 'linear-gradient(to top, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.20) 60%, rgba(0,0,0,0.08) 100%)', borderRadius: 10, transition: 'background 0.15s' }} />
                   {isSelected && (
-                    <div style={{
-                      position: 'absolute', top: 6, right: 6,
-                      width: 18, height: 18, borderRadius: '50%',
-                      background: '#B5593C',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 10, color: 'white', fontWeight: 900, lineHeight: 1,
-                    }}>✓</div>
+                    <div style={{ position: 'absolute', top: 6, right: 6, width: 18, height: 18, borderRadius: '50%', background: '#B5593C', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'white', fontWeight: 900, lineHeight: 1 }}>✓</div>
                   )}
                   <div style={{ position: 'absolute', top: 8, left: 8 }}>
-                <span style={{ fontSize: 20, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))' }}>{t.emoji}</span>
-              </div>
-              <span style={{
-                    position: 'absolute', bottom: 8, left: 0, right: 0,
-                    textAlign: 'center', fontSize: 11, fontWeight: 900,
-                    color: '#FFFFFF', fontFamily: 'Archivo, sans-serif',
-                    letterSpacing: 0.5, textTransform: 'uppercase',
-                    textShadow: '0 1px 4px rgba(0,0,0,0.7)',
-                  }}>
-                    {t.label}
-                  </span>
+                    <span style={{ fontSize: 20, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))' }}>{t.emoji}</span>
+                  </div>
+                  <span style={{ position: 'absolute', bottom: 8, left: 0, right: 0, textAlign: 'center', fontSize: 11, fontWeight: 900, color: '#FFFFFF', fontFamily: 'Archivo, sans-serif', letterSpacing: 0.5, textTransform: 'uppercase', textShadow: '0 1px 4px rgba(0,0,0,0.7)' }}>{t.label}</span>
                 </button>
               )
             })}
           </div>
 
           {workoutType === 'custom' && (
-            <input
-              placeholder="Session name"
-              value={customName}
-              onChange={e => setCustomName(e.target.value)}
-              style={{ ...inputStyle, marginBottom: 16 }}
-            />
+            <input placeholder="Session name" value={customName} onChange={e => setCustomName(e.target.value)} style={{ ...inputStyle, marginBottom: 16 }} />
           )}
 
           <button onClick={() => setStep('details')} style={btnPrimary}>Next →</button>
@@ -422,23 +348,16 @@ export default function LogPage() {
       {step === 'details' && (
         <>
           <div style={{ marginBottom: 20 }}>
-            <p style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>Duration</p>
+            <p style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12, color: '#F5F0EA' }}>Duration</p>
             <div style={{ display: 'flex', gap: 8 }}>
               {DURATIONS.map(d => (
-                <button
-                  key={d}
-                  onClick={() => setDuration(d)}
-                  style={{
-                    flex: 1, padding: '14px 0',
-                    background: duration === d ? '#B5593C' : '#1A1A18',
-                    border: `1.5px solid ${duration === d ? '#B5593C' : 'rgba(245,240,234,0.1)'}`,
-                    borderRadius: 10, cursor: 'pointer',
-                    fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700,
-                    color: '#F5F0EA',
-                  }}
-                >
-                  {d}
-                </button>
+                <button key={d} onClick={() => setDuration(d)} style={{
+                  flex: 1, padding: '14px 0',
+                  background: duration === d ? '#B5593C' : '#1A1A18',
+                  border: `1.5px solid ${duration === d ? '#B5593C' : 'rgba(245,240,234,0.1)'}`,
+                  borderRadius: 10, cursor: 'pointer',
+                  fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700, color: '#F5F0EA',
+                }}>{d}</button>
               ))}
             </div>
             <p style={{ color: '#8A8478', fontSize: 11, marginTop: 6 }}>minutes</p>
@@ -448,21 +367,19 @@ export default function LogPage() {
             <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10, color: 'rgba(245,240,234,0.4)' }}>Points Preview</p>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
               <span style={{ fontSize: 13, color: '#8A8478' }}>Base ({duration}min)</span>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700 }}>{verifiedPoints.base} pts</span>
+              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>{verifiedPoints.base} pts</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
               <span style={{ fontSize: 13, color: '#8A8478' }}>{getTierLabel(tier)} tier</span>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700 }}>{multiplier}x</span>
+              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>{multiplier}x</span>
             </div>
-            <div style={{ height: 1, background: '#E0D9CE', margin: '10px 0' }} />
+            <div style={{ height: 1, background: 'rgba(245,240,234,0.08)', margin: '10px 0' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 14, fontWeight: 800 }}>Verified total</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: '#F5F0EA' }}>Verified total</span>
               <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 18, fontWeight: 900, color: '#B5593C' }}>{verifiedPoints.total} pts</span>
             </div>
             {user.free_unverified_remaining > 0 && (
-              <p style={{ fontSize: 11, color: '#8A8478', marginTop: 6 }}>
-                {user.free_unverified_remaining} free unverified sessions remaining (25% pts)
-              </p>
+              <p style={{ fontSize: 11, color: '#8A8478', marginTop: 6 }}>{user.free_unverified_remaining} free unverified sessions remaining (25% pts)</p>
             )}
           </div>
 
@@ -495,12 +412,12 @@ export default function LogPage() {
 
 const inputStyle: React.CSSProperties = {
   padding: '14px 16px',
-  border: '1.5px solid #E0D9CE',
+  border: '1.5px solid rgba(245,240,234,0.12)',
   borderRadius: 10,
   fontSize: 15,
   fontFamily: 'Archivo, sans-serif',
-  background: '#fff',
-  color: '#111110',
+  background: '#1A1A18',
+  color: '#F5F0EA',
   outline: 'none',
   width: '100%',
 }
@@ -509,7 +426,7 @@ const btnPrimary: React.CSSProperties = {
   flex: 1,
   width: '100%',
   padding: 15,
-  background: '#111110',
+  background: '#B5593C',
   color: '#F5F0EA',
   border: 'none',
   borderRadius: 10,
@@ -522,9 +439,9 @@ const btnPrimary: React.CSSProperties = {
 const btnSecondary: React.CSSProperties = {
   flex: 1,
   padding: 15,
-  background: '#fff',
-  color: '#111110',
-  border: '1.5px solid #E0D9CE',
+  background: '#1A1A18',
+  color: '#F5F0EA',
+  border: '1.5px solid rgba(245,240,234,0.12)',
   borderRadius: 10,
   fontSize: 15,
   fontWeight: 800,
