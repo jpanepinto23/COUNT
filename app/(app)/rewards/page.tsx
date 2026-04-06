@@ -218,14 +218,6 @@ function RewardCard({ reward, userBalance, redeeming, onRedeem }: {
 }) {
   const canAfford = userBalance >= reward.point_cost
   const isRedeeming = redeeming === reward.id
-
-  const categoryAccent: Record<string, string> = {
-    supplements: '#22c55e',
-    gear: '#3b82f6',
-    lifestyle: '#a855f7',
-  }
-  const accent = categoryAccent[reward.category] ?? COPPER
-
   const CARD = '#111110'
   const CARD2 = '#1A1A18'
   const BORDER = 'rgba(245,240,234,0.08)'
@@ -234,6 +226,12 @@ function RewardCard({ reward, userBalance, redeeming, onRedeem }: {
   const MUTED = 'rgba(245,240,234,0.45)'
   const STONE = '#8A8478'
   const COPPER = '#B5593C'
+  const categoryAccent: Record<string, string> = {
+    supplements: '#22c55e',
+    gear: '#3b82f6',
+    lifestyle: '#a855f7',
+  }
+  const accent = categoryAccent[reward.category] ?? COPPER
 
   return (
     <div style={{ background: CARD, border: '1.5px solid ' + (canAfford ? BORDER_A : BORDER), borderRadius: 14, padding: '14px 16px' }}>
