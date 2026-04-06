@@ -236,8 +236,11 @@ function RewardCard({ reward, userBalance, redeeming, onRedeem }: {
   return (
     <div style={{ background: CARD, border: '1.5px solid ' + (canAfford ? BORDER_A : BORDER), borderRadius: 14, padding: '14px 16px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, background: accent + '18', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: 12, height: 12, borderRadius: '50%', background: accent }} />
+        <div style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, background: accent + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+          {reward.image_url
+            ? <img src={reward.image_url} alt={reward.brand_name} style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 4 }} />
+            : <div style={{ width: 12, height: 12, borderRadius: '50%', background: accent }} />
+          }
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 1 }}>
