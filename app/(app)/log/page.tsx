@@ -39,6 +39,8 @@ export default function LogPage() {
   const [workoutType, setWorkoutType] = useState<WorkoutType>('push')
   const [customName, setCustomName] = useState('')
   const [duration, setDuration] = useState(60)
+  const [effortRating, setEffortRating] = useState(0)
+  const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [earnedPoints, setEarnedPoints] = useState(0)
@@ -172,6 +174,8 @@ export default function LogPage() {
       base_points:         pts.base,
       multiplier_applied:  pts.multiplier,
       total_points_earned: pts.total,
+      effort_rating:       effortRating || null,
+      notes:               notes.trim() || null,
     })
 
     if (workoutError) { setError(workoutError.message); setLoading(false); return }
@@ -381,6 +385,43 @@ export default function LogPage() {
             {user.free_unverified_remaining > 0 && (
               <p style={{ fontSize: 11, color: '#8A8478', marginTop: 6 }}>{user.free_unverified_remaining} free unverified sessions remaining (25% pts)</p>
             )}
+          </div>
+
+          <div style={{ marginBottom: 20 }}>
+            <p style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12, color: '#F5F0EA' }}>
+              How hard was it?
+              {effortRating > 0 && <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, color: '#B5593C', marginLeft: 8 }}>
+                {['', 'Recovery', 'Easy', 'Moderate', 'Hard', 'Max Effort'][effortRating]}
+              </span>}
+            </p>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {[1,2,3,4,5].map(n => (
+                <button key={n} onClick={() => setEffortRating(effortRating === n ? 0 : n)} style={{
+                  flex: 1, padding: '12px 0', fontSize: 22,
+                  background: n <= effortRating ? 'rgba(181,89,60,0.15)' : '#1A1A18',
+                  border: `1.5px solid ${n <= effortRating ? '#B5593C' : 'rgba(245,240,234,0.1)'}`,
+                  borderRadius: 10, cursor: 'pointer',
+                  opacity: effortRating > 0 && n > effortRating ? 0.35 : 1,
+                  transition: 'all 0.15s ease',
+                }}>🔥</button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 20 }}>
+            <textarea
+              placeholder="What did you crush? (optional)"
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              maxLength={280}
+              rows={2}
+              style={{
+                ...inputStyle,
+                resize: 'none',
+                lineHeight: 1.5,
+                fontSize: 14,
+              }}
+            />
           </div>
 
           {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12 }}>{error}</p>}
