@@ -10,7 +10,7 @@ import type { WorkoutType, Tier } from '@/lib/types'
 const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string; emoji: string }[] = [
   { value: 'push',      label: 'Push',      photo: '4488764', emoji: '🤜' },
   { value: 'pull',      label: 'Pull',      photo: '6922157', emoji: '💪' },
-  { value: 'legs',      label: 'Legs',      photo: '583722',  emoji: '🦵' },
+  { value: 'legs',      label: 'Legs',      photo: '8846443',  emoji: '🦵' },
   { value: 'upper',     label: 'Upper',     photo: '3916766', emoji: '🏋️' },
   { value: 'lower',     label: 'Lower',     photo: '4944435', emoji: '🚴' },
   { value: 'full_body', label: 'Full Body', photo: '6628962', emoji: '⚡' },
