@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
   const error = searchParams.get('error')
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://count-fitness-app.vercel.app'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://countfitness.app'
 
   if (error || !code) {
     return NextResponse.redirect(`${appUrl}/profile?connect=strava&status=error&msg=Authorization+denied`)
