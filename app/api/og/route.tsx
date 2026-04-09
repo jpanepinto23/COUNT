@@ -96,7 +96,7 @@ export async function GET(req: NextRequest) {
 
         {/* Footer URL */}
         <div style={{ position: 'absolute', bottom: 44, right: 56, fontSize: 14, color: '#8A8478', display: 'flex' }}>
-          count-fitness-app.vercel.app
+          countfitness.app
         </div>
       </div>
     ),
