@@ -77,7 +77,7 @@ export default function HomePage() {
   const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
   const daysLeft = daysInMonth - today.getDate()
   const monthName = today.toLocaleDateString('en-US', { month: 'long' })
-  const referralLink = `https://count-app-joe.vercel.app/auth/signup?ref=${user.referral_code ?? ''}`
+  const referralLink = `https://countfitness.app/auth/signup?ref=${user.referral_code ?? ''}`
 
   async function handleShare() {
     if (navigator.share) {
@@ -102,7 +102,7 @@ export default function HomePage() {
   async function handleShareStats() {
     if (!user) return
     const tier = user.tier ?? 'bronze'
-    const ogUrl = `https://count-fitness-app.vercel.app/api/og?name=${encodeURIComponent(user.name)}&tier=${tier}&streak=${user.current_streak}&sessions=${user.lifetime_sessions}&points=${user.points_balance}`
+    const ogUrl = `https://countfitness.app/api/og?name=${encodeURIComponent(user.name)}&tier=${tier}&streak=${user.current_streak}&sessions=${user.lifetime_sessions}&points=${user.points_balance}`
     if (navigator.share) {
       await navigator.share({ title: 'My COUNT Stats', text: `${user.current_streak}-day streak · ${user.lifetime_sessions} sessions on COUNT 💪`, url: ogUrl })
     } else {
