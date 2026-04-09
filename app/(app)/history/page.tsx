@@ -106,7 +106,7 @@ export default function HistoryPage() {
 
     ctx.fillStyle = '#252523'
     ctx.font = '500 26px "JetBrains Mono", monospace'
-    ctx.fillText('count-fitness-app.vercel.app', 84, SIZE - 66)
+    ctx.fillText('countfitness.app', 84, SIZE - 66)
 
     canvas.toBlob(async (blob) => {
       setSharingId(null)
