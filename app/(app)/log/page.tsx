@@ -46,6 +46,8 @@ export default function LogPage() {
   const [earnedPoints, setEarnedPoints] = useState(0)
   const [verificationSource, setVerificationSource] = useState<string | null>(null)
   const [newSessionCount, setNewSessionCount] = useState(0)
+  const [sharedStreak, setSharedStreak] = useState(0)
+  const [shareCopied, setShareCopied] = useState(false)
 
   if (!user) return null
 
@@ -230,6 +232,7 @@ export default function LogPage() {
 
     setEarnedPoints(pts.total)
     setNewSessionCount(newSessions)
+    setSharedStreak(newStreak)
     setVerificationSource(verified ? verificationMethod : gpsDenied ? 'gps_denied' : null)
     await refreshUser()
     setLoading(false)
@@ -246,8 +249,26 @@ export default function LogPage() {
     strava:       '🏊 Strava',
   }
 
+  const handleShare = async () => {
+    const wt = WORKOUT_TYPES.find(t => t.value === workoutType)!
+    const effortLabels = ['', 'Recovery', 'Easy', 'Moderate', 'Hard', 'Max Effort']
+    const effortText = effortRating > 0 ? ` · ${effortLabels[effortRating]} effort` : ''
+    const streakText = sharedStreak > 1 ? ` · ${sharedStreak}-day streak 🔥` : ''
+    const text = `Just logged a ${wt.label} session on COUNT ${wt.emoji}\n+${earnedPoints} pts earned${effortText}${streakText}\n\nLog workouts. Stack points. Earn free supplements.\ncount-fitness-app.vercel.app`
+    try {
+      if (navigator.share) {
+        await navigator.share({ text })
+      } else {
+        await navigator.clipboard.writeText(text)
+        setShareCopied(true)
+        setTimeout(() => setShareCopied(false), 2500)
+      }
+    } catch { /* dismissed */ }
+  }
+
   if (step === 'success') {
     const milestone = MILESTONES[newSessionCount]
+    const wt = WORKOUT_TYPES.find(t => t.value === workoutType)!
     return (
       <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#0E0E0D' }}>
         <div style={{ textAlign: 'center', width: '100%', maxWidth: 360 }}>
@@ -273,6 +294,37 @@ export default function LogPage() {
               ✓ Verified via {VERIFICATION_LABELS[verificationSource] ?? verificationSource}
             </div>
           )}
+          {/* Share card */}
+          <div style={{ background: 'linear-gradient(145deg, #1C1B19 0%, #141413 100%)', border: '1px solid rgba(181,89,60,0.25)', borderRadius: 16, padding: '18px 20px', marginBottom: 14, textAlign: 'left', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: -24, right: -24, fontSize: 80, opacity: 0.06, lineHeight: 1, userSelect: 'none' }}>{wt.emoji}</div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 12, fontWeight: 900, letterSpacing: '0.2em', color: '#B5593C', textTransform: 'uppercase' }}>COUNT</span>
+              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#333', letterSpacing: 1, textTransform: 'uppercase' }}>make it count</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+              <span style={{ fontSize: 26 }}>{wt.emoji}</span>
+              <div>
+                <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#555', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 2 }}>Session logged</p>
+                <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 18, fontWeight: 900, color: '#F5F0EA', lineHeight: 1 }}>{wt.label}</p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+              <div style={{ flex: 1, background: 'rgba(181,89,60,0.1)', border: '1px solid rgba(181,89,60,0.2)', borderRadius: 10, padding: '10px 12px' }}>
+                <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#555', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3 }}>Earned</p>
+                <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 22, fontWeight: 900, color: '#B5593C', lineHeight: 1 }}>+{earnedPoints}</p>
+              </div>
+              {sharedStreak > 0 && (
+                <div style={{ flex: 1, background: '#1A1A18', border: '1px solid rgba(245,240,234,0.07)', borderRadius: 10, padding: '10px 12px' }}>
+                  <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#555', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3 }}>Streak</p>
+                  <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 22, fontWeight: 900, color: '#F5F0EA', lineHeight: 1 }}>{sharedStreak} 🔥</p>
+                </div>
+              )}
+            </div>
+            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#2E2E2C', letterSpacing: 0.8, textAlign: 'center' }}>count-fitness-app.vercel.app</p>
+          </div>
+          <button onClick={handleShare} style={{ width: '100%', padding: '13px 0', background: shareCopied ? 'rgba(93,187,99,0.15)' : 'rgba(181,89,60,0.1)', border: `1.5px solid ${shareCopied ? 'rgba(93,187,99,0.4)' : 'rgba(181,89,60,0.3)'}`, borderRadius: 10, color: shareCopied ? '#5DBB63' : '#B5593C', fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer', marginBottom: 10, transition: 'all 0.2s ease' }}>
+            {shareCopied ? '✓ Copied to clipboard' : '↗ Share your workout'}
+          </button>
           <div style={{ display: 'flex', gap: 10 }}>
             <button onClick={() => router.push('/home')} style={{ flex: 1, padding: 15, background: '#111110', color: '#F5F0EA', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}>Back to Home</button>
             <button onClick={() => router.push('/rewards')} style={{ flex: 1, padding: 15, background: 'transparent', color: '#B5593C', border: '1.5px solid #B5593C', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}>Shop Rewards</button>
