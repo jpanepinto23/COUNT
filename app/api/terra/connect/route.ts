@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url)
   const provider = searchParams.get('provider')
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://count-fitness-app.vercel.app'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://countfitness.app'
 
   try {
     const res = await fetch('https://api.tryterra.co/v2/auth/generateWidgetSession', {
