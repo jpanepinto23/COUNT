@@ -251,21 +251,123 @@ export default function LogPage() {
 
   const handleShare = async () => {
     const wt = WORKOUT_TYPES.find(t => t.value === workoutType)!
-    const effortLabels = ['', 'Recovery', 'Easy', 'Moderate', 'Hard', 'Max Effort']
-    const effortText = effortRating > 0 ? ` · ${effortLabels[effortRating]} effort` : ''
-    const streakText = sharedStreak > 1 ? ` · ${sharedStreak}-day streak 🔥` : ''
-    const text = `Just logged a ${wt.label} session on COUNT ${wt.emoji}\n+${earnedPoints} pts earned${effortText}${streakText}\n\nLog workouts. Stack points. Earn free supplements.\ncount-fitness-app.vercel.app`
-    try {
-      if (navigator.share) {
-        await navigator.share({ text })
-      } else {
-        await navigator.clipboard.writeText(text)
-        setShareCopied(true)
-        setTimeout(() => setShareCopied(false), 2500)
-      }
-    } catch { /* dismissed */ }
-  }
+    await document.fonts.ready
 
+    const SIZE = 1080
+    const canvas = document.createElement('canvas')
+    canvas.width = SIZE
+    canvas.height = SIZE
+    const ctx = canvas.getContext('2d')!
+
+    // Background gradient
+    const bg = ctx.createLinearGradient(0, 0, SIZE, SIZE)
+    bg.addColorStop(0, '#1C1B19')
+    bg.addColorStop(1, '#0E0D0C')
+    ctx.fillStyle = bg
+    ctx.fillRect(0, 0, SIZE, SIZE)
+
+    // Border
+    ctx.strokeStyle = 'rgba(181,89,60,0.35)'
+    ctx.lineWidth = 3
+    ctx.strokeRect(44, 44, SIZE - 88, SIZE - 88)
+
+    // COUNT wordmark
+    ctx.fillStyle = '#B5593C'
+    ctx.font = '900 78px Archivo, sans-serif'
+    ctx.fillText('COUNT', 84, 158)
+
+    // Tagline
+    ctx.fillStyle = '#2A2A28'
+    ctx.font = '500 26px "JetBrains Mono", monospace'
+    ctx.fillText('MAKE IT COUNT', 86, 204)
+
+    // Divider
+    ctx.strokeStyle = 'rgba(245,240,234,0.07)'
+    ctx.lineWidth = 1
+    ctx.beginPath(); ctx.moveTo(84, 238); ctx.lineTo(SIZE - 84, 238); ctx.stroke()
+
+    // Emoji
+    ctx.font = '170px serif'
+    ctx.fillText(wt.emoji, 76, 474)
+
+    // Workout name
+    ctx.fillStyle = '#F5F0EA'
+    ctx.font = '900 96px Archivo, sans-serif'
+    ctx.fillText(wt.label.toUpperCase(), 84, 592)
+
+    // Session label
+    ctx.fillStyle = '#444442'
+    ctx.font = '500 30px "JetBrains Mono", monospace'
+    ctx.fillText('SESSION LOGGED', 84, 642)
+
+    // Divider
+    ctx.strokeStyle = 'rgba(245,240,234,0.07)'
+    ctx.lineWidth = 1
+    ctx.beginPath(); ctx.moveTo(84, 678); ctx.lineTo(SIZE - 84, 678); ctx.stroke()
+
+    // Points box
+    ctx.fillStyle = 'rgba(181,89,60,0.1)'
+    ctx.beginPath()
+    ctx.roundRect(84, 706, 460, 230, 18)
+    ctx.fill()
+    ctx.strokeStyle = 'rgba(181,89,60,0.2)'
+    ctx.lineWidth = 1
+    ctx.stroke()
+
+    ctx.fillStyle = '#444442'
+    ctx.font = '500 27px "JetBrains Mono", monospace'
+    ctx.fillText('POINTS EARNED', 114, 754)
+    ctx.fillStyle = '#B5593C'
+    ctx.font = '900 108px "JetBrains Mono", monospace'
+    ctx.fillText(`+${earnedPoints}`, 114, 884)
+
+    // Streak box
+    if (sharedStreak > 0) {
+      ctx.fillStyle = '#1A1A18'
+      ctx.beginPath()
+      ctx.roundRect(564, 706, 432, 230, 18)
+      ctx.fill()
+      ctx.strokeStyle = 'rgba(245,240,234,0.07)'
+      ctx.lineWidth = 1
+      ctx.stroke()
+
+      ctx.fillStyle = '#444442'
+      ctx.font = '500 27px "JetBrains Mono", monospace'
+      ctx.fillText('STREAK', 594, 754)
+      ctx.fillStyle = '#F5F0EA'
+      ctx.font = '900 90px "JetBrains Mono", monospace'
+      ctx.fillText(`${sharedStreak}`, 594, 876)
+      ctx.font = '500 68px serif'
+      ctx.fillText('ð¥', 594 + ctx.measureText(`${sharedStreak}`).width + 10, 876)
+    }
+
+    // URL
+    ctx.fillStyle = '#252523'
+    ctx.font = '500 26px "JetBrains Mono", monospace'
+    ctx.fillText('count-fitness-app.vercel.app', 84, SIZE - 66)
+
+    // Generate PNG and share
+    canvas.toBlob(async (blob) => {
+      if (!blob) return
+      const file = new File([blob], 'count-workout.png', { type: 'image/png' })
+      try {
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file], title: `${wt.label} Â· +${earnedPoints} pts` })
+        } else {
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = 'count-workout.png'
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          URL.revokeObjectURL(url)
+          setShareCopied(true)
+          setTimeout(() => setShareCopied(false), 2500)
+        }
+      } catch { /* dismissed */ }
+    }, 'image/png')
+  }
   if (step === 'success') {
     const milestone = MILESTONES[newSessionCount]
     const wt = WORKOUT_TYPES.find(t => t.value === workoutType)!
