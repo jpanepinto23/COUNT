@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
         </p>
         ${adminFulfillmentHtml}
         <p style="font-family:sans-serif;margin-top:24px;font-size:13px">
-          <a href="https://count-fitness-app.vercel.app/admin">View all redemptions &#8594;</a>
+          <a href="https://countfitness.app/admin">View all redemptions &#8594;</a>
         </p>
       `
     )
