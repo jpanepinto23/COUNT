@@ -6,8 +6,8 @@ import { createClient } from '@/lib/supabase'
 import type { Workout } from '@/lib/types'
 
 const WORKOUT_EMOJIS: Record<string, string> = {
-  push: 'ð¤', pull: 'ðª', legs: 'ð¦µ', upper: 'ðï¸',
-  lower: 'ð´', full_body: 'â¡', cardio: 'ð', hiit: 'ð¥', custom: 'âï¸',
+  push: '🤜', pull: '💪', legs: '🦵', upper: '🏋️',
+  lower: '🚴', full_body: '⚡', cardio: '🏃', hiit: '🔥', custom: '✏️',
 }
 
 const BG     = '#0E0E0D'
@@ -41,7 +41,7 @@ export default function HistoryPage() {
   const handleShareWorkout = async (w: Workout) => {
     setSharingId(w.id)
     const label = w.custom_name || WORKOUT_LABELS[w.type] || w.type
-    const emoji = WORKOUT_EMOJIS[w.type] || 'ðï¸'
+    const emoji = WORKOUT_EMOJIS[w.type] || '🏋️'
     const pts = w.total_points_earned ?? 0
 
     await document.fonts.ready
@@ -114,7 +114,7 @@ export default function HistoryPage() {
       const file = new File([blob], 'count-workout.png', { type: 'image/png' })
       try {
         if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `${label} Â· +${pts} pts` })
+          await navigator.share({ files: [file], title: `${label} · +${pts} pts` })
         } else {
           const url = URL.createObjectURL(blob)
           const a = document.createElement('a')
@@ -188,7 +188,7 @@ export default function HistoryPage() {
     .slice(0, 3)
 
   return (
-    <div style={{ padding: '20px 16px', paddingBottom: 24, background: BG, minHeight: '100dvh' }}>
+    <div style={{ padding: '20px 16px', paddingBottom: 100, background: BG, minHeight: '100dvh' }}>
       <p style={{ color: STONE, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 2 }}>
         Your Progress
       </p>
@@ -200,47 +200,6 @@ export default function HistoryPage() {
         <StatCard label="This month" value={monthSessions} unit="sessions" color={tierColor} />
         <StatCard label="Points" value={monthPoints} unit="earned" color={tierColor} />
         <StatCard label="Verified" value={monthVerified} unit={`of ${monthSessions}`} color="#22c55e" />
-      </div>
-
-      <div style={{ background: CARD, border: `1.5px solid ${BORDER}`, borderRadius: 14, padding: '14px 16px', marginBottom: 16 }}>
-        <p style={{ fontSize: 11, fontWeight: 800, color: STONE, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>
-          {monthName}
-        </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3, marginBottom: 4 }}>
-          {['S','M','T','W','T','F','S'].map((d, i) => (
-            <div key={i} style={{ textAlign: 'center', fontSize: 9, fontWeight: 700, color: MUTED }}>{d}</div>
-          ))}
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3 }}>
-          {Array.from({ length: firstDayOfWeek }).map((_, i) => <div key={`e${i}`} />)}
-          {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
-            const hit = hasWorkout(day)
-            const isToday = day === now.getDate()
-            return (
-              <div key={day} style={{
-                aspectRatio: '1',
-                borderRadius: 4,
-                background: hit ? tierColor : 'rgba(245,240,234,0.05)',
-                border: isToday ? `2px solid ${tierColor}` : '2px solid transparent',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <span style={{ fontSize: 9, fontWeight: 700, color: hit ? 'rgba(255,255,255,0.85)' : MUTED }}>
-                  {day}
-                </span>
-              </div>
-            )
-          })}
-        </div>
-        <div style={{ display: 'flex', gap: 14, marginTop: 10, alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <div style={{ width: 10, height: 10, borderRadius: 2, background: tierColor }} />
-            <span style={{ fontSize: 10, color: STONE }}>Workout</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <div style={{ width: 10, height: 10, borderRadius: 2, background: 'rgba(245,240,234,0.05)', border: `1px solid ${BORDER}` }} />
-            <span style={{ fontSize: 10, color: STONE }}>Rest day</span>
-          </div>
-        </div>
       </div>
 
       <div style={{ background: CARD, border: `1.5px solid ${BORDER}`, borderRadius: 14, padding: '14px 16px', marginBottom: 16 }}>
@@ -296,7 +255,7 @@ export default function HistoryPage() {
         <p style={{ color: STONE, fontSize: 13, textAlign: 'center', padding: 20 }}>Loading...</p>
       ) : workouts.length === 0 ? (
         <div style={{ background: CARD, border: `1.5px solid ${BORDER}`, borderRadius: 14, padding: 24, textAlign: 'center' }}>
-          <p style={{ fontSize: 28, marginBottom: 6 }}>ðï¸</p>
+          <p style={{ fontSize: 28, marginBottom: 6 }}>🏋️</p>
           <p style={{ fontSize: 14, fontWeight: 800, color: TEXT }}>No workouts yet</p>
           <p style={{ fontSize: 12, color: STONE, marginTop: 4 }}>Log your first session to start building your history</p>
         </div>
@@ -334,7 +293,7 @@ export default function HistoryPage() {
                     <p style={{ fontSize: 11, color: STONE }}>
                       {w.duration_minutes}min{' '}
                       <span style={{ color: w.verified ? '#22c55e' : '#f59e0b', marginLeft: 6 }}>
-                        {w.verified ? 'â verified' : 'â  unverified'}
+                        {w.verified ? 'verified' : 'unverified'}
                       </span>
                     </p>
                   </div>
@@ -355,7 +314,7 @@ export default function HistoryPage() {
                       flexShrink: 0,
                     }}
                   >
-                    ð¸
+                    📸
                   </button>
                 </div>
               ))}
@@ -363,6 +322,47 @@ export default function HistoryPage() {
           ))}
         </div>
       )}
+
+      <div style={{ background: CARD, border: `1.5px solid ${BORDER}`, borderRadius: 14, padding: '14px 16px', marginTop: 16 }}>
+        <p style={{ fontSize: 11, fontWeight: 800, color: STONE, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>
+          {monthName}
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3, marginBottom: 4 }}>
+          {['S','M','T','W','T','F','S'].map((d, i) => (
+            <div key={i} style={{ textAlign: 'center', fontSize: 9, fontWeight: 700, color: MUTED }}>{d}</div>
+          ))}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3 }}>
+          {Array.from({ length: firstDayOfWeek }).map((_, i) => <div key={`e${i}`} />)}
+          {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
+            const hit = hasWorkout(day)
+            const isToday = day === now.getDate()
+            return (
+              <div key={day} style={{
+                aspectRatio: '1',
+                borderRadius: 4,
+                background: hit ? tierColor : 'rgba(245,240,234,0.05)',
+                border: isToday ? `2px solid ${tierColor}` : '2px solid transparent',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <span style={{ fontSize: 9, fontWeight: 700, color: hit ? 'rgba(255,255,255,0.85)' : MUTED }}>
+                  {day}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+        <div style={{ display: 'flex', gap: 14, marginTop: 10, alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <div style={{ width: 10, height: 10, borderRadius: 2, background: tierColor }} />
+            <span style={{ fontSize: 10, color: STONE }}>Workout</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <div style={{ width: 10, height: 10, borderRadius: 2, background: 'rgba(245,240,234,0.05)', border: `1px solid ${BORDER}` }} />
+            <span style={{ fontSize: 10, color: STONE }}>Rest day</span>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
