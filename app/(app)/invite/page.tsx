@@ -41,7 +41,7 @@ export default function InvitePage() {
 
   if (!user) return null
 
-  const referralLink = `https://count-fitness-app.vercel.app/auth/signup?ref=${user.referral_code ?? ''}`
+  const referralLink = `https://countfitness.app/auth/signup?ref=${user.referral_code ?? ''}`
   const bonusPerReferral   = getReferralPoints(user.tier)
   const pendingBonus       = referrals.filter(r => !r.bonus_awarded).length * bonusPerReferral
   const earnedBonus        = referrals.filter(r => r.bonus_awarded).length * bonusPerReferral
