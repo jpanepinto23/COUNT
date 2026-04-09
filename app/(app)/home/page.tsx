@@ -382,7 +382,7 @@ export default function HomePage() {
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
                   <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 900, color: tierColor }}>+{w.total_points_earned}</p>
-                  <p style={{ fontSize: 10, color: w.verified ? '#22c55e' : '#f59e0b' }}>{w.verified ? '✓ verified' : '⚠ unverified'}</p>
+                  <p style={{ fontSize: 10, color: w.verified ? '#22c55e' : '#f59e0b' }}>{w.verified ? 'verified' : 'unverified'}</p>
                 </div>
               </div>
             ))}
