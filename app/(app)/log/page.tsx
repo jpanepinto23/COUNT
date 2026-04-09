@@ -344,7 +344,7 @@ export default function LogPage() {
     // URL
     ctx.fillStyle = '#252523'
     ctx.font = '500 26px "JetBrains Mono", monospace'
-    ctx.fillText('count-fitness-app.vercel.app', 84, SIZE - 66)
+    ctx.fillText('countfitness.app', 84, SIZE - 66)
 
     // Generate PNG and share
     canvas.toBlob(async (blob) => {
@@ -422,7 +422,7 @@ export default function LogPage() {
                 </div>
               )}
             </div>
-            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#2E2E2C', letterSpacing: 0.8, textAlign: 'center' }}>count-fitness-app.vercel.app</p>
+            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#2E2E2C', letterSpacing: 0.8, textAlign: 'center' }}>countfitness.app</p>
           </div>
           <button onClick={handleShare} style={{ width: '100%', padding: '13px 0', background: shareCopied ? 'rgba(93,187,99,0.15)' : 'rgba(181,89,60,0.1)', border: `1.5px solid ${shareCopied ? 'rgba(93,187,99,0.4)' : 'rgba(181,89,60,0.3)'}`, borderRadius: 10, color: shareCopied ? '#5DBB63' : '#B5593C', fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer', marginBottom: 10, transition: 'all 0.2s ease' }}>
             {shareCopied ? '✓ Copied to clipboard' : '↗ Share your workout'}
