@@ -233,7 +233,7 @@ export default function ProfilePage() {
                   <span style={{ fontSize: 22 }}>{info.emoji}</span>
                   <div>
                     <p style={{ fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>{info.label}</p>
-                    <p style={{ fontSize: 11, color: '#8A8478' }}>{isConnected ? '✓ Connected — workouts auto-verified' : 'Tap to connect'}</p>
+                    <p style={{ fontSize: 11, color: '#8A8478' }}>{isConnected ? 'Connected — workouts auto-verified' : 'Tap to connect'}</p>
                   </div>
                 </div>
                 {isConnected ? (
@@ -253,7 +253,7 @@ export default function ProfilePage() {
           <span style={{ fontSize: 20 }}>📍</span>
           <div>
             <p style={{ fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>GPS Check-in</p>
-            <p style={{ fontSize: 11, color: '#8A8478' }}>✓ Always active — auto-used when logging</p>
+            <p style={{ fontSize: 11, color: '#8A8478' }}>Always active — auto-used when logging</p>
           </div>
         </div>
       </div>
