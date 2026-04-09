@@ -5,6 +5,11 @@ import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import type { Workout } from '@/lib/types'
 
+const WORKOUT_EMOJIS: Record<string, string> = {
+  push: 'ð¤', pull: 'ðª', legs: 'ð¦µ', upper: 'ðï¸',
+  lower: 'ð´', full_body: 'â¡', cardio: 'ð', hiit: 'ð¥', custom: 'âï¸',
+}
+
 const BG     = '#0E0E0D'
 const CARD   = '#111110'
 const CARD2  = '#1A1A18'
@@ -30,7 +35,99 @@ export default function HistoryPage() {
   const { user } = useAuth()
   const [workouts, setWorkouts] = useState<Workout[]>([])
   const [loading, setLoading] = useState(true)
+  const [sharingId, setSharingId] = useState<string | null>(null)
   const supabase = createClient()
+
+  const handleShareWorkout = async (w: Workout) => {
+    setSharingId(w.id)
+    const label = w.custom_name || WORKOUT_LABELS[w.type] || w.type
+    const emoji = WORKOUT_EMOJIS[w.type] || 'ðï¸'
+    const pts = w.total_points_earned ?? 0
+
+    await document.fonts.ready
+
+    const SIZE = 1080
+    const canvas = document.createElement('canvas')
+    canvas.width = SIZE
+    canvas.height = SIZE
+    const ctx = canvas.getContext('2d')!
+
+    const bg = ctx.createLinearGradient(0, 0, SIZE, SIZE)
+    bg.addColorStop(0, '#1C1B19')
+    bg.addColorStop(1, '#0E0D0C')
+    ctx.fillStyle = bg
+    ctx.fillRect(0, 0, SIZE, SIZE)
+
+    ctx.strokeStyle = 'rgba(181,89,60,0.35)'
+    ctx.lineWidth = 3
+    ctx.strokeRect(44, 44, SIZE - 88, SIZE - 88)
+
+    ctx.fillStyle = '#B5593C'
+    ctx.font = '900 78px Archivo, sans-serif'
+    ctx.fillText('COUNT', 84, 158)
+
+    ctx.fillStyle = '#2A2A28'
+    ctx.font = '500 26px "JetBrains Mono", monospace'
+    ctx.fillText('MAKE IT COUNT', 86, 204)
+
+    ctx.strokeStyle = 'rgba(245,240,234,0.07)'
+    ctx.lineWidth = 1
+    ctx.beginPath(); ctx.moveTo(84, 238); ctx.lineTo(SIZE - 84, 238); ctx.stroke()
+
+    ctx.font = '170px serif'
+    ctx.fillText(emoji, 76, 474)
+
+    ctx.fillStyle = '#F5F0EA'
+    ctx.font = '900 96px Archivo, sans-serif'
+    ctx.fillText(label.toUpperCase(), 84, 592)
+
+    ctx.fillStyle = '#444442'
+    ctx.font = '500 30px "JetBrains Mono", monospace'
+    ctx.fillText('SESSION LOGGED', 84, 642)
+
+    ctx.strokeStyle = 'rgba(245,240,234,0.07)'
+    ctx.lineWidth = 1
+    ctx.beginPath(); ctx.moveTo(84, 678); ctx.lineTo(SIZE - 84, 678); ctx.stroke()
+
+    ctx.fillStyle = 'rgba(181,89,60,0.1)'
+    ctx.beginPath()
+    ctx.roundRect(84, 706, SIZE - 168, 230, 18)
+    ctx.fill()
+    ctx.strokeStyle = 'rgba(181,89,60,0.2)'
+    ctx.lineWidth = 1
+    ctx.stroke()
+
+    ctx.fillStyle = '#444442'
+    ctx.font = '500 27px "JetBrains Mono", monospace'
+    ctx.fillText('POINTS EARNED', 114, 754)
+    ctx.fillStyle = '#B5593C'
+    ctx.font = '900 108px "JetBrains Mono", monospace'
+    ctx.fillText(`+${pts}`, 114, 884)
+
+    ctx.fillStyle = '#252523'
+    ctx.font = '500 26px "JetBrains Mono", monospace'
+    ctx.fillText('count-fitness-app.vercel.app', 84, SIZE - 66)
+
+    canvas.toBlob(async (blob) => {
+      setSharingId(null)
+      if (!blob) return
+      const file = new File([blob], 'count-workout.png', { type: 'image/png' })
+      try {
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file], title: `${label} Â· +${pts} pts` })
+        } else {
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = 'count-workout.png'
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          URL.revokeObjectURL(url)
+        }
+      } catch { /* dismissed */ }
+    }, 'image/png')
+  }
 
   useEffect(() => {
     if (!user) return
@@ -199,7 +296,7 @@ export default function HistoryPage() {
         <p style={{ color: STONE, fontSize: 13, textAlign: 'center', padding: 20 }}>Loading...</p>
       ) : workouts.length === 0 ? (
         <div style={{ background: CARD, border: `1.5px solid ${BORDER}`, borderRadius: 14, padding: 24, textAlign: 'center' }}>
-          <p style={{ fontSize: 28, marginBottom: 6 }}>🏋️</p>
+          <p style={{ fontSize: 28, marginBottom: 6 }}>ðï¸</p>
           <p style={{ fontSize: 14, fontWeight: 800, color: TEXT }}>No workouts yet</p>
           <p style={{ fontSize: 12, color: STONE, marginTop: 4 }}>Log your first session to start building your history</p>
         </div>
@@ -237,7 +334,7 @@ export default function HistoryPage() {
                     <p style={{ fontSize: 11, color: STONE }}>
                       {w.duration_minutes}min{' '}
                       <span style={{ color: w.verified ? '#22c55e' : '#f59e0b', marginLeft: 6 }}>
-                        {w.verified ? '✓ verified' : '⚠ unverified'}
+                        {w.verified ? 'â verified' : 'â  unverified'}
                       </span>
                     </p>
                   </div>
@@ -247,6 +344,19 @@ export default function HistoryPage() {
                     </p>
                     <p style={{ fontSize: 10, color: MUTED }}>pts</p>
                   </div>
+                  <button
+                    onClick={() => handleShareWorkout(w)}
+                    disabled={sharingId === w.id}
+                    title="Share workout"
+                    style={{
+                      background: 'none', border: 'none', cursor: sharingId === w.id ? 'wait' : 'pointer',
+                      padding: '4px 2px', fontSize: 18, lineHeight: 1,
+                      opacity: sharingId === w.id ? 0.35 : 0.65,
+                      flexShrink: 0,
+                    }}
+                  >
+                    ð¸
+                  </button>
                 </div>
               ))}
             </div>
