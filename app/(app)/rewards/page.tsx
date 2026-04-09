@@ -114,7 +114,7 @@ export default function RewardsPage() {
       <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, background: BG }}>
         <div style={{ width: '100%', maxWidth: 380, textAlign: 'center' }}>
           <p style={{ fontSize: 56, marginBottom: 8 }}>
-            {reward_type === 'discount_code' ? '&#x1F3F7;' : '&#x1F517;'}
+            {reward_type === 'discount_code' ? '🏷️' : '🔗'}
           </p>
           <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, fontFamily: 'Archivo, sans-serif', marginBottom: 8, color: TEXT }}>
             Your reward is ready!
@@ -265,3 +265,4 @@ function RewardCard({ reward, userBalance, redeeming, onRedeem }: {
     </div>
   )
 }
+Fix garbled emoji in rewards page
