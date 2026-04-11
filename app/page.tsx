@@ -18,7 +18,6 @@ const HOW_IT_WORKS = [
 ]
 
 const REWARD_CATALOG = [
-  { name: 'Amazon Gift Cards', status: 'live',        note: 'Available now' },
   { name: 'Momentous',         status: 'coming_soon', note: 'Coming soon'   },
   { name: 'Thorne',            status: 'live',        note: 'Available now' },
   { name: 'Gymshark',          status: 'coming_soon', note: 'Coming soon'   },
