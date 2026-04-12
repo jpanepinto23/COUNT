@@ -136,10 +136,9 @@ export default function LogPage() {
     }
 
     const pts = calculatePoints({
-      durationMinutes: duration,
       verified,
-      freeUnverifiedRemaining: user.free_unverified_remaining,
       lifetimeSessions: user.lifetime_sessions,
+      currentStreak: user.current_streak,
     })
 
     const { error: workoutError } = await supabase.from('workouts').insert({
