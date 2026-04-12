@@ -52,17 +52,15 @@ export default function LogPage() {
   if (!user) return null
 
   const tier = getTier(user.lifetime_sessions)
-  const { base, multiplier, total, verificationMultiplier } = calculatePoints({
-    durationMinutes: duration,
+  const { base, multiplier, total, verificationMultiplier, streakMultiplier } = calculatePoints({
     verified: false,
-    freeUnverifiedRemaining: user.free_unverified_remaining,
     lifetimeSessions: user.lifetime_sessions,
+    currentStreak: user.current_streak,
   })
   const verifiedPoints = calculatePoints({
-    durationMinutes: duration,
     verified: true,
-    freeUnverifiedRemaining: user.free_unverified_remaining,
     lifetimeSessions: user.lifetime_sessions,
+    currentStreak: user.current_streak,
   })
 
   async function handleLog() {
@@ -179,8 +177,7 @@ export default function LogPage() {
 
     const newStreak  = (yesterdaySession && yesterdaySession.length > 0) ? user.current_streak + 1 : 1
     const newLongest = Math.max(user.longest_streak, newStreak)
-    const newFreeUnverified = !verified ? Math.max(0, user.free_unverified_remaining - 1) : user.free_unverified_remaining
-
+  
     await supabase.from('users').update({
       lifetime_sessions:         newSessions,
       tier:                      newTier,
@@ -189,8 +186,7 @@ export default function LogPage() {
       points_lifetime_earned:    user.points_lifetime_earned + pts.total,
       current_streak:            newStreak,
       longest_streak:            newLongest,
-      free_unverified_remaining: newFreeUnverified,
-    }).eq('id', user.id)
+      }).eq('id', user.id)
 
     if (user.lifetime_sessions === 0 && user.referred_by && !user.referral_bonus_claimed) {
       const { data: referrer } = await supabase
@@ -472,7 +468,7 @@ export default function LogPage() {
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                 <span>✅</span>
-                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Unverified sessions still count</strong> — you earn fewer points, but every workout matters.</span>
+                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Unverified sessions earn 10%</strong> — still worth logging, verified is always better.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                 <span>⚖️</span>
@@ -504,8 +500,8 @@ export default function LogPage() {
           <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: 16, marginBottom: 20 }}>
             <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10, color: 'rgba(245,240,234,0.4)' }}>Points Preview</p>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-              <span style={{ fontSize: 13, color: '#8A8478' }}>Base ({duration}min)</span>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>{verifiedPoints.base} pts</span>
+              <span style={{ fontSize: 13, color: '#8A8478' }}>Base (flat)</span>
+              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>200 pts</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
               <span style={{ fontSize: 13, color: '#8A8478' }}>{getTierLabel(tier)} tier</span>
@@ -516,9 +512,6 @@ export default function LogPage() {
               <span style={{ fontSize: 14, fontWeight: 800, color: '#F5F0EA' }}>Verified total</span>
               <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 18, fontWeight: 900, color: '#B5593C' }}>{verifiedPoints.total} pts</span>
             </div>
-            {user.free_unverified_remaining > 0 && (
-              <p style={{ fontSize: 11, color: '#8A8478', marginTop: 6 }}>{user.free_unverified_remaining} free unverified sessions remaining (25% pts)</p>
-            )}
           </div>
 
           <div style={{ marginBottom: 20 }}>
@@ -567,7 +560,7 @@ export default function LogPage() {
                 <span>⌚</span><span><strong>Wearable</strong> — Apple Health, Garmin, Fitbit, or Google Fit</span>
               </div>
             </div>
-            <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.5)', marginTop: 8, marginBottom: 0 }}>Verified sessions earn <strong>100% of your points</strong>. Unverified sessions still count for less.</p>
+            <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.5)', marginTop: 8, marginBottom: 0 }}>Verified sessions earn <strong>100% of your points</strong>. Unverified sessions earn <strong>10%</strong>.</p>
           </div>
 
           <div style={{ display: 'flex', gap: 10 }}>
