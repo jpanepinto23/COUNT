@@ -137,26 +137,6 @@ export default function LogPage() {
       }
     }
 
-    let gpsDenied = false
-    if (!verified) {
-      try {
-        await new Promise<void>((resolve) => {
-          navigator.geolocation.getCurrentPosition(
-            () => { verified = true; verificationMethod = 'gps'; resolve() },
-            (err) => { if ((err as GeolocationPositionError).code === 1) gpsDenied = true; resolve() },
-            { timeout: 15000, enableHighAccuracy: false }
-          )
-        })
-      } catch { /* no geolocation */ }
-    }
-
-    if (verified && verificationMethod === 'gps') {
-      await supabase.from('connected_devices').upsert(
-        { user_id: user.id, type: 'gps', status: 'active' },
-        { onConflict: 'user_id,type', ignoreDuplicates: true }
-      )
-    }
-
     const pts = calculatePoints({
       durationMinutes: duration,
       verified,
@@ -233,7 +213,7 @@ export default function LogPage() {
     setEarnedPoints(pts.total)
     setNewSessionCount(newSessions)
     setSharedStreak(newStreak)
-    setVerificationSource(verified ? verificationMethod : gpsDenied ? 'gps_denied' : null)
+    setVerificationSource(verified ? verificationMethod : null)
     await refreshUser()
     setLoading(false)
     setStep('success')
@@ -488,7 +468,7 @@ export default function LogPage() {
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                 <span>📍</span>
-                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Verify with GPS or a wearable</strong> (Apple Health, Garmin, Fitbit, Google Fit) to earn <strong>100% of your points</strong>.</span>
+                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Verify with a wearable</strong> (Apple Health, Garmin, Fitbit, Google Fit) to earn <strong>100% of your points</strong>.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                 <span>✅</span>
@@ -583,9 +563,6 @@ export default function LogPage() {
           <div style={{ background: '#111110', border: '1px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '12px 14px', marginBottom: 16 }}>
             <p style={{ fontSize: 12, fontWeight: 700, color: '#F5F0EA', marginBottom: 8 }}>🔒 Verify your workout for full points</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: 'rgba(245,240,234,0.7)' }}>
-                <span>📍</span><span><strong>GPS</strong> — allow location access when prompted</span>
-              </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: 'rgba(245,240,234,0.7)' }}>
                 <span>⌚</span><span><strong>Wearable</strong> — Apple Health, Garmin, Fitbit, or Google Fit</span>
               </div>
