@@ -30,6 +30,9 @@ const REWARD_CATALOG = [
   { name: 'Alani Nu',            status: 'coming_soon', note: 'Coming soon',   initials: 'AN', color: '#E85D9B' },
   { name: 'Transparent Labs',    status: 'coming_soon', note: 'Coming soon',   initials: 'TL', color: '#3B82F6' },
   { name: 'Hyperice',            status: 'coming_soon', note: 'Coming soon',   initials: 'H',  color: '#00C2FF' },
+  { name: 'AG1',                  status: 'coming_soon', note: 'Coming soon',   initials: 'AG', color: '#1B5E20' },
+  { name: 'Brooks Running',       status: 'coming_soon', note: 'Coming soon',   initials: 'BR', color: '#1A237E' },
+  { name: 'Bodybuilding.com',     status: 'coming_soon', note: 'Coming soon',   initials: 'BB', color: '#D32F2F' },
 ]
 
 const INTEGRATIONS = [
