@@ -62,6 +62,44 @@ export const BASE_POINTS = 200
 // Unverified sessions earn 10% of full points — always, no free session mechanics
 export const UNVERIFIED_MULTIPLIER = 0.10
 
+// Mystery bonus — weighted random coins after each workout
+// Streak holders get better odds for higher tiers
+export function generateMysteryBonus(currentStreak: number): {
+  amount: number
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic'
+} {
+  const roll = Math.random() * 100
+
+  // Streak ≥7 shifts 5% from common → uncommon and 2% from uncommon → rare
+  const hasStreak = currentStreak >= 7
+  const epicThreshold = hasStreak ? 7 : 5       // top slice
+  const rareThreshold = epicThreshold + (hasStreak ? 17 : 15)
+  // uncommon fills the next band, common is the remainder
+
+  let amount: number
+  let rarity: 'common' | 'uncommon' | 'rare' | 'epic'
+
+  if (roll < epicThreshold) {
+    // Epic: 75-200 coins
+    amount = Math.floor(Math.random() * 126) + 75
+    rarity = 'epic'
+  } else if (roll < rareThreshold) {
+    // Rare: 25-75 coins
+    amount = Math.floor(Math.random() * 51) + 25
+    rarity = 'rare'
+  } else if (roll < rareThreshold + 20) {
+    // Uncommon: 10-25 coins
+    amount = Math.floor(Math.random() * 16) + 10
+    rarity = 'uncommon'
+  } else {
+    // Common: 5-10 coins
+    amount = Math.floor(Math.random() * 6) + 5
+    rarity = 'common'
+  }
+
+  return { amount, rarity }
+}
+
 export function calculatePoints({
   verified,
   lifetimeSessions,
