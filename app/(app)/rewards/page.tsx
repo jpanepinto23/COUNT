@@ -44,18 +44,31 @@ export default function RewardsPage() {
       if (data) setRewards(data)
     })
     if (user) {
+      // Build local-timezone week boundaries (same pattern as Home page)
       const now = new Date()
       const dayOfWeek = now.getDay()
       const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
       const monday = new Date(now)
       monday.setDate(now.getDate() - daysFromMonday)
       monday.setHours(0, 0, 0, 0)
+      const weekDays = new Set(
+        Array.from({ length: 7 }, (_, i) => {
+          const d = new Date(monday)
+          d.setDate(monday.getDate() + i)
+          return d.toDateString()
+        })
+      )
       supabase
         .from('workouts')
-        .select('id', { count: 'exact' })
+        .select('logged_at')
         .eq('user_id', user.id)
         .gte('logged_at', monday.toISOString())
-        .then(({ count }) => { setWeeklyWorkouts(count ?? 0) })
+        .then(({ data }) => {
+          if (data) {
+            // Use local toDateString() matching like Home page for timezone correctness
+            setWeeklyWorkouts(data.filter((w: any) => weekDays.has(new Date(w.logged_at).toDateString())).length)
+          }
+        })
     }
   }, []) // eslint-disable-line
 
@@ -114,7 +127,7 @@ export default function RewardsPage() {
       <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, background: BG }}>
         <div style={{ width: '100%', maxWidth: 380, textAlign: 'center' }}>
           <p style={{ fontSize: 56, marginBottom: 8 }}>
-            {reward_type === 'discount_code' ? '🏷️' : '🔗'}
+            {reward_type === 'discount_code' ? 'ð·ï¸' : 'ð'}
           </p>
           <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, fontFamily: 'Archivo, sans-serif', marginBottom: 8, color: TEXT }}>
             Your reward is ready!
@@ -249,7 +262,7 @@ function RewardCard({ reward, userBalance, redeeming, onRedeem }: {
             {reward.is_new && !reward.is_hot && <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 5px', borderRadius: 20, background: 'rgba(168,85,247,0.15)', color: '#c084fc' }}>New</span>}
           </div>
           <p style={{ fontSize: 12, color: STONE, margin: 0 }}>
-            {reward.brand_name}{reward.description ? ' · ' + reward.description : ''}
+            {reward.brand_name}{reward.description ? ' Â· ' + reward.description : ''}
           </p>
           <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 700, color: accent, margin: '4px 0 0' }}>
             {reward.point_cost.toLocaleString()} coins
