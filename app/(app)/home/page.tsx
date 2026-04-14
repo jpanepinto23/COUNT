@@ -202,7 +202,7 @@ export default function HomePage() {
       <div style={{ backgroundImage: `url(${POINTS_CARD_PHOTO})`, backgroundSize: 'cover', backgroundPosition: 'center 40%', borderRadius: 16, padding: '20px', marginBottom: 14, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,8,7,0.60)', borderRadius: 16 }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <p style={{ color: 'rgba(245,240,234,0.65)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 }}>Points Balance</p>
+          <p style={{ color: 'rgba(245,240,234,0.65)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 }}>COUNT Coins</p>
           <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 42, fontWeight: 900, color: '#F5F0EA', lineHeight: 1, marginBottom: 4 }}>
             {user.points_balance.toLocaleString()}
           </p>
