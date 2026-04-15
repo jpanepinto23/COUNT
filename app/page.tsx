@@ -62,6 +62,14 @@ const FAQ_ITEMS = [
   { q: 'When do new brands get added?', a: 'We\'re onboarding new brands regularly. Drop your email in the waitlist to get notified when new rewards go live.' },
 ]
 
+/* Hero background images — mixed gender, diverse athletes */
+const HERO_IMAGES = [
+  { id: '1517836357463', pos: 'center 30%' },  /* man lifting weights */
+  { id: '1571019614242', pos: 'center 40%' },  /* woman doing crossfit */
+  { id: '1534438327276', pos: 'center 25%' },  /* man running */
+  { id: '1518611012118', pos: 'center 35%' },  /* woman stretching */
+]
+
 export default function LandingPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
@@ -69,10 +77,16 @@ export default function LandingPage() {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [heroIdx, setHeroIdx] = useState(0)
 
   useEffect(() => {
     if (!loading && user) router.replace('/home')
   }, [loading, user])
+
+  useEffect(() => {
+    const t = setInterval(() => setHeroIdx(i => (i + 1) % HERO_IMAGES.length), 5000)
+    return () => clearInterval(t)
+  }, [])
 
   if (loading) return (
     <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111110' }}>
@@ -100,19 +114,26 @@ export default function LandingPage() {
 
   return (
     <div style={{ minHeight: '100dvh', background: '#111110', display: 'flex', flexDirection: 'column' }}>
+      <style>{`
+        @keyframes heroFade { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
+      `}</style>
 
       {/* ── HERO ── */}
       <div style={{ position: 'relative', overflow: 'hidden', background: '#0E0D0C', height: '60vw', minHeight: 340, maxHeight: 560 }}>
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-          <iframe
-            src="https://www.youtube-nocookie.com/embed/1tyX7qDArfA?autoplay=1&mute=1&loop=1&playlist=1tyX7qDArfA&controls=0&disablekb=1&playsinline=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&start=15"
-            allow="autoplay; encrypted-media"
-            style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '177.78vh', minWidth: '100%', height: '56.25vw', minHeight: '100%', border: 'none' }}
+        {HERO_IMAGES.map((img, i) => (
+          <div
+            key={img.id}
+            style={{
+              position: 'absolute', inset: 0, zIndex: 0,
+              backgroundImage: `url(https://images.pexels.com/photos/${img.id}/pexels-photo-${img.id}.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900&dpr=2)`,
+              backgroundSize: 'cover', backgroundPosition: img.pos,
+              opacity: heroIdx === i ? 1 : 0,
+              transition: 'opacity 1.2s ease-in-out',
+            }}
           />
-        </div>
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,8,7,0.45)', zIndex: 1 }} />
-        <style>{`@keyframes videoFadeOut { from { opacity: 1; } to { opacity: 0; } }`}</style>
-        <div style={{ position: 'absolute', inset: 0, background: '#0E0D0C', zIndex: 4, animation: 'videoFadeOut 0.8s ease-out 3.5s forwards', pointerEvents: 'none' }} />
+        ))}
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,8,7,0.55)', zIndex: 1 }} />
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 100, background: 'linear-gradient(to bottom, transparent, #111110)', zIndex: 1 }} />
         <div style={{ position: 'absolute', top: 0, right: 0, zIndex: 3, padding: '18px 20px' }}>
           <Link href="/auth/login" style={{ color: '#F5F0EA', fontSize: 13, fontWeight: 700, textDecoration: 'none', fontFamily: 'Archivo, sans-serif', letterSpacing: 0.5, background: 'rgba(0,0,0,0.45)', padding: '8px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)' }}>
@@ -135,9 +156,6 @@ export default function LandingPage() {
           <Link href="/auth/signup" style={{ display: 'inline-block', padding: '16px 36px', background: '#B5593C', color: '#F5F0EA', textDecoration: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800, fontFamily: 'Archivo, sans-serif', letterSpacing: 0.3, textShadow: 'none', boxShadow: '0 4px 20px rgba(181,89,60,0.45)' }}>
             Start earning &rarr;
           </Link>
-        </div>
-        <div style={{ position: 'absolute', bottom: 0, right: 0, zIndex: 3, padding: '0 12px 14px 0' }}>
-          <div style={{ width: 120, height: 36, background: 'rgba(10,8,7,0.7)', borderRadius: 6 }} />
         </div>
       </div>
 
@@ -189,6 +207,59 @@ export default function LandingPage() {
         </div>
       </div>
 
+      {/* ── OUR PARTNERS ── */}
+      <div style={{ padding: '44px 24px', background: '#111110', borderBottom: '1px solid #1C1C1B' }}>
+        <p style={{ color: '#444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 6, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>Our Partners</p>
+        <p style={{ color: '#3A3A38', fontSize: 12, textAlign: 'center', marginBottom: 28, fontFamily: 'JetBrains Mono, monospace' }}>Brands that believe in rewarding the grind</p>
+
+        <a
+          href="https://glnk.io/qv9ww/joseph-panepinto"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: 'block', textDecoration: 'none', maxWidth: 420, margin: '0 auto' }}
+        >
+          <div style={{
+            background: 'linear-gradient(145deg, #1C1B19 0%, #141413 100%)',
+            border: '1.5px solid rgba(181,89,60,0.3)',
+            borderRadius: 18,
+            padding: '28px 24px',
+            position: 'relative',
+            overflow: 'hidden',
+            transition: 'border-color 0.2s ease',
+          }}>
+            <div style={{ position: 'absolute', top: -40, right: -40, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,89,60,0.08) 0%, transparent 70%)' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+              <div style={{
+                width: 60, height: 60, borderRadius: 14,
+                background: 'linear-gradient(135deg, rgba(181,89,60,0.15) 0%, rgba(181,89,60,0.05) 100%)',
+                border: '1.5px solid rgba(181,89,60,0.25)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, color: '#B5593C', letterSpacing: -1 }}>K</span>
+              </div>
+              <div>
+                <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, color: '#F5F0EA', letterSpacing: -0.3, marginBottom: 4 }}>Kane</p>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(93,187,99,0.1)', border: '1px solid rgba(93,187,99,0.2)', borderRadius: 6, padding: '3px 8px' }}>
+                  <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#5DBB63' }} />
+                  <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#5DBB63', letterSpacing: 0.5, textTransform: 'uppercase' }}>Official Partner</span>
+                </div>
+              </div>
+            </div>
+            <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 14, color: '#9A9087', lineHeight: 1.6, marginBottom: 16 }}>
+              Premium fitness essentials built for athletes who show up every day. COUNT members get exclusive access.
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 13, fontWeight: 800, color: '#B5593C', letterSpacing: 0.3 }}>Shop Kane</span>
+              <span style={{ color: '#B5593C', fontSize: 16 }}>&rarr;</span>
+            </div>
+          </div>
+        </a>
+
+        <p style={{ textAlign: 'center', marginTop: 20, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#333' }}>
+          More partnerships coming soon
+        </p>
+      </div>
+
       {/* ── STRAVA COMPARISON HOOK ── */}
       <div style={{ padding: '36px 24px', background: '#0D0D0C', borderTop: '1px solid #1C1C1B' }}>
         <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, color: '#F5F0EA', lineHeight: 1.25, marginBottom: 14 }}>
@@ -224,10 +295,10 @@ export default function LandingPage() {
         <p style={{ color: '#3A3A38', fontSize: 12, textAlign: 'center', marginBottom: 28, fontFamily: 'JetBrains Mono, monospace' }}>Built for speed. Designed to keep you coming back.</p>
         <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8, scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}>
           {[
-            { title: 'Home', desc: 'See your streak, points, and tier at a glance. One tap to log.', icon: '⚡', accent: '#B5593C' },
-            { title: 'Log Workout', desc: 'Confirm your session in seconds. Sync with Strava or log manually.', icon: '✓', accent: '#5DBB63' },
-            { title: 'Rewards Store', desc: 'Browse real products. Redeem points for protein, gear, and more.', icon: '★', accent: '#FFD700' },
-            { title: 'Leaderboard', desc: 'See where you rank. Climb tiers. Compete with the community.', icon: '▲', accent: '#2A9DF4' },
+            { title: 'Home', desc: 'See your streak, points, and tier at a glance. One tap to log.', icon: '\u26A1', accent: '#B5593C' },
+            { title: 'Log Workout', desc: 'Confirm your session in seconds. Sync with Strava or log manually.', icon: '\u2713', accent: '#5DBB63' },
+            { title: 'Rewards Store', desc: 'Browse real products. Redeem points for protein, gear, and more.', icon: '\u2605', accent: '#FFD700' },
+            { title: 'Leaderboard', desc: 'See where you rank. Climb tiers. Compete with the community.', icon: '\u25B2', accent: '#2A9DF4' },
           ].map(({ title, desc, icon, accent }) => (
             <div key={title} style={{ minWidth: 220, maxWidth: 220, scrollSnapAlign: 'start', background: '#141413', borderRadius: 16, border: '1px solid #1E1E1D', overflow: 'hidden', flexShrink: 0 }}>
               <div style={{ height: 140, background: `linear-gradient(135deg, ${accent}15, ${accent}08)`, display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid #1E1E1D' }}>
@@ -258,12 +329,12 @@ export default function LandingPage() {
             <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 60px 60px', gap: 8, alignItems: 'center', padding: '11px 12px', background: i % 2 === 0 ? '#141413' : '#111110', borderRadius: 8 }}>
               <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 13, color: '#B0A89E', lineHeight: 1.3 }}>{feature}</span>
               <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <span style={{ fontSize: 17, color: count ? '#5DBB63' : '#555' }}>{count ? '✓' : '✗'}</span>
+                <span style={{ fontSize: 17, color: count ? '#5DBB63' : '#555' }}>{count ? '\u2713' : '\u2717'}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 {others === true
                   ? <span style={{ fontSize: 14, color: '#555' }}>~</span>
-                  : <span style={{ fontSize: 14, color: '#3A3A38' }}>✗</span>
+                  : <span style={{ fontSize: 14, color: '#3A3A38' }}>{'\u2717'}</span>
                 }
               </div>
             </div>
@@ -289,19 +360,43 @@ export default function LandingPage() {
       {/* ── REWARD CATALOG ── */}
       <div style={{ padding: '36px 24px 40px', background: '#0D0D0C', borderTop: '1px solid #1C1C1B' }}>
         <p style={{ color: '#444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 4, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>Reward catalog</p>
-        <p style={{ color: '#3A3A38', fontSize: 12, textAlign: 'center', marginBottom: 24, fontFamily: 'JetBrains Mono, monospace' }}>Live now + brands we&apos;re onboarding</p>
+        <p style={{ color: '#3A3A38', fontSize: 12, textAlign: 'center', marginBottom: 12, fontFamily: 'JetBrains Mono, monospace' }}>Live now + brands we&apos;re onboarding</p>
+
+        {/* Live brands - featured */}
+        <div style={{ display: 'flex', gap: 10, marginBottom: 16, maxWidth: 420, margin: '0 auto 16px' }}>
+          {REWARD_CATALOG.filter(b => b.status === 'live').map(({ name, initials, color }) => (
+            <div key={name} style={{
+              flex: 1, padding: '18px 16px', background: 'linear-gradient(145deg, #1C1B19 0%, #141413 100%)',
+              borderRadius: 14, border: '1.5px solid rgba(93,187,99,0.3)',
+              textAlign: 'center', position: 'relative', overflow: 'hidden',
+            }}>
+              <div style={{ position: 'absolute', top: 8, right: 10, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#5DBB63' }} />
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 8, color: '#5DBB63', textTransform: 'uppercase', letterSpacing: 0.5 }}>Live</span>
+              </div>
+              <div style={{
+                width: 52, height: 52, borderRadius: 14, margin: '0 auto 10px',
+                background: `${color}18`, border: `1.5px solid ${color}30`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 18, fontWeight: 900, color, letterSpacing: -0.5 }}>{initials}</span>
+              </div>
+              <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 16, fontWeight: 800, color: '#F5F0EA', marginBottom: 3 }}>{name}</p>
+              <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: '#5DBB63' }}>Available now</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Coming soon brands - grid */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, maxWidth: 420, margin: '0 auto' }}>
-          {REWARD_CATALOG.map(({ name, status, note, initials, color }) => (
-            <div key={name} style={{ padding: '12px 14px', background: '#141413', borderRadius: 10, border: `1px solid ${status === 'live' ? 'rgba(93,187,99,0.3)' : '#252523'}`, display: 'flex', alignItems: 'center', gap: 10 }}>
+          {REWARD_CATALOG.filter(b => b.status === 'coming_soon').map(({ name, initials, color }) => (
+            <div key={name} style={{ padding: '12px 14px', background: '#141413', borderRadius: 10, border: '1px solid #252523', display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 36, height: 36, borderRadius: 8, background: `${color}18`, border: `1px solid ${color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 12, fontWeight: 900, color, letterSpacing: -0.5 }}>{initials}</span>
               </div>
               <div style={{ minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                  {status === 'live' && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#5DBB63', flexShrink: 0 }} />}
-                  <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 13, fontWeight: 700, color: status === 'live' ? '#B0A89E' : '#555', letterSpacing: 0.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
-                </div>
-                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: status === 'live' ? '#5DBB63' : '#333', display: 'block', marginTop: 2, letterSpacing: 0.5 }}>{note}</span>
+                <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 13, fontWeight: 700, color: '#555', letterSpacing: 0.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>{name}</span>
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#333', display: 'block', marginTop: 2, letterSpacing: 0.5 }}>Coming soon</span>
               </div>
             </div>
           ))}
