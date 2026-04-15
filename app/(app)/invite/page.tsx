@@ -25,6 +25,7 @@ export default function InvitePage() {
   const [referrals, setReferrals] = useState<ReferralRow[]>([])
   const [copied, setCopied] = useState(false)
   const [codeCopied, setCodeCopied] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
   const supabase = createClient()
 
   useEffect(() => {
@@ -75,118 +76,166 @@ export default function InvitePage() {
     setTimeout(() => setCodeCopied(false), 2000)
   }
 
+  async function handleCopyLink() {
+    await navigator.clipboard.writeText(referralLink)
+    setLinkCopied(true)
+    setTimeout(() => setLinkCopied(false), 2000)
+  }
+
   return (
     <div style={{ padding: '20px 16px', paddingBottom: 100, maxWidth: 448, margin: '0 auto', background: '#0E0E0D', minHeight: '100dvh' }}>
+      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
         <Link href="/home" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 10, textDecoration: 'none', fontSize: 16, color: '#F5F0EA' }}>←</Link>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, fontFamily: "'Archivo', sans-serif", color: '#F5F0EA' }}>Invite Friends</h1>
-          <p style={{ fontSize: 12, color: '#8A8478' }}>{pillText(bonusPerReferral)}</p>
+          <p style={{ fontSize: 12, color: '#8A8478' }}>Grow the squad, earn together</p>
         </div>
       </div>
 
-      <div style={{ background: '#111110', borderRadius: 20, padding: '24px 20px', marginBottom: 16, position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: '#B5593C', opacity: 0.15 }} />
-        <div style={{ position: 'absolute', bottom: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: '#B5593C', opacity: 0.10 }} />
+      {/* Hero card — "Both get coins" emphasis */}
+      <div style={{ background: 'linear-gradient(145deg, #1C1209 0%, #111110 50%, #0E0E0D 100%)', borderRadius: 22, padding: '28px 22px', marginBottom: 16, position: 'relative', overflow: 'hidden', border: '1.5px solid rgba(181,89,60,0.20)' }}>
+        <div style={{ position: 'absolute', top: -50, right: -50, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,89,60,0.18) 0%, transparent 65%)' }} />
+        <div style={{ position: 'absolute', bottom: -30, left: -30, width: 120, height: 120, borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,197,94,0.10) 0%, transparent 65%)' }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 6 }}>Your referral code</p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-            <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 34, fontWeight: 900, color: '#F5F0EA', letterSpacing: 8, flex: 1, lineHeight: 1 }}>
+          {/* "Both earn" visual */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 20 }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ width: 52, height: 52, borderRadius: 16, background: 'rgba(181,89,60,0.15)', border: '1.5px solid rgba(181,89,60,0.30)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, margin: '0 auto 6px' }}>🏋️</div>
+              <p style={{ fontSize: 10, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1 }}>You</p>
+              <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 20, fontWeight: 900, color: '#22c55e' }}>+{bonusPerReferral}</p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+              <span style={{ fontSize: 20 }}>🤝</span>
+              <div style={{ width: 40, height: 2, background: 'linear-gradient(90deg, rgba(181,89,60,0.5), rgba(34,197,94,0.5))', borderRadius: 1 }} />
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ width: 52, height: 52, borderRadius: 16, background: 'rgba(34,197,94,0.12)', border: '1.5px solid rgba(34,197,94,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, margin: '0 auto 6px' }}>👋</div>
+              <p style={{ fontSize: 10, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1 }}>Friend</p>
+              <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 20, fontWeight: 900, color: '#22c55e' }}>+{bonusPerReferral}</p>
+            </div>
+          </div>
+
+          <p style={{ textAlign: 'center', fontSize: 14, fontWeight: 800, color: '#F5F0EA', fontFamily: "'Archivo', sans-serif", marginBottom: 4 }}>You both earn {bonusPerReferral} coins</p>
+          <p style={{ textAlign: 'center', fontSize: 12, color: '#8A8478', marginBottom: 20 }}>When your friend logs their first workout</p>
+
+          {/* Referral code */}
+          <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 6, textAlign: 'center' }}>Your code</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, background: 'rgba(245,240,234,0.04)', border: '1px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '12px 16px' }}>
+            <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 30, fontWeight: 900, color: '#F5F0EA', letterSpacing: 8, flex: 1, textAlign: 'center', lineHeight: 1 }}>
               {user.referral_code ?? '------'}
             </p>
-            <button onClick={handleCopyCode} style={{ padding: '8px 14px', background: codeCopied ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.08)', color: codeCopied ? '#22c55e' : '#9CA3AF', border: `1px solid ${codeCopied ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.12)'}`, borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <button onClick={handleCopyCode} style={{ padding: '8px 14px', background: codeCopied ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.08)', color: codeCopied ? '#22c55e' : '#9CA3AF', border: `1px solid ${codeCopied ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.12)'}`, borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, transition: 'all 0.2s' }}>
               {codeCopied ? '✓ Copied' : '⎘ Copy'}
             </button>
           </div>
-          <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
-            <div style={{ flex: 1, background: 'rgba(245,240,234,0.07)', borderRadius: 10, padding: '10px 12px' }}>
-              <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 20, fontWeight: 900, color: '#B5593C' }}>{referrals.length}</p>
-              <p style={{ fontSize: 10, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1 }}>Friends joined</p>
-            </div>
-            <div style={{ flex: 1, background: 'rgba(245,240,234,0.07)', borderRadius: 10, padding: '10px 12px' }}>
-              <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 20, fontWeight: 900, color: '#22c55e' }}>+{earnedBonus}</p>
-              <p style={{ fontSize: 10, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1 }}>Pts earned</p>
-            </div>
-            {pendingBonus > 0 && (
-              <div style={{ flex: 1, background: 'rgba(245,240,234,0.07)', borderRadius: 10, padding: '10px 12px' }}>
-                <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 20, fontWeight: 900, color: '#f59e0b' }}>+{pendingBonus}</p>
-                <p style={{ fontSize: 10, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1 }}>Pending</p>
-              </div>
-            )}
+
+          {/* Action buttons */}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={handleShare} style={{ flex: 2, padding: '14px', background: 'linear-gradient(135deg, #B5593C 0%, #D4734F 100%)', color: '#F5F0EA', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 800, cursor: 'pointer', fontFamily: "'Archivo', sans-serif" }}>
+              {copied ? '✓ Link Copied!' : 'Share Invite Link →'}
+            </button>
+            <button onClick={handleCopyLink} style={{ flex: 1, padding: '14px', background: 'rgba(181,89,60,0.10)', color: '#B5593C', border: '1.5px solid rgba(181,89,60,0.25)', borderRadius: 14, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>
+              {linkCopied ? '✓' : '🔗 Link'}
+            </button>
           </div>
-          {nextMilestone ? (
-            <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: '12px 14px', marginBottom: 16 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <p style={{ fontSize: 11, color: '#8A8478' }}>{nextMilestone.emoji} {nextMilestone.count - totalReferrals} more to unlock &ldquo;{nextMilestone.label}&rdquo;</p>
-                <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: '#F5F0EA' }}>{totalReferrals}/{nextMilestone.count}</p>
-              </div>
-              <div style={{ height: 5, background: 'rgba(255,255,255,0.1)', borderRadius: 3, overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${Math.min(milestoneProgress, 100)}%`, background: nextMilestone.color, borderRadius: 3 }} />
-              </div>
-            </div>
-          ) : (
-            <div style={{ background: 'rgba(124,58,237,0.15)', borderRadius: 12, padding: '12px 14px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 18 }}>🏆</span>
-              <p style={{ fontSize: 13, color: '#F5F0EA', fontWeight: 700 }}>You&apos;re a referral legend!</p>
-            </div>
-          )}
-          <button onClick={handleShare} style={{ width: '100%', padding: '14px', background: '#B5593C', color: '#F5F0EA', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800, cursor: 'pointer', fontFamily: "'Archivo', sans-serif" }}>
-            {copied ? '✓ Link Copied!' : 'Share Your Invite Link →'}
-          </button>
         </div>
       </div>
 
+      {/* Stats row */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        <div style={{ flex: 1, background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 12px', textAlign: 'center' }}>
+          <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 24, fontWeight: 900, color: '#B5593C', lineHeight: 1 }}>{referrals.length}</p>
+          <p style={{ fontSize: 10, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1, marginTop: 4 }}>Friends joined</p>
+        </div>
+        <div style={{ flex: 1, background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 12px', textAlign: 'center' }}>
+          <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 24, fontWeight: 900, color: '#22c55e', lineHeight: 1 }}>+{earnedBonus}</p>
+          <p style={{ fontSize: 10, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1, marginTop: 4 }}>Coins earned</p>
+        </div>
+        {pendingBonus > 0 && (
+          <div style={{ flex: 1, background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 12px', textAlign: 'center' }}>
+            <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 24, fontWeight: 900, color: '#f59e0b', lineHeight: 1 }}>+{pendingBonus}</p>
+            <p style={{ fontSize: 10, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1, marginTop: 4 }}>Pending</p>
+          </div>
+        )}
+      </div>
+
+      {/* Milestone progress */}
+      {nextMilestone ? (
+        <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 16px', marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <p style={{ fontSize: 12, color: '#8A8478', fontWeight: 600 }}>{nextMilestone.emoji} {nextMilestone.count - totalReferrals} more to unlock &ldquo;{nextMilestone.label}&rdquo;</p>
+            <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: '#F5F0EA', fontWeight: 700 }}>{totalReferrals}/{nextMilestone.count}</p>
+          </div>
+          <div style={{ height: 6, background: 'rgba(255,255,255,0.08)', borderRadius: 3, overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${Math.min(milestoneProgress, 100)}%`, background: `linear-gradient(90deg, ${nextMilestone.color}, ${nextMilestone.color}dd)`, borderRadius: 3, transition: 'width 0.6s ease' }} />
+          </div>
+        </div>
+      ) : (
+        <div style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(124,58,237,0.06) 100%)', border: '1.5px solid rgba(124,58,237,0.20)', borderRadius: 14, padding: '14px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 22 }}>🏆</span>
+          <div>
+            <p style={{ fontSize: 14, color: '#F5F0EA', fontWeight: 800, fontFamily: "'Archivo', sans-serif" }}>Referral Legend!</p>
+            <p style={{ fontSize: 11, color: '#8A8478' }}>You&apos;ve unlocked every milestone</p>
+          </div>
+        </div>
+      )}
+
+      {/* Milestone badges */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         {REFERRAL_MILESTONES.map(m => {
           const unlocked = totalReferrals >= m.count
           return (
-            <div key={m.count} style={{ flex: 1, background: unlocked ? '#111110' : 'rgba(255,255,255,0.03)', border: `1.5px solid ${unlocked ? 'rgba(245,240,234,0.10)' : 'rgba(245,240,234,0.04)'}`, borderRadius: 12, padding: '10px 6px', textAlign: 'center', opacity: unlocked ? 1 : 0.45 }}>
-              <span style={{ fontSize: 20, filter: unlocked ? 'none' : 'grayscale(1)', display: 'block' }}>{m.emoji}</span>
-              <p style={{ fontSize: 9, fontWeight: 800, color: unlocked ? m.color : '#8A8478', marginTop: 5, textTransform: 'uppercase', letterSpacing: 0.3 }}>{m.count} friend{m.count > 1 ? 's' : ''}</p>
+            <div key={m.count} style={{ flex: 1, background: unlocked ? 'rgba(245,240,234,0.04)' : 'rgba(255,255,255,0.02)', border: `1.5px solid ${unlocked ? m.color + '40' : 'rgba(245,240,234,0.04)'}`, borderRadius: 14, padding: '12px 6px', textAlign: 'center', opacity: unlocked ? 1 : 0.40, transition: 'all 0.3s' }}>
+              <span style={{ fontSize: 22, filter: unlocked ? 'none' : 'grayscale(1)', display: 'block' }}>{m.emoji}</span>
+              <p style={{ fontSize: 9, fontWeight: 800, color: unlocked ? m.color : '#8A8478', marginTop: 6, textTransform: 'uppercase', letterSpacing: 0.3 }}>{m.label}</p>
+              <p style={{ fontSize: 8, color: '#8A8478', marginTop: 2 }}>{m.count} friend{m.count > 1 ? 's' : ''}</p>
             </div>
           )
         })}
       </div>
 
-      <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '16px', marginBottom: 16 }}>
-        <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: '#8A8478', marginBottom: 12 }}>How it works</p>
+      {/* How it works */}
+      <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 16, padding: '18px 16px', marginBottom: 16 }}>
+        <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 14 }}>How it works</p>
         {[
-          { icon: '🔗', title: 'Share your link or code',     desc: 'Send your unique referral link to a friend.' },
-          { icon: '✍️', title: 'Friend signs up',              desc: "They enter your code during signup — it's pre-filled from your link." },
-          { icon: '💪', title: 'They log their first workout', desc: 'Once they complete their first session, the bonus triggers.' },
-          { icon: '🏆', title: `You both get ${bonusPerReferral} pts`, desc: 'Bonus points land in both accounts instantly.' },
+          { num: '1', icon: '🔗', title: 'Share your link or code',     desc: 'Send your unique referral link to a friend.' },
+          { num: '2', icon: '✍️', title: 'Friend signs up',              desc: "They enter your code during signup — it's pre-filled from your link." },
+          { num: '3', icon: '💪', title: 'They log their first workout', desc: 'Once they complete their first session, the bonus triggers.' },
+          { num: '4', icon: '🎉', title: `You BOTH get ${bonusPerReferral} coins`, desc: 'Bonus coins land in both accounts instantly.' },
         ].map((step, i) => (
-          <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: i < 3 ? 12 : 0 }}>
-            <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(181,89,60,0.12)', border: '1.5px solid rgba(181,89,60,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0, marginTop: 1 }}>
-              {step.icon}
+          <div key={i} style={{ display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: i < 3 ? 14 : 0 }}>
+            <div style={{ width: 34, height: 34, borderRadius: 10, background: 'linear-gradient(135deg, rgba(181,89,60,0.15) 0%, rgba(181,89,60,0.08) 100%)', border: '1.5px solid rgba(181,89,60,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+              <span style={{ fontSize: 16 }}>{step.icon}</span>
             </div>
-            <div>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontSize: 13, fontWeight: 700, color: '#F5F0EA', marginBottom: 2 }}>{step.title}</p>
-              <p style={{ fontSize: 12, color: '#8A8478' }}>{step.desc}</p>
+              <p style={{ fontSize: 12, color: '#8A8478', lineHeight: 1.4 }}>{step.desc}</p>
             </div>
           </div>
         ))}
       </div>
 
+      {/* Your referrals list */}
       {referrals.length > 0 && (
         <div>
-          <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: '#8A8478', marginBottom: 10 }}>Your referrals</p>
-          <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, overflow: 'hidden' }}>
+          <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 10 }}>Your referrals</p>
+          <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 16, overflow: 'hidden' }}>
             {referrals.map((r, i) => (
-              <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderTop: i > 0 ? '1px solid rgba(245,240,234,0.06)' : 'none' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(181,89,60,0.15)', border: '1.5px solid rgba(181,89,60,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 900, color: '#B5593C' }}>
+              <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderTop: i > 0 ? '1px solid rgba(245,240,234,0.06)' : 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 12, background: r.bonus_awarded ? 'rgba(34,197,94,0.12)' : 'rgba(181,89,60,0.12)', border: `1.5px solid ${r.bonus_awarded ? 'rgba(34,197,94,0.25)' : 'rgba(181,89,60,0.25)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 900, color: r.bonus_awarded ? '#22c55e' : '#B5593C' }}>
                     {(r.referred?.name ?? '?').charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>{r.referred?.name ?? 'Friend'}</p>
-                    <p style={{ fontSize: 11, color: '#8A8478' }}>{new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#F5F0EA' }}>{r.referred?.name ?? 'Friend'}</p>
+                    <p style={{ fontSize: 11, color: '#8A8478' }}>Joined {new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   {r.bonus_awarded
-                    ? <span style={{ fontSize: 12, fontWeight: 800, color: '#22c55e' }}>{bonusText(bonusPerReferral)}</span>
-                    : <span style={{ fontSize: 11, color: '#f59e0b', fontWeight: 700 }}>Awaiting 1st workout</span>
+                    ? <span style={{ fontSize: 13, fontWeight: 800, color: '#22c55e', fontFamily: "'JetBrains Mono', monospace" }}>+{bonusPerReferral} ✓</span>
+                    : <span style={{ fontSize: 11, color: '#f59e0b', fontWeight: 700, background: 'rgba(245,158,11,0.08)', padding: '4px 10px', borderRadius: 6 }}>Awaiting 1st workout</span>
                   }
                 </div>
               </div>
@@ -194,9 +243,18 @@ export default function InvitePage() {
           </div>
         </div>
       )}
+
+      {/* Empty state for no referrals */}
+      {referrals.length === 0 && (
+        <div style={{ background: '#111110', border: '1.5px dashed rgba(245,240,234,0.10)', borderRadius: 16, padding: '28px 20px', textAlign: 'center' }}>
+          <p style={{ fontSize: 32, marginBottom: 8 }}>👥</p>
+          <p style={{ fontSize: 15, fontWeight: 800, color: '#F5F0EA', fontFamily: "'Archivo', sans-serif", marginBottom: 4 }}>No referrals yet</p>
+          <p style={{ fontSize: 12, color: '#8A8478', marginBottom: 16, lineHeight: 1.4 }}>Share your code with friends who work out — you&apos;ll both earn {bonusPerReferral} bonus coins when they join!</p>
+          <button onClick={handleShare} style={{ padding: '12px 28px', background: 'linear-gradient(135deg, #B5593C 0%, #D4734F 100%)', color: '#F5F0EA', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: "'Archivo', sans-serif" }}>
+            Share Your Code →
+          </button>
+        </div>
+      )}
     </div>
   )
 }
-
-function pillText(pts: number) { return `You and your friend each get ${pts} pts` }
-function bonusText(pts: number) { return `+${pts} pts ✓` }
