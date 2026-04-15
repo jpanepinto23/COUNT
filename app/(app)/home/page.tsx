@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
-import { getTierLabel, getTierMultiplier, getNextTierSessions } from '@/lib/points'
-import type { Workout } from '@/lib/types'
+import { getTierLabel, getTierMultiplier, getNextTierSessions, calculatePoints } from '@/lib/points'
+import type { Workout, WorkoutType } from '@/lib/types'
+import { generateDailyMissions, todayDateStr, DIFFICULTY_COLORS, type Mission, type MissionContext } from '@/lib/missions'
 import TallyLogo from '@/components/TallyLogo'
 import { subscribeToPush, isPushSubscribed } from '@/lib/push'
 
@@ -34,6 +35,8 @@ export default function HomePage() {
   const [isFrozen, setIsFrozen] = useState(false)
   const [freezing, setFreezing] = useState(false)
   const [freezeSuccess, setFreezeSuccess] = useState(false)
+  const [missions, setMissions] = useState<Mission[]>([])
+  const [claimingKey, setClaimingKey] = useState<string | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -55,6 +58,52 @@ export default function HomePage() {
     supabase.from('rewards').select('name, points_cost').gt('points_cost', user.points_balance)
       .order('points_cost', { ascending: true }).limit(1)
       .then(({ data }) => { if (data && data[0]) setNextReward(data[0]) })
+
+    // Fetch mission data
+    ;(async () => {
+      const dateStr = todayDateStr()
+      const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0)
+      const weekStart = new Date(todayStart); weekStart.setDate(weekStart.getDate() - weekStart.getDay())
+
+      // Get today's workout info for mission context
+      const { data: todayWorkouts } = await supabase
+        .from('workouts')
+        .select('type, verified, total_points_earned, effort_rating')
+        .eq('user_id', user.id)
+        .gte('logged_at', todayStart.toISOString())
+        .limit(1)
+
+      // Get week session count for missions
+      const { count: weekCount } = await supabase
+        .from('workouts')
+        .select('id', { count: 'exact' })
+        .eq('user_id', user.id)
+        .gte('logged_at', weekStart.toISOString())
+
+      // Get claimed missions for today
+      const { data: claims } = await supabase
+        .from('mission_claims')
+        .select('mission_key')
+        .eq('user_id', user.id)
+        .eq('date', dateStr)
+
+      const claimedKeys = new Set((claims ?? []).map(c => c.mission_key))
+      const tw = todayWorkouts?.[0]
+
+      const ctx: MissionContext = {
+        hasLoggedToday: !!tw,
+        todayWorkoutType: (tw?.type as WorkoutType) ?? null,
+        todayVerified: tw?.verified ?? false,
+        todayPoints: tw?.total_points_earned ?? 0,
+        todayEffort: tw?.effort_rating ?? 0,
+        currentStreak: user.current_streak,
+        weekSessionCount: weekCount ?? 0,
+        lifetimeSessions: user.lifetime_sessions,
+      }
+
+      setMissions(generateDailyMissions(dateStr, ctx, claimedKeys))
+    })()
+
     refreshUser()
   }, [user?.id]) // eslint-disable-line
 
@@ -108,6 +157,27 @@ export default function HomePage() {
     } else {
       await navigator.clipboard.writeText(ogUrl)
     }
+  }
+
+  async function handleClaimMission(mission: Mission) {
+    if (!user || claimingKey || mission.claimed || !mission.completed) return
+    setClaimingKey(mission.key)
+    const dateStr = todayDateStr()
+    const { error: claimError } = await supabase.from('mission_claims').insert({
+      user_id: user.id,
+      mission_key: mission.key,
+      date: dateStr,
+      coins_claimed: mission.reward,
+    })
+    if (!claimError) {
+      await supabase.from('users').update({
+        points_balance: user.points_balance + mission.reward,
+        points_lifetime_earned: user.points_lifetime_earned + mission.reward,
+      }).eq('id', user.id)
+      setMissions(prev => prev.map(m => m.key === mission.key ? { ...m, claimed: true } : m))
+      await refreshUser()
+    }
+    setClaimingKey(null)
   }
 
   async function handleFreezeStreak() {
@@ -266,6 +336,86 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* ── Daily Missions ── */}
+      {missions.length > 0 && (
+        <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <p style={{ fontSize: 10, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5 }}>Daily Missions</p>
+            <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(245,240,234,0.3)' }}>Resets at midnight</p>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {missions.map(mission => {
+              const dc = DIFFICULTY_COLORS[mission.difficulty]
+              const isComplete = mission.completed
+              const isClaimed = mission.claimed
+              const isClaiming = claimingKey === mission.key
+              return (
+                <div key={mission.key} style={{
+                  background: isClaimed ? 'rgba(34,197,94,0.06)' : isComplete ? 'rgba(245,240,234,0.04)' : 'rgba(245,240,234,0.02)',
+                  border: `1.5px solid ${isClaimed ? 'rgba(34,197,94,0.2)' : isComplete ? dc.border : 'rgba(245,240,234,0.06)'}`,
+                  borderRadius: 12,
+                  padding: '12px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  opacity: isClaimed ? 0.6 : 1,
+                  transition: 'all 0.3s ease',
+                }}>
+                  <span style={{ fontSize: 24, flexShrink: 0 }}>{isClaimed ? '✅' : mission.emoji}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                      <p style={{ fontSize: 13, fontWeight: 800, color: isClaimed ? '#22c55e' : '#F5F0EA' }}>
+                        {mission.title}
+                      </p>
+                      <span style={{
+                        fontSize: 8,
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        letterSpacing: 0.8,
+                        color: dc.text,
+                        background: dc.bg,
+                        border: `1px solid ${dc.border}`,
+                        borderRadius: 4,
+                        padding: '1px 5px',
+                      }}>{mission.difficulty}</span>
+                    </div>
+                    <p style={{ fontSize: 11, color: isClaimed ? 'rgba(34,197,94,0.5)' : 'rgba(245,240,234,0.4)' }}>
+                      {isClaimed ? 'Claimed!' : mission.description}
+                    </p>
+                  </div>
+                  <div style={{ flexShrink: 0, textAlign: 'right' }}>
+                    {isClaimed ? (
+                      <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 900, color: '#22c55e' }}>+{mission.reward}</p>
+                    ) : isComplete ? (
+                      <button
+                        onClick={() => handleClaimMission(mission)}
+                        disabled={isClaiming}
+                        style={{
+                          background: `linear-gradient(135deg, ${dc.text}, ${tierColor})`,
+                          border: 'none',
+                          borderRadius: 8,
+                          padding: '6px 12px',
+                          color: '#fff',
+                          fontSize: 11,
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                          fontFamily: 'Archivo, sans-serif',
+                          opacity: isClaiming ? 0.6 : 1,
+                        }}
+                      >
+                        {isClaiming ? '...' : `+${mission.reward} 🪙`}
+                      </button>
+                    ) : (
+                      <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 700, color: 'rgba(245,240,234,0.2)' }}>{mission.reward} 🪙</p>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* ── Rank card — dark ── */}
       {userRank !== null && (
         <Link href="/leaderboard" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
@@ -343,17 +493,40 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* Referral */}
+      {/* Referral — enhanced CTA */}
       {user.referral_code && (
-        <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
-          <p style={{ fontSize: 10, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 8 }}>Invite Friends</p>
-          <p style={{ fontSize: 13, color: 'rgba(245,240,234,0.6)', marginBottom: 10 }}>
-            You and a friend each get <span style={{ color: tierColor, fontWeight: 700 }}>500 bonus pts</span> when they sign up with your code.
-            {referralCount > 0 && <span style={{ color: '#8A8478' }}> ({referralCount} referred)</span>}
-          </p>
-          <button onClick={handleShare} style={{ width: '100%', padding: '12px', background: '#111110', color: '#F5F0EA', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}>
-            {copied ? '✓ Link copied!' : `Share your code: ${user.referral_code}`}
-          </button>
+        <div style={{ background: 'linear-gradient(135deg, #1C1209 0%, #111110 40%, #0E0E0D 100%)', border: '1.5px solid rgba(181,89,60,0.25)', borderRadius: 18, padding: '20px 18px', marginBottom: 14, position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: -40, right: -40, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,89,60,0.20) 0%, transparent 70%)' }} />
+          <div style={{ position: 'absolute', bottom: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,89,60,0.10) 0%, transparent 70%)' }} />
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <div style={{ width: 38, height: 38, borderRadius: 12, background: 'rgba(181,89,60,0.15)', border: '1.5px solid rgba(181,89,60,0.30)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🤝</div>
+              <div>
+                <p style={{ fontSize: 15, fontWeight: 900, color: '#F5F0EA', fontFamily: "'Archivo', sans-serif", lineHeight: 1.1 }}>Invite a Friend</p>
+                <p style={{ fontSize: 11, color: '#B5593C', fontWeight: 700 }}>You BOTH earn bonus coins</p>
+              </div>
+            </div>
+            <div style={{ background: 'rgba(181,89,60,0.08)', border: '1px solid rgba(181,89,60,0.15)', borderRadius: 12, padding: '12px 14px', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              <span style={{ fontSize: 13, color: 'rgba(245,240,234,0.5)' }}>You get</span>
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 18, fontWeight: 900, color: '#22c55e' }}>+500</span>
+              <span style={{ fontSize: 13, color: 'rgba(245,240,234,0.3)' }}>&</span>
+              <span style={{ fontSize: 13, color: 'rgba(245,240,234,0.5)' }}>they get</span>
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 18, fontWeight: 900, color: '#22c55e' }}>+500</span>
+            </div>
+            {referralCount > 0 && (
+              <p style={{ fontSize: 11, color: '#8A8478', textAlign: 'center', marginBottom: 10 }}>
+                {referralCount} friend{referralCount !== 1 ? 's' : ''} joined so far — keep going!
+              </p>
+            )}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={handleShare} style={{ flex: 1, padding: '13px', background: 'linear-gradient(135deg, #B5593C 0%, #D4734F 100%)', color: '#F5F0EA', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: "'Archivo', sans-serif" }}>
+                {copied ? '✓ Copied!' : 'Share Invite Link'}
+              </button>
+              <Link href="/invite" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '13px 16px', background: 'rgba(181,89,60,0.12)', border: '1.5px solid rgba(181,89,60,0.25)', borderRadius: 12, color: '#B5593C', fontSize: 13, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                Details →
+              </Link>
+            </div>
+          </div>
         </div>
       )}
 
