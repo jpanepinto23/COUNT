@@ -121,11 +121,20 @@ export default function LandingPage() {
 
       {/* ── HERO ── */}
       <div style={{ position: 'relative', overflow: 'hidden', background: '#0E0D0C', height: '60vw', minHeight: 340, maxHeight: 560 }}>
+        {/* Video background */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/1tyX7qDArfA?autoplay=1&mute=1&loop=1&playlist=1tyX7qDArfA&controls=0&disablekb=1&playsinline=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&start=15"
+            allow="autoplay; encrypted-media"
+            style={{ position: 'absolute', top: '50%', left: '50%', width: '177.78vh', minWidth: '100%', minHeight: '100%', transform: 'translate(-50%, -50%)', border: 'none', pointerEvents: 'none' }}
+          />
+        </div>
+        {/* Fallback rotating images behind video */}
         {HERO_IMAGES.map((img, i) => (
           <div
             key={img.id}
             style={{
-              position: 'absolute', inset: 0, zIndex: 0,
+              position: 'absolute', inset: 0, zIndex: -1,
               backgroundImage: `url(https://images.pexels.com/photos/${img.id}/pexels-photo-${img.id}.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900&dpr=2)`,
               backgroundSize: 'cover', backgroundPosition: img.pos,
               opacity: heroIdx === i ? 1 : 0,
@@ -133,7 +142,7 @@ export default function LandingPage() {
             }}
           />
         ))}
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,8,7,0.55)', zIndex: 1 }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,8,7,0.45)', zIndex: 1 }} />
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 100, background: 'linear-gradient(to bottom, transparent, #111110)', zIndex: 1 }} />
         <div style={{ position: 'absolute', top: 0, right: 0, zIndex: 3, padding: '18px 20px' }}>
           <Link href="/auth/login" style={{ color: '#F5F0EA', fontSize: 13, fontWeight: 700, textDecoration: 'none', fontFamily: 'Archivo, sans-serif', letterSpacing: 0.5, background: 'rgba(0,0,0,0.45)', padding: '8px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)' }}>
