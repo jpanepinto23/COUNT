@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import { calculatePoints, getTier, getTierLabel, getReferralPoints, generateMysteryBonus } from '@/lib/points'
@@ -449,9 +450,35 @@ export default function LogPage() {
             </div>
             <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#2E2E2C', letterSpacing: 0.8, textAlign: 'center' }}>countfitness.app</p>
           </div>
-          <button onClick={handleShare} style={{ width: '100%', padding: '13px 0', background: shareCopied ? 'rgba(93,187,99,0.15)' : 'rgba(181,89,60,0.1)', border: `1.5px solid ${shareCopied ? 'rgba(93,187,99,0.4)' : 'rgba(181,89,60,0.3)'}`, borderRadius: 10, color: shareCopied ? '#5DBB63' : '#B5593C', fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer', marginBottom: 10, transition: 'all 0.2s ease' }}>
+          <button onClick={handleShare} style={{ width: '100%', padding: '13px 0', background: shareCopied ? 'rgba(93,187,99,0.15)' : 'rgba(181,89,60,0.1)', border: `1.5px solid ${shareCopied? 'rgba(93,187,99,0.4)' : 'rgba(181,89,60,0.3)'}`, borderRadius: 10, color: shareCopied ? '#5DBB63' : '#B5593C', fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer', marginBottom: 10, transition: 'all 0.2s ease' }}>
             {shareCopied ? '✓ Copied to clipboard' : '↗ Share your workout'}
           </button>
+          {/* Post-workout referral nudge — enhanced on streak milestones */}
+          {user?.referral_code && (() => {
+            const isStreakMilestone = [3, 7, 14, 21, 30].includes(sharedStreak)
+            return isStreakMilestone ? (
+              <Link href="/invite" style={{ display: 'block', textDecoration: 'none', marginBottom: 10 }}>
+                <div style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.10) 0%, rgba(181,89,60,0.10) 100%)', border: '1.5px solid rgba(34,197,94,0.25)', borderRadius: 14, padding: '16px 18px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', top: -30, right: -30, width: 100, height: 100, borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,197,94,0.12) 0%, transparent 70%)' }} />
+                  <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2, color: '#22c55e', marginBottom: 6 }}>🔥 {sharedStreak}-day streak!</p>
+                  <p style={{ fontSize: 15, fontWeight: 900, color: '#F5F0EA', fontFamily: "'Archivo', sans-serif", marginBottom: 4 }}>Challenge a friend to match it</p>
+                  <p style={{ fontSize: 12, color: 'rgba(245,240,234,0.5)', marginBottom: 10 }}>Invite them and you BOTH earn <span style={{ color: '#22c55e', fontWeight: 700 }}>500 bonus coins</span></p>
+                  <span style={{ display: 'inline-block', padding: '8px 20px', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.30)', borderRadius: 8, color: '#22c55e', fontSize: 13, fontWeight: 800 }}>Invite a Friend →</span>
+                </div>
+              </Link>
+            ) : (
+              <Link href="/invite" style={{ display: 'block', textDecoration: 'none', marginBottom: 10 }}>
+                <div style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.06) 0%, rgba(181,89,60,0.06) 100%)', border: '1px solid rgba(34,197,94,0.15)', borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(34,197,94,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>🤝</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 13, fontWeight: 800, color: '#F5F0EA', marginBottom: 2 }}>Bring a friend along!</p>
+                    <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.5)' }}>You both earn <span style={{ color: '#22c55e', fontWeight: 700 }}>500 bonus coins</span> when they join</p>
+                  </div>
+                  <span style={{ fontSize: 16, color: 'rgba(245,240,234,0.3)', flexShrink: 0 }}>›</span>
+                </div>
+              </Link>
+            )
+          })()}
           <div style={{ display: 'flex', gap: 10 }}>
             <button onClick={() => router.push('/home')} style={{ flex: 1, padding: 15, background: '#111110', color: '#F5F0EA', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}>Back to Home</button>
             <button onClick={() => router.push('/rewards')} style={{ flex: 1, padding: 15, background: 'transparent', color: '#B5593C', border: '1.5px solid #B5593C', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}>Shop Rewards</button>
@@ -512,7 +539,7 @@ export default function LogPage() {
                 <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Earn points every session</strong> — each workout adds to your score and moves you up the leaderboard.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <span>📝</span>
+                <span>�M</span>
                 <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Verify with a wearable</strong> (Apple Health, Garmin, Fitbit, Google Fit) to earn <strong>100% of your points</strong>.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
@@ -520,7 +547,7 @@ export default function LogPage() {
                 <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Unverified sessions earn 10%</strong> — still worth logging, verified is always better.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <span>⚖️</span>
+                <span>⚦️</span>
                 <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Why verify?</strong> It keeps the leaderboard fair and honest for everyone competing.</span>
               </div>
             </div>
@@ -539,7 +566,7 @@ export default function LogPage() {
                   background: duration === d ? '#B5593C' : '#1A1A18',
                   border: `1.5px solid ${duration === d ? '#B5593C' : 'rgba(245,240,234,0.1)'}`,
                   borderRadius: 10, cursor: 'pointer',
-                  fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700, color: '#F5F0EA',
+                   fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700, color: '#F5F0EA',
                 }}>{d}</button>
               ))}
             </div>
