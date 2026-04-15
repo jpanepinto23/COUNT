@@ -124,7 +124,7 @@ export default function LandingPage() {
         {/* Video background */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
           <iframe
-            src="https://www.youtube-nocookie.com/embed/1tyX7qDArfA?autoplay=1&mute=1&loop=1&playlist=1tyX7qDArfA&controls=0&disablekb=1&playsinline=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&start=15"
+            src="https://www.youtube-nocookie.com/embed/1tyX7qDArfA?autoplay=1&mute=1&loop=1&playlist=1tyX7qDArfA&controls=0&disablekb=1&playsinline=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&start=45"
             allow="autoplay; encrypted-media"
             style={{ position: 'absolute', top: '50%', left: '50%', width: '177.78vh', minWidth: '100%', minHeight: '100%', transform: 'translate(-50%, -50%)', border: 'none', pointerEvents: 'none' }}
           />
