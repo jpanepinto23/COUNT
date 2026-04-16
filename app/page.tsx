@@ -18,29 +18,29 @@ const HOW_IT_WORKS = [
 ]
 
 const REWARD_CATALOG = [
-  { name: 'Thorne',              status: 'live',        note: 'Available now', initials: 'T',  color: '#1A7A4C', logo: 'https://logo.clearbit.com/thorne.com' },
-  { name: 'Momentous',           status: 'live',        note: 'Available now', initials: 'M',  color: '#1E3A5F', logo: 'https://logo.clearbit.com/livemomentous.com' },
-  { name: 'Gymshark',            status: 'coming_soon', note: 'Coming soon',   initials: 'GS', color: '#2A9DF4', logo: 'https://logo.clearbit.com/gymshark.com' },
-  { name: 'Ten Thousand',        status: 'coming_soon', note: 'Coming soon',   initials: 'TT', color: '#C4A35A', logo: 'https://logo.clearbit.com/tenthousand.cc' },
-  { name: 'Optimum Nutrition',   status: 'coming_soon', note: 'Coming soon',   initials: 'ON', color: '#E23D28', logo: 'https://logo.clearbit.com/optimumnutrition.com' },
-  { name: 'Ghost',               status: 'coming_soon', note: 'Coming soon',   initials: 'G',  color: '#00D4FF', logo: 'https://logo.clearbit.com/ghostlifestyle.com' },
-  { name: 'Lululemon',           status: 'coming_soon', note: 'Coming soon',   initials: 'LL', color: '#D31334', logo: 'https://logo.clearbit.com/lululemon.com' },
-  { name: 'Vuori',               status: 'coming_soon', note: 'Coming soon',   initials: 'V',  color: '#4A7C59', logo: 'https://logo.clearbit.com/vuoriclothing.com' },
-  { name: 'Celsius',             status: 'coming_soon', note: 'Coming soon',   initials: 'C',  color: '#FF6B35', logo: 'https://logo.clearbit.com/celsius.com' },
-  { name: 'Alani Nu',            status: 'coming_soon', note: 'Coming soon',   initials: 'AN', color: '#E85D9B', logo: 'https://logo.clearbit.com/alaninu.com' },
-  { name: 'Transparent Labs',    status: 'coming_soon', note: 'Coming soon',   initials: 'TL', color: '#3B82F6', logo: 'https://logo.clearbit.com/transparentlabs.com' },
-  { name: 'Hyperice',            status: 'coming_soon', note: 'Coming soon',   initials: 'H',  color: '#00C2FF', logo: 'https://logo.clearbit.com/hyperice.com' },
-  { name: 'AG1',                  status: 'coming_soon', note: 'Coming soon',   initials: 'AG', color: '#1B5E20', logo: 'https://logo.clearbit.com/drinkag1.com' },
-  { name: 'Brooks Running',       status: 'coming_soon', note: 'Coming soon',   initials: 'BR', color: '#1A237E', logo: 'https://logo.clearbit.com/brooksrunning.com' },
-  { name: 'Bodybuilding.com',     status: 'coming_soon', note: 'Coming soon',   initials: 'BB', color: '#D32F2F', logo: 'https://logo.clearbit.com/bodybuilding.com' },
+  { name: 'Thorne',              status: 'live',        note: 'Available now', initials: 'T',  color: '#1A7A4C', logo: 'https://cdn.brandfetch.io/thorne.com/w/256/h/256' },
+  { name: 'Momentous',           status: 'live',        note: 'Available now', initials: 'M',  color: '#1E3A5F', logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
+  { name: 'Gymshark',            status: 'coming_soon', note: 'Coming soon',   initials: 'GS', color: '#2A9DF4', logo: 'https://cdn.brandfetch.io/gymshark.com/w/256/h/256' },
+  { name: 'Ten Thousand',        status: 'coming_soon', note: 'Coming soon',   initials: 'TT', color: '#C4A35A', logo: 'https://cdn.brandfetch.io/tenthousand.cc/w/256/h/256' },
+  { name: 'Optimum Nutrition',   status: 'coming_soon', note: 'Coming soon',   initials: 'ON', color: '#E23D28', logo: 'https://cdn.brandfetch.io/optimumnutrition.com/w/256/h/256' },
+  { name: 'Ghost',               status: 'coming_soon', note: 'Coming soon',   initials: 'G',  color: '#00D4FF', logo: 'https://cdn.brandfetch.io/ghostlifestyle.com/w/256/h/256' },
+  { name: 'Lululemon',           status: 'coming_soon', note: 'Coming soon',   initials: 'LL', color: '#D31334', logo: 'https://cdn.brandfetch.io/lululemon.com/w/256/h/256' },
+  { name: 'Vuori',               status: 'coming_soon', note: 'Coming soon',   initials: 'V',  color: '#4A7C59', logo: 'https://cdn.brandfetch.io/vuoriclothing.com/w/256/h/256' },
+  { name: 'Celsius',             status: 'coming_soon', note: 'Coming soon',   initials: 'C',  color: '#FF6B35', logo: 'https://cdn.brandfetch.io/celsius.com/w/256/h/256' },
+  { name: 'Alani Nu',            status: 'coming_soon', note: 'Coming soon',   initials: 'AN', color: '#E85D9B', logo: 'https://cdn.brandfetch.io/alaninu.com/w/256/h/256' },
+  { name: 'Transparent Labs',    status: 'coming_soon', note: 'Coming soon',   initials: 'TL', color: '#3B82F6', logo: 'https://cdn.brandfetch.io/transparentlabs.com/w/256/h/256' },
+  { name: 'Hyperice',            status: 'coming_soon', note: 'Coming soon',   initials: 'H',  color: '#00C2FF', logo: 'https://cdn.brandfetch.io/hyperice.com/w/256/h/256' },
+  { name: 'AG1',                  status: 'coming_soon', note: 'Coming soon',   initials: 'AG', color: '#1B5E20', logo: 'https://cdn.brandfetch.io/drinkag1.com/w/256/h/256' },
+  { name: 'Brooks Running',       status: 'coming_soon', note: 'Coming soon',   initials: 'BR', color: '#1A237E', logo: 'https://cdn.brandfetch.io/brooksrunning.com/w/256/h/256' },
+  { name: 'Bodybuilding.com',     status: 'coming_soon', note: 'Coming soon',   initials: 'BB', color: '#D32F2F', logo: 'https://cdn.brandfetch.io/bodybuilding.com/w/256/h/256' },
 ]
 
 const INTEGRATIONS = [
-  { name: 'Strava',       color: '#FC4C02', icon: 'S',  logo: 'https://logo.clearbit.com/strava.com' },
-  { name: 'Apple Health', color: '#FF2D55', icon: 'AH', logo: 'https://logo.clearbit.com/apple.com' },
-  { name: 'Google Fit',   color: '#34A853', icon: 'GF', logo: 'https://logo.clearbit.com/google.com' },
-  { name: 'Garmin',       color: '#007CC3', icon: 'G',  logo: 'https://logo.clearbit.com/garmin.com' },
-  { name: 'MyFitnessPal', color: '#0066FF', icon: 'MF', logo: 'https://logo.clearbit.com/myfitnesspal.com' },
+  { name: 'Strava',       color: '#FC4C02', icon: 'S',  logo: 'https://cdn.brandfetch.io/strava.com/w/256/h/256' },
+  { name: 'Apple Health', color: '#FF2D55', icon: 'AH', logo: 'https://cdn.brandfetch.io/apple.com/w/256/h/256' },
+  { name: 'Google Fit',   color: '#34A853', icon: 'GF', logo: 'https://cdn.brandfetch.io/google.com/w/256/h/256' },
+  { name: 'Garmin',       color: '#007CC3', icon: 'G',  logo: 'https://cdn.brandfetch.io/garmin.com/w/256/h/256' },
+  { name: 'MyFitnessPal', color: '#0066FF', icon: 'MF', logo: 'https://cdn.brandfetch.io/myfitnesspal.com/w/256/h/256' },
 ]
 
 const COMPARISON = [
@@ -244,7 +244,7 @@ export default function LandingPage() {
                 border: '1.5px solid rgba(181,89,60,0.25)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
-                <img src="https://logo.clearbit.com/kanefootwear.com" alt="Kane" style={{ width: '65%', height: '65%', objectFit: 'contain', borderRadius: 4 }} />
+                <img src="https://cdn.brandfetch.io/kanefootwear.com/w/256/h/256" alt="Kane" style={{ width: '65%', height: '65%', objectFit: 'contain', borderRadius: 4 }} />
               </div>
               <div>
                 <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, color: '#F5F0EA', letterSpacing: -0.3, marginBottom: 4 }}>Kane</p>
@@ -362,7 +362,7 @@ export default function LandingPage() {
               <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 17, fontWeight: 800, color, marginBottom: 4 }}>{tier}</p>
               <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 20, fontWeight: 900, color: '#F5F0EA', lineHeight: 1 }}>{mult}</p>
             </div>
-                ))}
+          ))}
         </div>
       </div>
 
