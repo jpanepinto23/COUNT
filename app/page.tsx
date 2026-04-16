@@ -18,29 +18,29 @@ const HOW_IT_WORKS = [
 ]
 
 const REWARD_CATALOG = [
-  { name: 'Thorne',              status: 'live',        note: 'Available now', initials: 'T',  color: '#1A7A4C' },
-  { name: 'Momentous',           status: 'live',        note: 'Available now', initials: 'M',  color: '#1E3A5F' },
-  { name: 'Gymshark',            status: 'coming_soon', note: 'Coming soon',   initials: 'GS', color: '#2A9DF4' },
-  { name: 'Ten Thousand',        status: 'coming_soon', note: 'Coming soon',   initials: 'TT', color: '#C4A35A' },
-  { name: 'Optimum Nutrition',   status: 'coming_soon', note: 'Coming soon',   initials: 'ON', color: '#E23D28' },
-  { name: 'Ghost',               status: 'coming_soon', note: 'Coming soon',   initials: 'G',  color: '#00D4FF' },
-  { name: 'Lululemon',           status: 'coming_soon', note: 'Coming soon',   initials: 'LL', color: '#D31334' },
-  { name: 'Vuori',               status: 'coming_soon', note: 'Coming soon',   initials: 'V',  color: '#4A7C59' },
-  { name: 'Celsius',             status: 'coming_soon', note: 'Coming soon',   initials: 'C',  color: '#FF6B35' },
-  { name: 'Alani Nu',            status: 'coming_soon', note: 'Coming soon',   initials: 'AN', color: '#E85D9B' },
-  { name: 'Transparent Labs',    status: 'coming_soon', note: 'Coming soon',   initials: 'TL', color: '#3B82F6' },
-  { name: 'Hyperice',            status: 'coming_soon', note: 'Coming soon',   initials: 'H',  color: '#00C2FF' },
-  { name: 'AG1',                  status: 'coming_soon', note: 'Coming soon',   initials: 'AG', color: '#1B5E20' },
-  { name: 'Brooks Running',       status: 'coming_soon', note: 'Coming soon',   initials: 'BR', color: '#1A237E' },
-  { name: 'Bodybuilding.com',     status: 'coming_soon', note: 'Coming soon',   initials: 'BB', color: '#D32F2F' },
+  { name: 'Thorne',              status: 'live',        note: 'Available now', initials: 'T',  color: '#1A7A4C', logo: 'https://logo.clearbit.com/thorne.com' },
+  { name: 'Momentous',           status: 'live',        note: 'Available now', initials: 'M',  color: '#1E3A5F', logo: 'https://logo.clearbit.com/livemomentous.com' },
+  { name: 'Gymshark',            status: 'coming_soon', note: 'Coming soon',   initials: 'GS', color: '#2A9DF4', logo: 'https://logo.clearbit.com/gymshark.com' },
+  { name: 'Ten Thousand',        status: 'coming_soon', note: 'Coming soon',   initials: 'TT', color: '#C4A35A', logo: 'https://logo.clearbit.com/tenthousand.cc' },
+  { name: 'Optimum Nutrition',   status: 'coming_soon', note: 'Coming soon',   initials: 'ON', color: '#E23D28', logo: 'https://logo.clearbit.com/optimumnutrition.com' },
+  { name: 'Ghost',               status: 'coming_soon', note: 'Coming soon',   initials: 'G',  color: '#00D4FF', logo: 'https://logo.clearbit.com/ghostlifestyle.com' },
+  { name: 'Lululemon',           status: 'coming_soon', note: 'Coming soon',   initials: 'LL', color: '#D31334', logo: 'https://logo.clearbit.com/lululemon.com' },
+  { name: 'Vuori',               status: 'coming_soon', note: 'Coming soon',   initials: 'V',  color: '#4A7C59', logo: 'https://logo.clearbit.com/vuoriclothing.com' },
+  { name: 'Celsius',             status: 'coming_soon', note: 'Coming soon',   initials: 'C',  color: '#FF6B35', logo: 'https://logo.clearbit.com/celsius.com' },
+  { name: 'Alani Nu',            status: 'coming_soon', note: 'Coming soon',   initials: 'AN', color: '#E85D9B', logo: 'https://logo.clearbit.com/alaninu.com' },
+  { name: 'Transparent Labs',    status: 'coming_soon', note: 'Coming soon',   initials: 'TL', color: '#3B82F6', logo: 'https://logo.clearbit.com/transparentlabs.com' },
+  { name: 'Hyperice',            status: 'coming_soon', note: 'Coming soon',   initials: 'H',  color: '#00C2FF', logo: 'https://logo.clearbit.com/hyperice.com' },
+  { name: 'AG1',                  status: 'coming_soon', note: 'Coming soon',   initials: 'AG', color: '#1B5E20', logo: 'https://logo.clearbit.com/drinkag1.com' },
+  { name: 'Brooks Running',       status: 'coming_soon', note: 'Coming soon',   initials: 'BR', color: '#1A237E', logo: 'https://logo.clearbit.com/brooksrunning.com' },
+  { name: 'Bodybuilding.com',     status: 'coming_soon', note: 'Coming soon',   initials: 'BB', color: '#D32F2F', logo: 'https://logo.clearbit.com/bodybuilding.com' },
 ]
 
 const INTEGRATIONS = [
-  { name: 'Strava',       color: '#FC4C02', icon: 'S'  },
-  { name: 'Apple Health', color: '#FF2D55', icon: 'AH' },
-  { name: 'Google Fit',   color: '#34A853', icon: 'GF' },
-  { name: 'Garmin',       color: '#007CC3', icon: 'G'  },
-  { name: 'MyFitnessPal', color: '#0066FF', icon: 'MF' },
+  { name: 'Strava',       color: '#FC4C02', icon: 'S',  logo: 'https://logo.clearbit.com/strava.com' },
+  { name: 'Apple Health', color: '#FF2D55', icon: 'AH', logo: 'https://logo.clearbit.com/apple.com' },
+  { name: 'Google Fit',   color: '#34A853', icon: 'GF', logo: 'https://logo.clearbit.com/google.com' },
+  { name: 'Garmin',       color: '#007CC3', icon: 'G',  logo: 'https://logo.clearbit.com/garmin.com' },
+  { name: 'MyFitnessPal', color: '#0066FF', icon: 'MF', logo: 'https://logo.clearbit.com/myfitnesspal.com' },
 ]
 
 const COMPARISON = [
@@ -142,7 +142,7 @@ export default function LandingPage() {
             }}
           />
         ))}
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,8,7,0.45)', zIndex: 1 }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,8,7,0.55)', zIndex: 1 }} />
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 100, background: 'linear-gradient(to bottom, transparent, #111110)', zIndex: 1 }} />
         <div style={{ position: 'absolute', top: 0, right: 0, zIndex: 3, padding: '18px 20px' }}>
           <Link href="/auth/login" style={{ color: '#F5F0EA', fontSize: 13, fontWeight: 700, textDecoration: 'none', fontFamily: 'Archivo, sans-serif', letterSpacing: 0.5, background: 'rgba(0,0,0,0.45)', padding: '8px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)' }}>
@@ -244,7 +244,7 @@ export default function LandingPage() {
                 border: '1.5px solid rgba(181,89,60,0.25)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
-                <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, color: '#B5593C', letterSpacing: -1 }}>K</span>
+                <img src="https://logo.clearbit.com/kanefootwear.com" alt="Kane" style={{ width: '65%', height: '65%', objectFit: 'contain', borderRadius: 4 }} />
               </div>
               <div>
                 <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, color: '#F5F0EA', letterSpacing: -0.3, marginBottom: 4 }}>Kane</p>
@@ -362,7 +362,7 @@ export default function LandingPage() {
               <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 17, fontWeight: 800, color, marginBottom: 4 }}>{tier}</p>
               <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 20, fontWeight: 900, color: '#F5F0EA', lineHeight: 1 }}>{mult}</p>
             </div>
-          ))}
+                ))}
         </div>
       </div>
 
@@ -373,7 +373,7 @@ export default function LandingPage() {
 
         {/* Live brands - featured */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, maxWidth: 420, margin: '0 auto 16px' }}>
-          {REWARD_CATALOG.filter(b => b.status === 'live').map(({ name, initials, color }) => (
+          {REWARD_CATALOG.filter(b => b.status === 'live').map(({ name, logo, color }) => (
             <div key={name} style={{
               flex: 1, padding: '18px 16px', background: 'linear-gradient(145deg, #1C1B19 0%, #141413 100%)',
               borderRadius: 14, border: '1.5px solid rgba(93,187,99,0.3)',
@@ -388,7 +388,7 @@ export default function LandingPage() {
                 background: `${color}18`, border: `1.5px solid ${color}30`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 18, fontWeight: 900, color, letterSpacing: -0.5 }}>{initials}</span>
+                <img src={logo} alt={name} style={{ width: '65%', height: '65%', objectFit: 'contain', borderRadius: 4 }} />
               </div>
               <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 16, fontWeight: 800, color: '#F5F0EA', marginBottom: 3 }}>{name}</p>
               <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: '#5DBB63' }}>Available now</p>
@@ -398,10 +398,10 @@ export default function LandingPage() {
 
         {/* Coming soon brands - grid */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, maxWidth: 420, margin: '0 auto' }}>
-          {REWARD_CATALOG.filter(b => b.status === 'coming_soon').map(({ name, initials, color }) => (
+          {REWARD_CATALOG.filter(b => b.status === 'coming_soon').map(({ name, logo, color }) => (
             <div key={name} style={{ padding: '12px 14px', background: '#141413', borderRadius: 10, border: '1px solid #252523', display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 36, height: 36, borderRadius: 8, background: `${color}18`, border: `1px solid ${color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 12, fontWeight: 900, color, letterSpacing: -0.5 }}>{initials}</span>
+                <img src={logo} alt={name} style={{ width: '65%', height: '65%', objectFit: 'contain', borderRadius: 4 }} />
               </div>
               <div style={{ minWidth: 0 }}>
                 <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 13, fontWeight: 700, color: '#555', letterSpacing: 0.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>{name}</span>
@@ -419,7 +419,7 @@ export default function LandingPage() {
           {INTEGRATIONS.map(b => (
             <div key={b.name} style={{ display: 'flex', alignItems: 'center', gap: 9, background: '#141413', borderRadius: 10, padding: '10px 16px', border: '1px solid #1E1E1D' }}>
               <div style={{ width: 28, height: 28, borderRadius: 7, background: `${b.color}18`, border: `1px solid ${b.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 10, fontWeight: 900, color: b.color, letterSpacing: -0.5 }}>{b.icon}</span>
+                <img src={b.logo} alt={b.name} style={{ width: '65%', height: '65%', objectFit: 'contain', borderRadius: 4 }} />
               </div>
               <span style={{ fontSize: 13, fontWeight: 600, color: '#B0A89E', fontFamily: 'Archivo, sans-serif' }}>{b.name}</span>
             </div>
