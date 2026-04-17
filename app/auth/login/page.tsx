@@ -34,7 +34,7 @@ export default function LoginPage() {
       </div>
 
       <div style={{ width: '100%', maxWidth: 380 }}>
-        <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif' }}>Welcome back</h1>
+        <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#111110' }}>Welcome back</h1>
         <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>Sign in to keep your streak alive.</p>
 
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
