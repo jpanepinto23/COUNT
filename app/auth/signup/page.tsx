@@ -119,7 +119,7 @@ function SignupContent() {
       await supabase.from('referrals').insert({
         referrer_id: referrerId,
         referred_id: userId,
-        bonus_points: 500,
+        bonus_points: 300, // bronze default
         bonus_awarded: false,
       })
     }
