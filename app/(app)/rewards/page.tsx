@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import type { Reward, RewardType } from '@/lib/types'
+import { getStreakMultiplierLabel } from '@/lib/points'
 
 const BG = '#0E0E0D'
 const CARD = '#111110'
@@ -15,12 +16,6 @@ const STONE = '#8A8478'
 const COPPER = '#B5593C'
 const GREEN = '#16a34a'
 
-function getStreakMultiplier(streak: number): string {
-  if (streak >= 14) return '2x'
-  if (streak >= 7) return '1.5x'
-  if (streak >= 3) return '1.2x'
-  return '1x'
-}
 
 interface FulfillmentData {
   reward_type: RewardType
@@ -164,7 +159,7 @@ export default function RewardsPage() {
     )
   }
 
-  const multiplier = getStreakMultiplier(user.current_streak)
+  const multiplier = getStreakMultiplierLabel(user.current_streak)
   const featured = rewards.filter(r => r.is_featured)
   const rest = rewards.filter(r => !r.is_featured)
   const weeklyDone = weeklyWorkouts >= 5
