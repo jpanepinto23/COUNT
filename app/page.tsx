@@ -23,7 +23,7 @@ const TIERS = [
 
 const HOW_IT_WORKS = [
   { step: '01', title: 'Log Your Workout', desc: 'Open COUNT after your session. Tap to confirm. Takes 30 seconds.' },
-  { step: '02', title: 'Earn Points',      desc: 'Every session earns points. Streaks multiply your total up to 3x.' },
+  { step: '02', title: 'Earn Points',      desc: 'Every session earns 200 base points. Move up tiers for up to 3x and build streaks for up to 2x — they stack.' },
   { step: '03', title: 'Redeem Rewards',   desc: 'Real protein, pre-workout, and gear from brands you already buy. Free.' },
 ]
 
@@ -49,7 +49,7 @@ const COMPARISON = [
   { feature: 'Earn real physical rewards',        count: true, others: false },
   { feature: 'Supplements shipped to your door', count: true, others: false },
   { feature: 'Points for every workout',          count: true, others: false },
-  { feature: 'Streak multipliers (up to 3x)',     count: true, others: false },
+  { feature: 'Tier & streak multipliers (up to 6x)',     count: true, others: false },
   { feature: 'Workout tracking',                  count: true, others: true  },
   { feature: 'Tier progression system',           count: true, others: false },
   { feature: 'Gear & apparel rewards',            count: true, others: false },
@@ -57,7 +57,7 @@ const COMPARISON = [
 
 const FAQ_ITEMS = [
   { q: 'Is COUNT really free?', a: 'Yes. No subscription, no hidden fees. Sign up, log workouts, and earn rewards â all completely free.' },
-  { q: 'How do I earn points?', a: 'Every workout you log earns 200 base points. Build a streak and your multiplier grows up to 3x â meaning up to 600 points per session.' },
+  { q: 'How do I earn points?', a: 'Every workout you log earns 200 base points. Move up tiers (Bronze to Platinum) for up to 3x and build streaks for up to 2x â meaning up to 1,200 points per session.' },
   { q: 'What kind of rewards can I get?', a: 'Real products â protein, pre-workout, gear, and apparel from brands like Thorne, Momentous, and more. No gift cards or digital badges.' },
   { q: 'How does verification work?', a: 'You can sync with Strava, Apple Health, Garmin, or Google Fit for verified sessions. Unverified sessions still earn points â just at a reduced rate.' },
   { q: 'When do new brands get added?', a: 'We\'re onboarding new brands regularly. Drop your email in the waitlist to get notified when new rewards go live.' },
@@ -274,7 +274,7 @@ export default function LandingPage() {
         <div style={{ display: 'flex', gap: 0, marginTop: 28, borderTop: '1px solid #1E1E1D', paddingTop: 24 }}>
           {[
             { num: '$0',  label: 'to join'     },
-            { num: '3x',  label: 'max streak'  },
+            { num: '6x',  label: 'max multiplier'  },
             { num: '200', label: 'pts/session'  },
           ].map(({ num, label }, i) => (
             <div key={label} style={{ flex: 1, textAlign: 'center', borderRight: i < 2 ? '1px solid #1E1E1D' : 'none' }}>
