@@ -216,7 +216,7 @@ export default function ProfilePage() {
 
       <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
         <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 4 }}>Fitness Trackers</p>
-        <p style={{ fontSize: 12, color: '#8A8478', marginBottom: 14 }}>Connect a tracker to auto-verify your workouts and earn 25% bonus points.</p>
+        <p style={{ fontSize: 12, color: '#8A8478', marginBottom: 14 }}>Connect a tracker to auto-verify your workouts and earn full points. Unverified sessions earn 10%.</p>
         {connectMessage && (
           <div style={{ background: connectMessage.ok ? 'rgba(22,163,74,0.12)' : 'rgba(220,38,38,0.12)', border: `1px solid ${connectMessage.ok ? 'rgba(34,197,94,0.25)' : 'rgba(252,165,165,0.3)'}`, borderRadius: 8, padding: '10px 12px', marginBottom: 12, fontSize: 12, color: connectMessage.ok ? '#4ade80' : '#f87171' }}>
             {connectMessage.text}
