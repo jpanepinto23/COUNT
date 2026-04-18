@@ -59,8 +59,9 @@ export function getNextTierSessions(lifetimeSessions: number): {
 // Base points per session — flat 200, duration does not affect earnings
 export const BASE_POINTS = 200
 
-// Unverified sessions earn 10% of full points — always, no free session mechanics
-export const UNVERIFIED_MULTIPLIER = 0.10
+// Verification bonus — verified sessions earn extra points on top of base
+// Everyone gets full base points; connecting Strava/Apple Health earns a bonus
+export const VERIFIED_BONUS = 50
 
 // Mystery bonus — weighted random coins after each workout
 // Streak holders get better odds for higher tiers
@@ -70,7 +71,7 @@ export function generateMysteryBonus(currentStreak: number): {
 } {
   const roll = Math.random() * 100
 
-  // Streak ≥7 shifts 5% from common → uncommon and 2% from uncommon → rare
+  // Streak >=7 shifts 5% from common -> uncommon and 2% from uncommon -> rare
   const hasStreak = currentStreak >= 7
   const epicThreshold = hasStreak ? 7 : 5       // top slice
   const rareThreshold = epicThreshold + (hasStreak ? 17 : 15)
@@ -113,20 +114,21 @@ export function calculatePoints({
   multiplier: number
   streakMultiplier: number
   total: number
-  verificationMultiplier: number
+  verifiedBonus: number
 } {
   const tier = getTier(lifetimeSessions)
   const tierMultiplier = getTierMultiplier(tier)
   const streakMult = getStreakMultiplier(currentStreak)
-  const verificationMultiplier = verified ? 1.0 : UNVERIFIED_MULTIPLIER
+  const verifiedBonus = verified ? VERIFIED_BONUS : 0
 
-  const total = Math.round(BASE_POINTS * verificationMultiplier * streakMult * tierMultiplier)
+  // Everyone gets full base x tier x streak. Verified users earn a flat bonus on top.
+  const total = Math.round((BASE_POINTS + verifiedBonus) * streakMult * tierMultiplier)
 
   return {
     base: BASE_POINTS,
     multiplier: tierMultiplier,
     streakMultiplier: streakMult,
     total,
-    verificationMultiplier,
+    verifiedBonus,
   }
 }
