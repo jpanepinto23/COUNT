@@ -7,7 +7,6 @@ import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import { calculatePoints, getTier, getTierLabel, getReferralPoints, generateMysteryBonus } from '@/lib/points'
 import type { WorkoutType, Tier } from '@/lib/types'
-
 const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string; emoji: string }[] = [
   { value: 'push',      label: 'Push',      photo: '4488764', emoji: '🤜' },
   { value: 'pull',      label: 'Pull',      photo: '6922157', emoji: '💪' },
@@ -55,7 +54,7 @@ export default function LogPage() {
   if (!user) return null
 
   const tier = getTier(user.lifetime_sessions)
-  const { base, multiplier, total, verificationMultiplier, streakMultiplier } = calculatePoints({
+  const { base, multiplier, total, verifiedBonus, streakMultiplier } = calculatePoints({
     verified: false,
     lifetimeSessions: user.lifetime_sessions,
     currentStreak: user.current_streak,
