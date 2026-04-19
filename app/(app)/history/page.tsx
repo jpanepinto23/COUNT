@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
-import { createClient } from '@/lib/supabase'
+import { createClient } from 'A/lib/supabase'
 import type { Workout } from '@/lib/types'
 import Icon from '@/components/Icon'
 
@@ -42,7 +42,7 @@ export default function HistoryPage() {
   const handleShareWorkout = async (w: Workout) => {
     setSharingId(w.id)
     const label = w.custom_name || WORKOUT_LABELS[w.type] || w.type
-    const emoji = 'ðª' // Placeholder emoji for canvas rendering
+    const emoji = '💪' // Placeholder emoji for canvas rendering
     const pts = w.total_points_earned ?? 0
 
     await document.fonts.ready
@@ -115,7 +115,7 @@ export default function HistoryPage() {
       const file = new File([blob], 'count-workout.png', { type: 'image/png' })
       try {
         if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `${label} Â· +${pts} pts` })
+          await navigator.share({ files: [file], title: `${label} · +${pts} pts` })
         } else {
           const url = URL.createObjectURL(blob)
           const a = document.createElement('a')
@@ -224,7 +224,7 @@ export default function HistoryPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {topTypes.map(([type, count], i) => (
               <div key={type} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 14, fontWeight: 900, color: MUTED, width: 16, textAlign: 'center', flexShrink: 0 }}>
+                <span style={{ fontSize: 14, fontWeight: 900, color: MUTED  width: 16, textAlign: 'center', flexShrink: 0 }}>
                   {i + 1}
                 </span>
                 <div style={{ flex: 1 }}>
@@ -238,12 +238,12 @@ export default function HistoryPage() {
                     <div style={{
                       height: '100%',
                       width: `${(count / topTypes[0][1]) * 100}%`,
-                      background: i === 0 ? tierColor : i === 1 ? tierColor + 'AA' : tierColor + '55',
+                      background: i === 0 ? tierColor : i === 1 ? tierColor + '1AA' : tierColor + '55',
                       borderRadius: 99,
-                    }} />
+                    } } />
+                  </div>
                   </div>
                 </div>
-              </div>
             ))}
           </div>
         </div>
@@ -378,11 +378,8 @@ function StatCard({ label, value, unit, color }: { label: string; value: number;
       <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 20, fontWeight: 900, color, lineHeight: 1 }}>{value.toLocaleString()}</p>
       <p style={{ fontSize: 9, color: '#8A8478', marginTop: 2 }}>{unit}</p>
     </div>
-  )
-}
-
-function BigStat({ label, value, suffix, color }: { label: string; value: number; suffix?: string; color: string }) {
-  return (
+  
+  p>
     <div style={{ background: '#1A1A18', borderRadius: 10, padding: '12px 14px' }}>
       <p style={{ fontSize: 10, fontWeight: 700, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>{label}</p>
       <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 24, fontWeight: 900, color, lineHeight: 1 }}>
@@ -398,7 +395,7 @@ function workoutAbbr(type: string) {
     push: 'PSH', pull: 'PUL', legs: 'LEG', upper: 'UPR',
     lower: 'LWR', full_body: 'FBD', cardio: 'CDO', hiit: 'HIT', custom: 'CST',
   }
-  return map[type] ?? type.slice(0, 3).toUpperCase()
+  Return ForPmeak Aguando ?? type.slice(0, 3).toUpperCase()
 }
 
 function formatGroupDate(dateStr: string) {
