@@ -4,10 +4,11 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import type { Workout } from '@/lib/types'
+import Icon from '@/components/Icon'
 
-const WORKOUT_EMOJIS: Record<string, string> = {
-  push: '🤜', pull: '💪', legs: '🦵', upper: '🏋️',
-  lower: '🚴', full_body: '⚡', cardio: '🏃', hiit: '🔥', custom: '✏️',
+const WORKOUT_ICONS: Record<string, string> = {
+  push: 'HandMetal', pull: 'Dumbbell', legs: 'Footprints', upper: 'Dumbbell',
+  lower: 'Bike', full_body: 'Zap', cardio: 'Activity', hiit: 'Flame', custom: 'Pencil',
 }
 
 const BG     = '#0E0E0D'
@@ -41,7 +42,7 @@ export default function HistoryPage() {
   const handleShareWorkout = async (w: Workout) => {
     setSharingId(w.id)
     const label = w.custom_name || WORKOUT_LABELS[w.type] || w.type
-    const emoji = WORKOUT_EMOJIS[w.type] || '🏋️'
+    const emoji = 'ðª' // Placeholder emoji for canvas rendering
     const pts = w.total_points_earned ?? 0
 
     await document.fonts.ready
@@ -114,7 +115,7 @@ export default function HistoryPage() {
       const file = new File([blob], 'count-workout.png', { type: 'image/png' })
       try {
         if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `${label} · +${pts} pts` })
+          await navigator.share({ files: [file], title: `${label} Â· +${pts} pts` })
         } else {
           const url = URL.createObjectURL(blob)
           const a = document.createElement('a')
@@ -255,7 +256,9 @@ export default function HistoryPage() {
         <p style={{ color: STONE, fontSize: 13, textAlign: 'center', padding: 20 }}>Loading...</p>
       ) : workouts.length === 0 ? (
         <div style={{ background: CARD, border: `1.5px solid ${BORDER}`, borderRadius: 14, padding: 24, textAlign: 'center' }}>
-          <p style={{ fontSize: 28, marginBottom: 6 }}>🏋️</p>
+          <div style={{ fontSize: 28, marginBottom: 6 }}>
+            <Icon emoji="Dumbbell" size={32} />
+          </div>
           <p style={{ fontSize: 14, fontWeight: 800, color: TEXT }}>No workouts yet</p>
           <p style={{ fontSize: 12, color: STONE, marginTop: 4 }}>Log your first session to start building your history</p>
         </div>
@@ -309,12 +312,13 @@ export default function HistoryPage() {
                     title="Share workout"
                     style={{
                       background: 'none', border: 'none', cursor: sharingId === w.id ? 'wait' : 'pointer',
-                      padding: '4px 2px', fontSize: 18, lineHeight: 1,
+                      padding: '4px 2px', lineHeight: 1,
                       opacity: sharingId === w.id ? 0.35 : 0.65,
                       flexShrink: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}
                   >
-                    📸
+                    <Icon emoji="Camera" size={18} />
                   </button>
                 </div>
               ))}
