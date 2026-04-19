@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
+import Icon from '@/components/Icon'
 import type { Reward, RewardType } from '@/lib/types'
 import { getStreakMultiplierLabel } from '@/lib/points'
 
@@ -15,7 +16,6 @@ const MUTED = 'rgba(245,240,234,0.45)'
 const STONE = '#8A8478'
 const COPPER = '#B5593C'
 const GREEN = '#16a34a'
-
 
 interface FulfillmentData {
   reward_type: RewardType
@@ -121,9 +121,9 @@ export default function RewardsPage() {
     return (
       <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, background: BG }}>
         <div style={{ width: '100%', maxWidth: 380, textAlign: 'center' }}>
-          <p style={{ fontSize: 56, marginBottom: 8 }}>
-            {reward_type === 'discount_code' ? '🏷️' : '🔗'}
-          </p>
+          <div style={{ fontSize: 56, marginBottom: 8, display: 'flex', justifyContent: 'center' }}>
+            <Icon emoji={reward_type === 'discount_code' ? 'Tag' : 'Link2'} size={56} />
+          </div>
           <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, fontFamily: 'Archivo, sans-serif', marginBottom: 8, color: TEXT }}>
             Your reward is ready!
           </h2>
@@ -257,7 +257,7 @@ function RewardCard({ reward, userBalance, redeeming, onRedeem }: {
             {reward.is_new && !reward.is_hot && <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 5px', borderRadius: 20, background: 'rgba(168,85,247,0.15)', color: '#c084fc' }}>New</span>}
           </div>
           <p style={{ fontSize: 12, color: STONE, margin: 0 }}>
-            {reward.brand_name}{reward.description ? ' · ' + reward.description : ''}
+            {reward.brand_name}{reward.description ? ' Â· ' + reward.description : ''}
           </p>
           <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 700, color: accent, margin: '4px 0 0' }}>
             {reward.point_cost.toLocaleString()} coins
