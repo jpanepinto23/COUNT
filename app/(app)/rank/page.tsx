@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/lib/auth-context'
 import { getTier, getTierLabel, getTierMultiplier, getNextTierSessions } from '@/lib/points'
+import Icon from '@/components/Icon'
 
 const TIERS = [
   { key: 'bronze',   label: 'Bronze',   range: '0â29 sessions',   multiplier: '1.0x', color: '#B5593C', perks: ['Base points', '1x multiplier', 'Access to all rewards'] },
@@ -11,12 +12,12 @@ const TIERS = [
 ]
 
 const MILESTONES = [
-  { sessions: 1,   emoji: 'ð±', label: 'First Rep',      color: '#4ADE80' },
-  { sessions: 5,   emoji: 'ð¥', label: 'On Fire',        color: '#FB923C' },
-  { sessions: 10,  emoji: 'ðª', label: 'Getting Strong', color: '#B5593C' },
-  { sessions: 25,  emoji: 'ð', label: 'Dedicated',      color: '#D97706' },
-  { sessions: 50,  emoji: 'â¡', label: 'Powerhouse',     color: '#6B7280' },
-  { sessions: 100, emoji: 'ð', label: 'Legend',         color: '#7C3AED' },
+  { sessions: 1,   icon: 'Rocket', label: 'First Rep',      color: '#4ADE80' },
+  { sessions: 5,   icon: 'Flame', label: 'On Fire',        color: '#FB923C' },
+  { sessions: 10,  icon: 'Dumbbell', label: 'Getting Strong', color: '#B5593C' },
+  { sessions: 25,  icon: 'Target', label: 'Dedicated',      color: '#D97706' },
+  { sessions: 50,  icon: 'Zap', label: 'Powerhouse',     color: '#6B7280' },
+  { sessions: 100, icon: 'Crown', label: 'Legend',         color: '#7C3AED' },
 ]
 
 export default function RankPage() {
@@ -70,7 +71,7 @@ export default function RankPage() {
               className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl border"
               style={{ background: `${currentTierData.color}22`, borderColor: `${currentTierData.color}44` }}
             >
-              {tier === 'bronze' ? 'ð¥' : tier === 'silver' ? 'ð¥' : tier === 'gold' ? 'ð¥' : 'ð'}
+              {tier === 'bronze' ? <Icon emoji="Award" size={40} /> : tier === 'silver' ? <Icon emoji="Medal" size={40} /> : tier === 'gold' ? <Icon emoji="Trophy" size={40} /> : <Icon emoji="Crown" size={40} />}
             </div>
           </div>
 
@@ -93,7 +94,7 @@ export default function RankPage() {
             </div>
           ) : (
             <div className="text-sm font-semibold" style={{ color: currentTierData.color }}>
-              ð Max tier reached
+              â Max tier reached
             </div>
           )}
         </div>
@@ -157,7 +158,7 @@ export default function RankPage() {
                   className="w-10 h-10 rounded-xl flex items-center justify-center text-xl border flex-shrink-0"
                   style={{ background: `${t.color}22`, borderColor: `${t.color}44` }}
                 >
-                  {t.key === 'bronze' ? 'ð¥' : t.key === 'silver' ? 'ð¥' : t.key === 'gold' ? 'ð¥' : 'ð'}
+                  {t.key === 'bronze' ? <Icon emoji="Award" size={20} /> : t.key === 'silver' ? <Icon emoji="Medal" size={20} /> : t.key === 'gold' ? <Icon emoji="Trophy" size={20} /> : <Icon emoji="Crown" size={20} />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
@@ -197,7 +198,9 @@ export default function RankPage() {
                   opacity: earned ? 1 : 0.45,
                 }}
               >
-                <div className="text-3xl mb-2">{earned ? m.emoji : 'ð'}</div>
+                <div className="text-3xl mb-2 flex justify-center">
+                  {earned ? <Icon emoji={m.icon} size={32} /> : <Icon emoji="Lock" size={32} />}
+                </div>
                 <div className="text-[10px] font-bold tracking-wide" style={{ color: earned ? m.color : 'rgba(255,255,255,0.3)' }}>
                   {m.label}
                 </div>
@@ -215,7 +218,7 @@ export default function RankPage() {
             className="rounded-2xl p-4 border flex items-center gap-4"
             style={{ background: `${nextMilestone.color}12`, borderColor: `${nextMilestone.color}33` }}
           >
-            <div className="text-3xl">{nextMilestone.emoji}</div>
+            <div className="text-3xl flex"><Icon emoji={nextMilestone.icon} size={32} /></div>
             <div>
               <div className="text-sm font-bold text-white/90">Next: {nextMilestone.label}</div>
               <div className="text-xs text-white/50">
