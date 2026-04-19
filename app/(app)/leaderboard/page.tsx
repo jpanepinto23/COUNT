@@ -162,7 +162,7 @@ export default function LeaderboardPage() {
                           {isUser ? 'You' : e.name.split(' ')[0] + ' ' + (e.name.split(' ')[1]?.[0] ?? '') + '.'}
                         </p>
                         <p style={{ fontSize: 11, color: '#8A8478', display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <Icon emoji="Flame" size={12} /> {e.current_streak} Â· {getTierLabel(e.tier)}
+                          <Icon emoji="Flame" size={12} /> {e.current_streak} · {getTierLabel(e.tier)}
                         </p>
                       </div>
                       <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14, fontWeight: 900, color: isUser ? '#B5593C' : '#F5F0EA' }}>
