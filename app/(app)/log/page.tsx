@@ -3,31 +3,34 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { HandMetal, Dumbbell, Footprints, Bike, Zap, Activity, Flame, Pencil, TrendingUp, Medal, Trophy, Gift, Sparkles, Target, Share2, Lock, Apple, Heart, MapPin, CircleDot } from 'lucide-react'
+import Icon from '@/components/Icon'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import { calculatePoints, getTier, getTierLabel, getReferralPoints, generateMysteryBonus } from '@/lib/points'
 import type { WorkoutType, Tier } from '@/lib/types'
-const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string; emoji: string }[] = [
-  { value: 'push',      label: 'Push',      photo: '4488764', emoji: '🤜' },
-  { value: 'pull',      label: 'Pull',      photo: '6922157', emoji: '💪' },
-  { value: 'legs',      label: 'Legs',      photo: '8846443',  emoji: '🦵' },
-  { value: 'upper',     label: 'Upper',     photo: '3916766', emoji: '🏋️' },
-  { value: 'lower',     label: 'Lower',     photo: '4944435', emoji: '🚴' },
-  { value: 'full_body', label: 'Full Body', photo: '6628962', emoji: '⚡' },
-  { value: 'cardio',    label: 'Cardio',    photo: '5327545', emoji: '🏃' },
-  { value: 'hiit',      label: 'HIIT',      photo: '2261481', emoji: '🔥' },
-  { value: 'custom',    label: 'Custom',    photo: '3999606', emoji: '✏️' },
+
+const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string; icon: string }[] = [
+  { value: 'push',      label: 'Push',      photo: '4488764', icon: 'HandMetal' },
+  { value: 'pull',      label: 'Pull',      photo: '6922157', icon: 'Dumbbell' },
+  { value: 'legs',      label: 'Legs',      photo: '8846443',  icon: 'Footprints' },
+  { value: 'upper',     label: 'Upper',     photo: '3916766', icon: 'Dumbbell' },
+  { value: 'lower',     label: 'Lower',     photo: '4944435', icon: 'Bike' },
+  { value: 'full_body', label: 'Full Body', photo: '6628962', icon: 'Zap' },
+  { value: 'cardio',    label: 'Cardio',    photo: '5327545', icon: 'Activity' },
+  { value: 'hiit',      label: 'HIIT',      photo: '2261481', icon: 'Flame' },
+  { value: 'custom',    label: 'Custom',    photo: '3999606', icon: 'Pencil' },
 ]
 
 const DURATIONS = [30, 45, 60, 75, 90]
 
-const MILESTONES: Record<number, { emoji: string; title: string; message: string }> = {
-  1:   { emoji: '🌱', title: 'First session!',     message: "Every legend starts somewhere. You just took your first step." },
-  5:   { emoji: '🔥', title: '5 sessions strong!', message: "You're building a habit. Keep showing up." },
-  10:  { emoji: '💪', title: '10 sessions down!',  message: "Double digits. You're officially consistent." },
-  25:  { emoji: '🏅', title: '25 sessions!',        message: "A quarter century of workouts. You're in the top tier of commitment." },
-  50:  { emoji: '⚡', title: '50 sessions!',         message: "Fifty sessions. Most people quit at 5. You didn't." },
-  100: { emoji: '🏆', title: '100 sessions!',       message: "One hundred. You are a COUNT legend. Truly elite." },
+const MILESTONES: Record<number, { icon: string; title: string; message: string }> = {
+  1:   { icon: 'TrendingUp', title: 'First session!',     message: "Every legend starts somewhere. You just took your first step." },
+  5:   { icon: 'Flame', title: '5 sessions strong!', message: "You're building a habit. Keep showing up." },
+  10:  { icon: 'Dumbbell', title: '10 sessions down!',  message: "Double digits. You're officially consistent." },
+  25:  { icon: 'Medal', title: '25 sessions!',        message: "A quarter century of workouts. You're in the top tier of commitment." },
+  50:  { icon: 'Zap', title: '50 sessions!',         message: "Fifty sessions. Most people quit at 5. You didn't." },
+  100: { icon: 'Trophy', title: '100 sessions!',       message: "One hundred. You are a COUNT legend. Truly elite." },
 }
 
 export default function LogPage() {
@@ -223,13 +226,13 @@ export default function LogPage() {
   }
 
   const VERIFICATION_LABELS: Record<string, string> = {
-    apple_health: '🍎 Apple Health',
-    garmin:       '⌚ Garmin',
-    fitbit:       '💚 Fitbit',
-    google_fit:   '🏃 Google Fit',
-    gps:          '📍 GPS',
-    gps_denied:   '⚠️ GPS Blocked',
-    strava:       '🏊 Strava',
+    apple_health: 'Apple Health',
+    garmin:       'Garmin',
+    fitbit:       'Fitbit',
+    google_fit:   'Google Fit',
+    gps:          'GPS',
+    gps_denied:   'GPS Blocked',
+    strava:       'Strava',
   }
 
   const handleShare = async () => {
@@ -269,9 +272,10 @@ export default function LogPage() {
     ctx.lineWidth = 1
     ctx.beginPath(); ctx.moveTo(84, 238); ctx.lineTo(SIZE - 84, 238); ctx.stroke()
 
-    // Emoji
+    // Icon (drawing via canvas, using a simple placeholder)
+    // Note: For actual icon rendering, consider using SVG overlay instead
     ctx.font = '170px serif'
-    ctx.fillText(wt.emoji, 76, 474)
+    ctx.fillText('â', 76, 474)
 
     // Workout name
     ctx.fillStyle = '#F5F0EA'
@@ -320,8 +324,7 @@ export default function LogPage() {
       ctx.fillStyle = '#F5F0EA'
       ctx.font = '900 90px "JetBrains Mono", monospace'
       ctx.fillText(`${sharedStreak}`, 594, 876)
-      ctx.font = '500 68px serif'
-      ctx.fillText('ð¥', 594 + ctx.measureText(`${sharedStreak}`).width + 10, 876)
+      // Note: Fire icon would be rendered here - consider SVG overlay for better quality
     }
 
     // URL
@@ -335,7 +338,7 @@ export default function LogPage() {
       const file = new File([blob], 'count-workout.png', { type: 'image/png' })
       try {
         if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `${wt.label} Â· +${earnedPoints} pts` })
+          await navigator.share({ files: [file], title: `${wt.label} ÃÂ· +${earnedPoints} pts` })
         } else {
           const url = URL.createObjectURL(blob)
           const a = document.createElement('a')
@@ -359,14 +362,20 @@ export default function LogPage() {
         <div style={{ textAlign: 'center', width: '100%', maxWidth: 360 }}>
           {milestone && (
             <div style={{ background: 'linear-gradient(135deg, #B5593C 0%, #D97706 100%)', borderRadius: 16, padding: '20px 24px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: -20, right: -20, fontSize: 80, opacity: 0.15, lineHeight: 1 }}>{milestone.emoji}</div>
+              <div style={{ position: 'absolute', top: -20, right: -20, opacity: 0.15, lineHeight: 1 }}>
+                <Icon emoji={milestone.icon} size={80} />
+              </div>
               <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2, color: 'rgba(255,255,255,0.75)', marginBottom: 6 }}>Milestone Unlocked</p>
-              <p style={{ fontSize: 32, marginBottom: 6 }}>{milestone.emoji}</p>
+              <div style={{ fontSize: 32, marginBottom: 6 }}>
+                <Icon emoji={milestone.icon} size={32} />
+              </div>
               <p style={{ fontSize: 22, fontWeight: 900, color: '#fff', fontFamily: 'Archivo, sans-serif', marginBottom: 6 }}>{milestone.title}</p>
               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', lineHeight: 1.4 }}>{milestone.message}</p>
             </div>
           )}
-          <div style={{ fontSize: milestone ? 40 : 56, marginBottom: 12 }}>🏆</div>
+          <div style={{ marginBottom: 12 }}>
+            <Trophy size={milestone ? 40 : 56} color="#B5593C" />
+          </div>
           <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, marginBottom: 8, fontFamily: 'Archivo, sans-serif' }}>Session logged!</h2>
           <p style={{ color: 'rgba(245,240,234,0.5)', marginBottom: 20 }}>You showed up. That&apos;s what counts.</p>
           <div style={{ background: '#111110', borderRadius: 16, padding: '20px 32px', marginBottom: verificationSource ? 12 : 24, display: 'inline-block', width: '100%' }}>
@@ -375,8 +384,8 @@ export default function LogPage() {
             <p style={{ color: '#8A8478', fontSize: 12, marginTop: 4 }}>{getTierLabel(tier)} tier &middot; {multiplier}x multiplier</p>
           </div>
           {verificationSource && (
-            <div style={{ background: 'rgba(22,163,74,0.12)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 10, padding: '8px 16px', marginBottom: 20, fontSize: 12, color: '#4ade80', fontWeight: 700 }}>
-              ✓ Verified via {VERIFICATION_LABELS[verificationSource] ?? verificationSource}
+            <div style={{ background: 'rgba(22,163,74,0.12)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 10, padding: '8px 16px', marginBottom: 20, fontSize: 12, color: '#4ade80', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>â</span> Verified via {VERIFICATION_LABELS[verificationSource] ?? verificationSource}
             </div>
           )}
           {/* Mystery bonus card */}
@@ -407,14 +416,32 @@ export default function LogPage() {
                 <>
                   <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, transparent 0%, rgba(181,89,60,0.08) 50%, transparent 100%)', animation: 'shimmer 2s infinite', backgroundSize: '200% 100%' }} />
                   <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2, color: '#B5593C', marginBottom: 6 }}>Mystery Bonus</p>
-                  <p style={{ fontSize: 28, marginBottom: 4 }}>🎁</p>
+                  <div style={{ marginBottom: 4 }}>
+                    <Gift size={28} color="#B5593C" />
+                  </div>
                   <p style={{ fontSize: 13, color: 'rgba(245,240,234,0.6)', fontWeight: 600 }}>Tap to reveal your bonus coins</p>
                 </>
               ) : (
                 <>
-                  <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2, color: mysteryBonus.rarity === 'epic' ? '#A855F7' : mysteryBonus.rarity === 'rare' ? '#EAB308' : mysteryBonus.rarity === 'uncommon' ? '#B5593C' : '#8A8478', marginBottom: 6 }}>
-                    {mysteryBonus.rarity === 'epic' ? '⚡ Epic Bonus!' : mysteryBonus.rarity === 'rare' ? '✨ Rare Bonus!' : mysteryBonus.rarity === 'uncommon' ? '🎯 Nice Bonus!' : '🎁 Bonus Coins'}
-                  </p>
+                  <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2, color: mysteryBonus.rarity === 'epic' ? '#A855F7' : mysteryBonus.rarity === 'rare' ? '#EAB308' : mysteryBonus.rarity === 'uncommon' ? '#B5593C' : '#8A8478', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
+                    {mysteryBonus.rarity === 'epic' ? (
+                      <>
+                        <Zap size={14} /> Epic Bonus!
+                      </>
+                    ) : mysteryBonus.rarity === 'rare' ? (
+                      <>
+                        <Sparkles size={14} /> Rare Bonus!
+                      </>
+                    ) : mysteryBonus.rarity === 'uncommon' ? (
+                      <>
+                        <Target size={14} /> Nice Bonus!
+                      </>
+                    ) : (
+                      <>
+                        <Gift size={14} /> Bonus Coins
+                      </>
+                    )}
+                  </div>
                   <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 36, fontWeight: 900, color: mysteryBonus.rarity === 'epic' ? '#A855F7' : mysteryBonus.rarity === 'rare' ? '#EAB308' : '#B5593C', lineHeight: 1, marginBottom: 4 }}>+{mysteryBonus.amount}</p>
                   <p style={{ fontSize: 12, color: 'rgba(245,240,234,0.5)' }}>bonus coins added</p>
                 </>
@@ -423,13 +450,15 @@ export default function LogPage() {
           )}
           {/* Share card */}
           <div style={{ background: 'linear-gradient(145deg, #1C1B19 0%, #141413 100%)', border: '1px solid rgba(181,89,60,0.25)', borderRadius: 16, padding: '18px 20px', marginBottom: 14, textAlign: 'left', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', top: -24, right: -24, fontSize: 80, opacity: 0.06, lineHeight: 1, userSelect: 'none' }}>{wt.emoji}</div>
+            <div style={{ position: 'absolute', top: -24, right: -24, opacity: 0.06, lineHeight: 1, userSelect: 'none' }}>
+              <Icon emoji={wt.icon} size={80} />
+            </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
               <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 12, fontWeight: 900, letterSpacing: '0.2em', color: '#B5593C', textTransform: 'uppercase' }}>COUNT</span>
               <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#333', letterSpacing: 1, textTransform: 'uppercase' }}>make it count</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-              <span style={{ fontSize: 26 }}>{wt.emoji}</span>
+              <Icon emoji={wt.icon} size={26} />
               <div>
                 <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#555', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 2 }}>Session logged</p>
                 <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 18, fontWeight: 900, color: '#F5F0EA', lineHeight: 1 }}>{wt.label}</p>
@@ -443,37 +472,52 @@ export default function LogPage() {
               {sharedStreak > 0 && (
                 <div style={{ flex: 1, background: '#1A1A18', border: '1px solid rgba(245,240,234,0.07)', borderRadius: 10, padding: '10px 12px' }}>
                   <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#555', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3 }}>Streak</p>
-                  <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 22, fontWeight: 900, color: '#F5F0EA', lineHeight: 1 }}>{sharedStreak} 🔥</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 22, fontWeight: 900, color: '#F5F0EA', lineHeight: 1 }}>{sharedStreak}</p>
+                    <Flame size={20} color="#F5F0EA" />
+                  </div>
                 </div>
               )}
             </div>
             <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#2E2E2C', letterSpacing: 0.8, textAlign: 'center' }}>countfitness.app</p>
           </div>
-          <button onClick={handleShare} style={{ width: '100%', padding: '13px 0', background: shareCopied ? 'rgba(93,187,99,0.15)' : 'rgba(181,89,60,0.1)', border: `1.5px solid ${shareCopied? 'rgba(93,187,99,0.4)' : 'rgba(181,89,60,0.3)'}`, borderRadius: 10, color: shareCopied ? '#5DBB63' : '#B5593C', fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer', marginBottom: 10, transition: 'all 0.2s ease' }}>
-            {shareCopied ? '✓ Copied to clipboard' : '↗ Share your workout'}
+          <button onClick={handleShare} style={{ width: '100%', padding: '13px 0', background: shareCopied ? 'rgba(93,187,99,0.15)' : 'rgba(181,89,60,0.1)', border: `1.5px solid ${shareCopied? 'rgba(93,187,99,0.4)' : 'rgba(181,89,60,0.3)'}`, borderRadius: 10, color: shareCopied ? '#5DBB63' : '#B5593C', fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer', marginBottom: 10, transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            {shareCopied ? (
+              <>
+                <span>â</span> Copied to clipboard
+              </>
+            ) : (
+              <>
+                <Share2 size={16} /> Share your workout
+              </>
+            )}
           </button>
-          {/* Post-workout referral nudge — enhanced on streak milestones */}
+          {/* Post-workout referral nudge â enhanced on streak milestones */}
           {user?.referral_code && (() => {
             const isStreakMilestone = [3, 7, 14, 21, 30].includes(sharedStreak)
             return isStreakMilestone ? (
               <Link href="/invite" style={{ display: 'block', textDecoration: 'none', marginBottom: 10 }}>
                 <div style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.10) 0%, rgba(181,89,60,0.10) 100%)', border: '1.5px solid rgba(34,197,94,0.25)', borderRadius: 14, padding: '16px 18px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
                   <div style={{ position: 'absolute', top: -30, right: -30, width: 100, height: 100, borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,197,94,0.12) 0%, transparent 70%)' }} />
-                  <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2, color: '#22c55e', marginBottom: 6 }}>🔥 {sharedStreak}-day streak!</p>
+                  <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2, color: '#22c55e', marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                    <Flame size={14} /> {sharedStreak}-day streak!
+                  </div>
                   <p style={{ fontSize: 15, fontWeight: 900, color: '#F5F0EA', fontFamily: "'Archivo', sans-serif", marginBottom: 4 }}>Challenge a friend to match it</p>
                   <p style={{ fontSize: 12, color: 'rgba(245,240,234,0.5)', marginBottom: 10 }}>Invite them and you BOTH earn <span style={{ color: '#22c55e', fontWeight: 700 }}>500 bonus coins</span></p>
-                  <span style={{ display: 'inline-block', padding: '8px 20px', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.30)', borderRadius: 8, color: '#22c55e', fontSize: 13, fontWeight: 800 }}>Invite a Friend →</span>
+                  <span style={{ display: 'inline-block', padding: '8px 20px', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.30)', borderRadius: 8, color: '#22c55e', fontSize: 13, fontWeight: 800 }}>Invite a Friend â</span>
                 </div>
               </Link>
             ) : (
               <Link href="/invite" style={{ display: 'block', textDecoration: 'none', marginBottom: 10 }}>
                 <div style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.06) 0%, rgba(181,89,60,0.06) 100%)', border: '1px solid rgba(34,197,94,0.15)', borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(34,197,94,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>🤝</div>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(34,197,94,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Share2 size={18} color="#22c55e" />
+                  </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontSize: 13, fontWeight: 800, color: '#F5F0EA', marginBottom: 2 }}>Bring a friend along!</p>
                     <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.5)' }}>You both earn <span style={{ color: '#22c55e', fontWeight: 700 }}>500 bonus coins</span> when they join</p>
                   </div>
-                  <span style={{ fontSize: 16, color: 'rgba(245,240,234,0.3)', flexShrink: 0 }}>›</span>
+                  <span style={{ fontSize: 16, color: 'rgba(245,240,234,0.3)', flexShrink: 0 }}>âº</span>
                 </div>
               </Link>
             )
@@ -513,10 +557,10 @@ export default function LogPage() {
                 }}>
                   <div style={{ position: 'absolute', inset: 0, background: isSelected ? 'linear-gradient(to top, rgba(181,89,60,0.65) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0.10) 100%)' : 'linear-gradient(to top, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.20) 60%, rgba(0,0,0,0.08) 100%)', borderRadius: 10, transition: 'background 0.15s' }} />
                   {isSelected && (
-                    <div style={{ position: 'absolute', top: 6, right: 6, width: 18, height: 18, borderRadius: '50%', background: '#B5593C', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'white', fontWeight: 900, lineHeight: 1 }}>✓</div>
+                    <div style={{ position: 'absolute', top: 6, right: 6, width: 18, height: 18, borderRadius: '50%', background: '#B5593C', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'white', fontWeight: 900, lineHeight: 1 }}>â</div>
                   )}
-                  <div style={{ position: 'absolute', top: 8, left: 8 }}>
-                    <span style={{ fontSize: 20, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))' }}>{t.emoji}</span>
+                  <div style={{ position: 'absolute', top: 8, left: 8, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))' }}>
+                    <Icon emoji={t.icon} size={20} />
                   </div>
                   <span style={{ position: 'absolute', bottom: 8, left: 0, right: 0, textAlign: 'center', fontSize: 11, fontWeight: 900, color: '#FFFFFF', fontFamily: 'Archivo, sans-serif', letterSpacing: 0.5, textTransform: 'uppercase', textShadow: '0 1px 4px rgba(0,0,0,0.7)' }}>{t.label}</span>
                 </button>
@@ -528,25 +572,25 @@ export default function LogPage() {
             <input placeholder="Session name" value={customName} onChange={e => setCustomName(e.target.value)} style={{ ...inputStyle, marginBottom: 16 }} />
           )}
 
-          <button onClick={() => setStep('details')} style={btnPrimary}>Next →</button>
+          <button onClick={() => setStep('details')} style={btnPrimary}>Next â</button>
 
           <div style={{ background: '#111110', border: '1px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '14px 16px', marginTop: 12 }}>
             <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(245,240,234,0.4)', marginBottom: 10 }}>How it works</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <span>🏆</span>
-                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Earn points every session</strong> — each workout adds to your score and moves you up the leaderboard.</span>
+                <Trophy size={16} style={{ flexShrink: 0, marginTop: 2 }} color="#F5F0EA" />
+                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Earn points every session</strong> â each workout adds to your score and moves you up the leaderboard.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <span>�M</span>
+                <Dumbbell size={16} style={{ flexShrink: 0, marginTop: 2 }} color="#F5F0EA" />
                 <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Verify with a wearable</strong> (Apple Health, Garmin, Fitbit, Google Fit) to earn <strong>100% of your points</strong>.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <span>✅</span>
-                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Unverified sessions earn 10%</strong> — still worth logging, verified is always better.</span>
+                <span style={{ flexShrink: 0, marginTop: 2 }}>â</span>
+                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Unverified sessions earn 10%</strong> â still worth logging, verified is always better.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <span>⚦️</span>
+                <Lock size={16} style={{ flexShrink: 0, marginTop: 2 }} color="#F5F0EA" />
                 <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Why verify?</strong> It keeps the leaderboard fair and honest for everyone competing.</span>
               </div>
             </div>
@@ -583,9 +627,13 @@ export default function LogPage() {
               <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>{multiplier}x</span>
             </div>
             <div style={{ height: 1, background: 'rgba(245,240,234,0.08)', margin: '10px 0' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <span style={{ fontSize: 14, fontWeight: 800, color: '#F5F0EA' }}>You earn</span>
+              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 18, fontWeight: 900, color: '#B5593C' }}>{total} pts</span>
+            </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 14, fontWeight: 800, color: '#F5F0EA' }}>Verified total</span>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 18, fontWeight: 900, color: '#B5593C' }}>{verifiedPoints.total} pts</span>
+              <span style={{ fontSize: 12, color: '#22c55e' }}>Connect Strava for bonus</span>
+              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 700, color: '#22c55e' }}>+{verifiedPoints.total - total} pts</span>
             </div>
           </div>
 
@@ -599,13 +647,18 @@ export default function LogPage() {
             <div style={{ display: 'flex', gap: 8 }}>
               {[1,2,3,4,5].map(n => (
                 <button key={n} onClick={() => setEffortRating(effortRating === n ? 0 : n)} style={{
-                  flex: 1, padding: '12px 0', fontSize: 22,
+                  flex: 1, padding: '12px 0',
                   background: n <= effortRating ? 'rgba(181,89,60,0.15)' : '#1A1A18',
                   border: `1.5px solid ${n <= effortRating ? '#B5593C' : 'rgba(245,240,234,0.1)'}`,
                   borderRadius: 10, cursor: 'pointer',
                   opacity: effortRating > 0 && n > effortRating ? 0.35 : 1,
                   transition: 'all 0.15s ease',
-                }}>🔥</button>
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  <Flame size={22} color={n <= effortRating ? '#B5593C' : 'rgba(245,240,234,0.5)'} />
+                </button>
               ))}
             </div>
           </div>
@@ -629,19 +682,21 @@ export default function LogPage() {
           {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12 }}>{error}</p>}
 
           <div style={{ background: '#111110', border: '1px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '12px 14px', marginBottom: 16 }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: '#F5F0EA', marginBottom: 8 }}>🔒 Verify your workout for full points</p>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#F5F0EA', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Lock size={14} /> Verify your workout for full points
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: 'rgba(245,240,234,0.7)' }}>
-                <span>⌚</span><span><strong>Wearable</strong> — Apple Health, Garmin, Fitbit, or Google Fit</span>
+                <Activity size={14} style={{ flexShrink: 0 }} /><span><strong>Wearable</strong> â Apple Health, Garmin, Fitbit, or Google Fit</span>
               </div>
             </div>
             <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.5)', marginTop: 8, marginBottom: 0 }}>Verified sessions earn <strong>100% of your points</strong>. Unverified sessions earn <strong>10%</strong>.</p>
           </div>
 
           <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={() => setStep('type')} style={btnSecondary}>← Back</button>
+            <button onClick={() => setStep('type')} style={btnSecondary}>â Back</button>
             <button onClick={handleLog} disabled={loading} style={{ ...btnPrimary, flex: 2 }}>
-              {loading ? 'Logging...' : 'Log Session ✓'}
+              {loading ? 'Logging...' : 'Log Session â'}
             </button>
           </div>
         </>
