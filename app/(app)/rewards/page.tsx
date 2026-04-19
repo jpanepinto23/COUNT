@@ -1,9 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { useAuth } from '@/lib/auth-context'
+import { useAuth } from 'A/lib/auth-context'
 import { createClient } from '@/lib/supabase'
-import Icon from '@/components/Icon'
-import type { Reward, RewardType } from '@/lib/types'
+import Icon from 'A/components/Icon'
+import type { Reward, RewardType } from 'A/lib/types'
 import { getStreakMultiplierLabel } from '@/lib/points'
 
 const BG = '#0E0E0D'
@@ -257,7 +257,7 @@ function RewardCard({ reward, userBalance, redeeming, onRedeem }: {
             {reward.is_new && !reward.is_hot && <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 5px', borderRadius: 20, background: 'rgba(168,85,247,0.15)', color: '#c084fc' }}>New</span>}
           </div>
           <p style={{ fontSize: 12, color: STONE, margin: 0 }}>
-            {reward.brand_name}{reward.description ? ' Â· ' + reward.description : ''}
+            {reward.brand_name}{reward.description ? ' · ' + reward.description : ''}
           </p>
           <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 700, color: accent, margin: '4px 0 0' }}>
             {reward.point_cost.toLocaleString()} coins
@@ -267,7 +267,7 @@ function RewardCard({ reward, userBalance, redeeming, onRedeem }: {
           onClick={() => onRedeem(reward)}
           disabled={!canAfford || !!redeeming}
           style={{ padding: '9px 14px', background: canAfford && !redeeming ? COPPER : CARD2, color: canAfford && !redeeming ? TEXT : STONE, border: '1.5px solid ' + (canAfford && !redeeming ? 'transparent' : BORDER), borderRadius: 9, fontSize: 12, fontWeight: 800, cursor: canAfford && !redeeming ? 'pointer' : 'not-allowed', flexShrink: 0, fontFamily: 'Archivo, sans-serif', minWidth: 68 }}>
-          {isRedeeming ? '...' : canAfford ? 'Redeem' : 'Locked'}
+            {isRedeeming ? '...' : canAfford ? 'Redeem' : 'Locked'}
         </button>
       </div>
     </div>
