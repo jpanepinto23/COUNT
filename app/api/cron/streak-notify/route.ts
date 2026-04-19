@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
       await webpush.sendNotification(
         { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
         JSON.stringify({
-          title: `🔥 ${user.current_streak}-day streak at risk!`,
+          title: `${user.current_streak}-day streak at risk!`,
           body: 'Log a workout today to keep your streak alive. Tap to open COUNT.',
           url: '/home',
         }),
