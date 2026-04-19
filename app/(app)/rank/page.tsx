@@ -5,9 +5,9 @@ import { getTier, getTierLabel, getTierMultiplier, getNextTierSessions } from '@
 import Icon from '@/components/Icon'
 
 const TIERS = [
-  { key: 'bronze',   label: 'Bronze',   range: '0â29 sessions',   multiplier: '1.0x', color: '#B5593C', perks: ['Base points', '1x multiplier', 'Access to all rewards'] },
-  { key: 'silver',   label: 'Silver',   range: '30â59 sessions',  multiplier: '1.5x', color: '#6B7280', perks: ['1.5x point multiplier', 'Priority reward access', 'Streak badges'] },
-  { key: 'gold',     label: 'Gold',     range: '60â119 sessions', multiplier: '2.0x', color: '#D97706', perks: ['2.0x point multiplier', 'Exclusive gold rewards', 'Monthly bonus points'] },
+  { key: 'bronze',   label: 'Bronze',   range: '0–29 sessions',   multiplier: '1.0x', color: '#B5593C', perks: ['Base points', '1x multiplier', 'Access to all rewards'] },
+  { key: 'silver',   label: 'Silver',   range: '30–59 sessions',  multiplier: '1.5x', color: '#6B7280', perks: ['1.5x point multiplier', 'Priority reward access', 'Streak badges'] },
+  { key: 'gold',     label: 'Gold',     range: '60–119 sessions', multiplier: '2.0x', color: '#D97706', perks: ['2.0x point multiplier', 'Exclusive gold rewards', 'Monthly bonus points'] },
   { key: 'platinum', label: 'Platinum', range: '120+ sessions',   multiplier: '3.0x', color: '#7C3AED', perks: ['3.0x point multiplier', 'Platinum-only rewards', 'Top 3 leaderboard bonus'] },
 ]
 
@@ -94,7 +94,7 @@ export default function RankPage() {
             </div>
           ) : (
             <div className="text-sm font-semibold" style={{ color: currentTierData.color }}>
-              â Max tier reached
+              ✓ Max tier reached
             </div>
           )}
         </div>
@@ -171,10 +171,10 @@ export default function RankPage() {
                       </span>
                     )}
                     {isPast && (
-                      <span className="text-[10px] text-white/30">â Completed</span>
+                      <span className="text-[10px] text-white/30">✓ Completed</span>
                     )}
                   </div>
-                  <div className="text-xs text-white/40">{t.range} Â· {t.multiplier}</div>
+                  <div className="text-xs text-white/40">{t.range} · {t.multiplier}</div>
                 </div>
               </div>
             )
@@ -229,5 +229,8 @@ export default function RankPage() {
         </div>
       )}
     </div>
-  )
-}
+  
+)=
+
+
+  'window._fullB64 stored";
