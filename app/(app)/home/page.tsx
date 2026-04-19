@@ -9,6 +9,8 @@ import type { Workout, WorkoutType } from '@/lib/types'
 import { generateDailyMissions, todayDateStr, DIFFICULTY_COLORS, type Mission, type MissionContext } from '@/lib/missions'
 import TallyLogo from '@/components/TallyLogo'
 import { subscribeToPush, isPushSubscribed } from '@/lib/push'
+import { Camera, AlertTriangle, Flame, Snowflake, Bell, Dumbbell, BarChart3, Share2, PartyPopper, Trophy, Zap, Gift, Award, ShieldCheck, CircleDot } from 'lucide-react'
+import Icon from '@/components/Icon'
 
 const TIER_COLORS: Record<string, string> = {
   bronze: '#B5593C',
@@ -130,7 +132,7 @@ export default function HomePage() {
 
   async function handleShare() {
     if (navigator.share) {
-      try { await navigator.share({ title: 'Join me on COUNT', text: `Join COUNT with my code ${user?.referral_code} and we both get 500 bonus points! 💪`, url: referralLink }) } catch {}
+      try { await navigator.share({ title: 'Join me on COUNT', text: `Join COUNT with my code ${user?.referral_code} and we both get 500 bonus points!`, url: referralLink }) } catch {}
     } else {
       await navigator.clipboard.writeText(referralLink)
       setCopied(true); setTimeout(() => setCopied(false), 2000)
@@ -153,7 +155,7 @@ export default function HomePage() {
     const tier = user.tier ?? 'bronze'
     const ogUrl = `https://countfitness.app/api/og?name=${encodeURIComponent(user.name)}&tier=${tier}&streak=${user.current_streak}&sessions=${user.lifetime_sessions}&points=${user.points_balance}`
     if (navigator.share) {
-      await navigator.share({ title: 'My COUNT Stats', text: `${user.current_streak}-day streak · ${user.lifetime_sessions} sessions on COUNT 💪`, url: ogUrl })
+      await navigator.share({ title: 'My COUNT Stats', text: `${user.current_streak}-day streak Â· ${user.lifetime_sessions} sessions on COUNT`, url: ogUrl })
     } else {
       await navigator.clipboard.writeText(ogUrl)
     }
@@ -224,12 +226,12 @@ export default function HomePage() {
       {!user.avatar_url && (
         <Link href="/profile" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
           <div style={{ background: '#1A1A18', border: '1.5px solid rgba(181,89,60,0.3)', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 20 }}>📸</span>
+            <Camera size={20} color="#B5593C" />
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 13, fontWeight: 800, color: '#B5593C', marginBottom: 1 }}>Add your profile photo</p>
-              <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.45)' }}>Make COUNT yours — tap to upload a photo</p>
+              <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.45)' }}>Make COUNT yours â tap to upload a photo</p>
             </div>
-            <span style={{ color: '#C5B9AC', fontSize: 18 }}>›</span>
+            <span style={{ color: '#C5B9AC', fontSize: 18 }}>âº</span>
           </div>
         </Link>
       )}
@@ -237,21 +239,21 @@ export default function HomePage() {
       {/* Streak at risk */}
       {streakAtRisk && (
         <div style={{ background: 'rgba(249,115,22,0.12)', border: '1.5px solid rgba(249,115,22,0.4)', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-          <span style={{ fontSize: 22 }}>⚠️</span>
+          <AlertTriangle size={22} color="#C2410C" />
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 13, fontWeight: 800, color: '#C2410C', marginBottom: 1 }}>Streak at risk!</p>
-            <p style={{ fontSize: 11, color: '#9A3412' }}>Log today to keep your {user.current_streak}-day streak alive 🔥</p>
+            <p style={{ fontSize: 11, color: '#9A3412' }}>Log today to keep your {user.current_streak}-day streak alive</p>
           </div>
           <Link href="/log" style={{ textDecoration: 'none' }}>
-            <span style={{ fontSize: 12, fontWeight: 800, color: '#B5593C', whiteSpace: 'nowrap' }}>Log now →</span>
+            <span style={{ fontSize: 12, fontWeight: 800, color: '#B5593C', whiteSpace: 'nowrap' }}>Log now â</span>
           </Link>
           {isFrozen ? (
-            <p style={{ fontSize: 11, color: '#92400e', fontWeight: 700, marginTop: 8 }}>🧊 Streak frozen — safe through tonight!</p>
+            <p style={{ fontSize: 11, color: '#92400e', fontWeight: 700, marginTop: 8, display: 'flex', alignItems: 'center', gap: 4 }}><Snowflake size={13} /> Streak frozen â safe through tonight!</p>
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-              <p style={{ fontSize: 11, color: '#92400e' }}>Protect it · {FREEZE_COST} pts</p>
+              <p style={{ fontSize: 11, color: '#92400e' }}>Protect it Â· {FREEZE_COST} pts</p>
               <button onClick={handleFreezeStreak} disabled={freezing || user.points_balance < FREEZE_COST} style={{ background: '#F97316', border: 'none', borderRadius: 8, padding: '5px 12px', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', opacity: (freezing || user.points_balance < FREEZE_COST) ? 0.5 : 1 }}>
-                {freezing ? '...' : freezeSuccess ? '🧊 Done!' : '🧊 Freeze'}
+                {freezing ? '...' : freezeSuccess ? 'Done!' : 'Freeze'}
               </button>
             </div>
           )}
@@ -260,12 +262,12 @@ export default function HomePage() {
 
       {!pushEnabled && (
         <button onClick={handleEnablePush} style={{ width: '100%', background: '#1A1A18', border: '1px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, cursor: 'pointer', textAlign: 'left' }}>
-          <span style={{ fontSize: 20 }}>🔔</span>
+          <Bell size={20} color="#F5F0EA" />
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 13, fontWeight: 800, color: '#F5F0EA', marginBottom: 1 }}>Enable streak reminders</p>
             <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.5)' }}>Get notified before your streak breaks</p>
           </div>
-          <span style={{ color: 'rgba(245,240,234,0.3)', fontSize: 18 }}>›</span>
+          <span style={{ color: 'rgba(245,240,234,0.3)', fontSize: 18 }}>âº</span>
         </button>
       )}
       {/* Points card */}
@@ -277,16 +279,16 @@ export default function HomePage() {
             {user.points_balance.toLocaleString()}
           </p>
           <p style={{ color: 'rgba(245,240,234,0.55)', fontSize: 12 }}>
-            {user.points_lifetime_earned.toLocaleString()} lifetime · {getTierMultiplier(tier)}x multiplier
+            {user.points_lifetime_earned.toLocaleString()} lifetime Â· {getTierMultiplier(tier)}x multiplier
           </p>
         </div>
       </div>
 
-      {/* ── Compact week strip ── */}
+      {/* ââ Compact week strip ââ */}
       <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '10px 14px', marginBottom: 14 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 7 }}>
           <p style={{ fontSize: 10, fontWeight: 800, color: 'rgba(245,240,234,0.4)', textTransform: 'uppercase', letterSpacing: 1.5 }}>This Week</p>
-          <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fontWeight: 700, color: '#B5593C' }}>🔥 {user.current_streak} day streak</p>
+          <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fontWeight: 700, color: '#B5593C' }}><Flame size={11} style={{ display: 'inline' }} /> {user.current_streak} day streak</p>
         </div>
         <div style={{ display: 'flex', gap: 4 }}>
           {week.map((d, i) => {
@@ -303,7 +305,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── Goals row: weekly + monthly side by side ── */}
+      {/* ââ Goals row: weekly + monthly side by side ââ */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
         {/* Weekly goal */}
         <div style={{ background: weekSessionCount >= WEEKLY_GOAL ? '#F0FDF4' : '#111110', border: 'none', borderRadius: 14, padding: '14px 14px' }}>
@@ -316,7 +318,7 @@ export default function HomePage() {
             <div style={{ height: '100%', width: `${Math.min((weekSessionCount / WEEKLY_GOAL) * 100, 100)}%`, background: weekSessionCount >= WEEKLY_GOAL ? '#16a34a' : tierColor, borderRadius: 99 }} />
           </div>
           <p style={{ fontSize: 9, fontWeight: 700, color: weekSessionCount >= WEEKLY_GOAL ? '#16a34a' : 'rgba(245,240,234,0.4)' }}>
-            {weekSessionCount >= WEEKLY_GOAL ? '🎉 Done!' : `${WEEKLY_GOAL - weekSessionCount} sessions to go`}
+            {weekSessionCount >= WEEKLY_GOAL ? 'Done!' : `${WEEKLY_GOAL - weekSessionCount} sessions to go`}
           </p>
         </div>
 
@@ -331,12 +333,12 @@ export default function HomePage() {
             <div style={{ height: '100%', width: `${Math.min((monthlyCount / MONTHLY_GOAL) * 100, 100)}%`, background: monthlyCount >= MONTHLY_GOAL ? '#16a34a' : tierColor, borderRadius: 99 }} />
           </div>
           <p style={{ fontSize: 9, fontWeight: 700, color: daysLeft <= 5 && monthlyCount < MONTHLY_GOAL ? '#C2410C' : monthlyCount >= MONTHLY_GOAL ? '#16a34a' : tierColor + 'CC' }}>
-            {monthlyCount >= MONTHLY_GOAL ? '🏆 Crushed!' : daysLeft <= 5 ? `⚡ ${daysLeft}d left!` : `${MONTHLY_GOAL - monthlyCount} to go`}
+            {monthlyCount >= MONTHLY_GOAL ? 'Crushed!' : daysLeft <= 5 ? `${daysLeft}d left!` : `${MONTHLY_GOAL - monthlyCount} to go`}
           </p>
         </div>
       </div>
 
-      {/* ── Daily Missions ── */}
+      {/* ââ Daily Missions ââ */}
       {missions.length > 0 && (
         <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
@@ -361,7 +363,7 @@ export default function HomePage() {
                   opacity: isClaimed ? 0.6 : 1,
                   transition: 'all 0.3s ease',
                 }}>
-                  <span style={{ fontSize: 24, flexShrink: 0 }}>{isClaimed ? '✅' : mission.emoji}</span>
+                  <span style={{ flexShrink: 0 }}>{isClaimed ? <ShieldCheck size={24} color="#22c55e" /> : <Icon emoji={mission.icon} size={24} color={dc.text} />}</span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
                       <p style={{ fontSize: 13, fontWeight: 800, color: isClaimed ? '#22c55e' : '#F5F0EA' }}>
@@ -403,10 +405,10 @@ export default function HomePage() {
                           opacity: isClaiming ? 0.6 : 1,
                         }}
                       >
-                        {isClaiming ? '...' : `+${mission.reward} 🪙`}
+                        {isClaiming ? '...' : `+${mission.reward}`}
                       </button>
                     ) : (
-                      <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 700, color: 'rgba(245,240,234,0.2)' }}>{mission.reward} 🪙</p>
+                      <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 700, color: 'rgba(245,240,234,0.2)' }}>{mission.reward} pts</p>
                     )}
                   </div>
                 </div>
@@ -416,7 +418,7 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* ── Rank card — dark ── */}
+      {/* ââ Rank card â dark ââ */}
       {userRank !== null && (
         <Link href="/leaderboard" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
           <div style={{ background: '#111110', borderRadius: 16, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -434,11 +436,11 @@ export default function HomePage() {
                   <div style={{ height: 4, background: 'rgba(245,240,234,0.1)', borderRadius: 99, overflow: 'hidden', marginBottom: 6 }}>
                     <div style={{ height: '100%', width: `${Math.max(4, 100 - Math.min((pointsToPassAbove / Math.max(user.points_lifetime_earned, 1)) * 200, 94))}%`, background: tierColor, borderRadius: 99 }} />
                   </div>
-                  <p style={{ fontSize: 9, color: 'rgba(245,240,234,0.3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>Tap to view leaderboard →</p>
+                  <p style={{ fontSize: 9, color: 'rgba(245,240,234,0.3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>Tap to view leaderboard â</p>
                 </>
               ) : (
                 <>
-                  <p style={{ fontSize: 20, marginBottom: 2 }}>🥇</p>
+                  <Award size={20} color="#D97706" style={{ marginBottom: 2 }} />
                   <p style={{ fontSize: 13, fontWeight: 800, color: '#F5F0EA' }}>You&apos;re #1!</p>
                   <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.4)' }}>Keep it up</p>
                 </>
@@ -448,11 +450,11 @@ export default function HomePage() {
         </Link>
       )}
 
-      {/* ── Next reward — warm gradient ── */}
+      {/* ââ Next reward â warm gradient ââ */}
       {nextReward && (
         <Link href="/rewards" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
           <div style={{ background: `linear-gradient(135deg, ${tierColor} 0%, #C2410C 100%)`, borderRadius: 16, padding: '18px 20px', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', top: -16, right: -12, fontSize: 90, opacity: 0.1, lineHeight: 1, transform: 'rotate(15deg)' }}>🎁</div>
+            <Gift size={90} color="#fff" style={{ position: 'absolute', top: -16, right: -12, opacity: 0.1, transform: 'rotate(15deg)' }} />
             <p style={{ fontSize: 9, fontWeight: 800, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6 }}>Next Reward</p>
             <p style={{ fontSize: 18, fontWeight: 900, color: '#fff', fontFamily: 'Archivo, sans-serif', marginBottom: 10, position: 'relative' }}>{nextReward.name}</p>
             <div style={{ height: 5, background: 'rgba(255,255,255,0.2)', borderRadius: 99, overflow: 'hidden', marginBottom: 8 }}>
@@ -472,11 +474,11 @@ export default function HomePage() {
         </Link>
       )}
 
-      {/* ── Tier progress ── */}
+      {/* ââ Tier progress ââ */}
       <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <p style={{ fontSize: 10, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5 }}>Tier Progress</p>
-          <Link href="/rank" style={{ fontSize: 11, color: tierColor, fontWeight: 700, textDecoration: 'none' }}>View rank ›</Link>
+          <Link href="/rank" style={{ fontSize: 11, color: tierColor, fontWeight: 700, textDecoration: 'none' }}>View rank âº</Link>
         </div>
         <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
           <StatCard label="Sessions" value={user.lifetime_sessions} unit="total" accent={tierColor} />
@@ -493,14 +495,14 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* Referral — enhanced CTA */}
+      {/* Referral â enhanced CTA */}
       {user.referral_code && (
         <div style={{ background: 'linear-gradient(135deg, #1C1209 0%, #111110 40%, #0E0E0D 100%)', border: '1.5px solid rgba(181,89,60,0.25)', borderRadius: 18, padding: '20px 18px', marginBottom: 14, position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: -40, right: -40, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,89,60,0.20) 0%, transparent 70%)' }} />
           <div style={{ position: 'absolute', bottom: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,89,60,0.10) 0%, transparent 70%)' }} />
           <div style={{ position: 'relative', zIndex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-              <div style={{ width: 38, height: 38, borderRadius: 12, background: 'rgba(181,89,60,0.15)', border: '1.5px solid rgba(181,89,60,0.30)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🤝</div>
+              <div style={{ width: 38, height: 38, borderRadius: 12, background: 'rgba(181,89,60,0.15)', border: '1.5px solid rgba(181,89,60,0.30)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Share2 size={20} color="#B5593C" /></div>
               <div>
                 <p style={{ fontSize: 15, fontWeight: 900, color: '#F5F0EA', fontFamily: "'Archivo', sans-serif", lineHeight: 1.1 }}>Invite a Friend</p>
                 <p style={{ fontSize: 11, color: '#B5593C', fontWeight: 700 }}>You BOTH earn bonus coins</p>
@@ -515,15 +517,15 @@ export default function HomePage() {
             </div>
             {referralCount > 0 && (
               <p style={{ fontSize: 11, color: '#8A8478', textAlign: 'center', marginBottom: 10 }}>
-                {referralCount} friend{referralCount !== 1 ? 's' : ''} joined so far — keep going!
+                {referralCount} friend{referralCount !== 1 ? 's' : ''} joined so far â keep going!
               </p>
             )}
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={handleShare} style={{ flex: 1, padding: '13px', background: 'linear-gradient(135deg, #B5593C 0%, #D4734F 100%)', color: '#F5F0EA', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: "'Archivo', sans-serif" }}>
-                {copied ? '✓ Copied!' : 'Share Invite Link'}
+                {copied ? 'â Copied!' : 'Share Invite Link'}
               </button>
               <Link href="/invite" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '13px 16px', background: 'rgba(181,89,60,0.12)', border: '1.5px solid rgba(181,89,60,0.25)', borderRadius: 12, color: '#B5593C', fontSize: 13, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                Details →
+                Details â
               </Link>
             </div>
           </div>
@@ -534,11 +536,11 @@ export default function HomePage() {
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <p style={{ fontSize: 10, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5 }}>Recent</p>
-          <Link href="/log" style={{ fontSize: 11, color: '#B5593C', fontWeight: 700, textDecoration: 'none' }}>Log workout ›</Link>
+          <Link href="/log" style={{ fontSize: 11, color: '#B5593C', fontWeight: 700, textDecoration: 'none' }}>Log workout âº</Link>
         </div>
         {recentWorkouts.length === 0 ? (
           <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '20px', textAlign: 'center' }}>
-            <p style={{ fontSize: 32, marginBottom: 6 }}>🏋️</p>
+            <Dumbbell size={32} color="#8A8478" style={{ marginBottom: 6 }} />
             <p style={{ fontSize: 14, fontWeight: 800, color: '#F5F0EA', marginBottom: 4 }}>No workouts yet</p>
             <p style={{ fontSize: 12, color: '#8A8478' }}>Log your first session to start earning points</p>
           </div>
@@ -551,7 +553,7 @@ export default function HomePage() {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontSize: 13, fontWeight: 800, color: '#F5F0EA', marginBottom: 1 }}>{w.custom_name || w.type.replace('_', ' ')}</p>
-                  <p style={{ fontSize: 11, color: '#8A8478' }}>{formatDate(w.logged_at)} · {w.duration_minutes}min</p>
+                  <p style={{ fontSize: 11, color: '#8A8478' }}>{formatDate(w.logged_at)} Â· {w.duration_minutes}min</p>
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
                   <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 900, color: tierColor }}>+{w.total_points_earned}</p>
@@ -564,12 +566,12 @@ export default function HomePage() {
       </div>
       {/* Share stats */}
       <button onClick={handleShareStats} style={{ width: '100%', background: 'linear-gradient(135deg, #111110 0%, #1e1e1c 100%)', border: '1.5px solid #333', borderRadius: 14, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', marginTop: 6 }}>
-        <span style={{ fontSize: 24 }}>📊</span>
+        <BarChart3 size={24} color="#B5593C" />
         <div style={{ flex: 1, textAlign: 'left' }}>
           <p style={{ fontSize: 14, fontWeight: 800, color: '#F5F0EA', fontFamily: 'Archivo, sans-serif', marginBottom: 2 }}>Share your stats</p>
           <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.45)' }}>Show off your streak &amp; progress</p>
         </div>
-        <span style={{ fontSize: 18, color: 'rgba(245,240,234,0.3)' }}>›</span>
+        <span style={{ fontSize: 18, color: 'rgba(245,240,234,0.3)' }}>âº</span>
       </button>
 
     </div>
