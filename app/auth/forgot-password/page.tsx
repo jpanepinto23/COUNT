@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
+import Icon from '@/components/Icon'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -25,7 +26,9 @@ export default function ForgotPasswordPage() {
       <div style={{ width: '100%', maxWidth: 380 }}>
         {sent ? (
           <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: 40, marginBottom: 16 }}>📬</p>
+            <div style={{ fontSize: 40, marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+              <Icon emoji="Mail" size={48} />
+            </div>
             <h2 style={{ fontSize: 22, fontWeight: 900, marginBottom: 8, fontFamily: 'Archivo, sans-serif' }}>Check your email</h2>
             <p style={{ color: '#8A8478', marginBottom: 24 }}>We sent a reset link to <strong>{email}</strong></p>
             <Link href="/auth/login" style={{ color: '#B5593C', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>← Back to login</Link>
