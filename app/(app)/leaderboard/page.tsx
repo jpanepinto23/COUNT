@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import { getTierLabel } from '@/lib/points'
+import Icon from '@/components/Icon'
 import type { LeaderboardEntry } from '@/lib/types'
 
 const TIER_COLORS: Record<string, string> = {
   bronze: '#B5593C', silver: '#6B7280', gold: '#D97706', platinum: '#7C3AED',
 }
 
-const CROWN = ['👑', '🥈', '🥉']
+const CROWN_ICONS = ['Trophy', 'Medal', 'Medal']
 
 export default function LeaderboardPage() {
   const { user } = useAuth()
@@ -81,7 +82,9 @@ export default function LeaderboardPage() {
         <div style={{ textAlign: 'center', padding: 60, color: '#8A8478' }}>Loading...</div>
       ) : entries.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 24px' }}>
-          <p style={{ fontSize: 48, marginBottom: 12 }}>🏆</p>
+          <div style={{ fontSize: 48, marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
+            <Icon emoji="Trophy" size={48} />
+          </div>
           <p style={{ fontWeight: 800, color: '#F5F0EA', marginBottom: 6 }}>No entries yet</p>
           <p style={{ color: '#8A8478', fontSize: 14 }}>Be the first to log a session this month!</p>
         </div>
@@ -112,7 +115,9 @@ export default function LeaderboardPage() {
                         position: 'relative',
                       }}>
                         {isUser && <div style={{ position: 'absolute', top: 6, right: 6, width: 7, height: 7, borderRadius: '50%', background: '#B5593C' }} />}
-                        <div style={{ fontSize: isFirst ? 28 : 20, marginBottom: 6 }}>{CROWN[e.rank - 1]}</div>
+                        <div style={{ fontSize: isFirst ? 28 : 20, marginBottom: 6, display: 'flex', justifyContent: 'center' }}>
+                          <Icon emoji={CROWN_ICONS[e.rank - 1]} size={isFirst ? 32 : 24} />
+                        </div>
                         <p style={{ fontSize: 12, fontWeight: 800, color: '#F5F0EA', marginBottom: 2 }}>
                           {isUser ? 'You' : e.name.split(' ')[0]}
                         </p>
@@ -156,7 +161,9 @@ export default function LeaderboardPage() {
                         <p style={{ fontSize: 14, fontWeight: 700, color: isUser ? '#B5593C' : '#F5F0EA' }}>
                           {isUser ? 'You' : e.name.split(' ')[0] + ' ' + (e.name.split(' ')[1]?.[0] ?? '') + '.'}
                         </p>
-                        <p style={{ fontSize: 11, color: '#8A8478' }}>🔥 {e.current_streak} · {getTierLabel(e.tier)}</p>
+                        <p style={{ fontSize: 11, color: '#8A8478', display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <Icon emoji="Flame" size={12} /> {e.current_streak} Â· {getTierLabel(e.tier)}
+                        </p>
                       </div>
                       <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14, fontWeight: 900, color: isUser ? '#B5593C' : '#F5F0EA' }}>
                         {e.points_earned_this_month.toLocaleString()}
