@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     if (reward_type === 'discount_code' && fulfillment_value) {
       adminFulfillmentHtml = `
         <p style="font-family:sans-serif;color:#16a34a;font-weight:bold">
-          ✅ Auto-fulfilled — promo code sent to user automatically.
+          Auto-fulfilled \u2014 promo code sent to user automatically.
         </p>
         <p style="font-family:sans-serif">Code: <strong>${fulfillment_value}</strong></p>
       `
@@ -79,18 +79,18 @@ export async function POST(req: NextRequest) {
     } else if (reward_type === 'affiliate_link' && affiliate_url) {
       adminFulfillmentHtml = `
         <p style="font-family:sans-serif;color:#16a34a;font-weight:bold">
-          ✅ Auto-fulfilled — affiliate link sent to user automatically.
+          Auto-fulfilled \u2014 affiliate link sent to user automatically.
         </p>
       `
       userFulfillmentHtml = `
         <div style="margin:24px 0;text-align:center">
           <a href="${affiliate_url}" target="_blank"
             style="background:#111110;color:white;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:bold;font-size:15px;display:inline-block">
-            Claim Your ${brand_name} Reward →
+            Claim Your ${brand_name} Reward \u2192
           </a>
         </div>
         <p style="font-family:sans-serif;color:#666;font-size:13px;text-align:center">
-          This is your exclusive link — use it to access your reward on ${brand_name}'s site.
+          This is your exclusive link \u2014 use it to access your reward on ${brand_name}'s site.
         </p>
       `
     } else {
@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
     // 4. Admin notification
     await sendEmail(
       'jpanepinto23@gmail.com',
-      `${isAutoFulfilled ? '✅ Auto-fulfilled' : '🎁 Action needed'}: ${product_name} for ${user_name}`,
+      `${isAutoFulfilled ? 'Auto-fulfilled' : 'Action needed'}: ${product_name} for ${user_name}`,
       `
         <h2 style="font-family:sans-serif">${isAutoFulfilled ? 'Auto-Fulfilled Redemption' : 'New Gift Card Redemption'}</h2>
         <p style="font-family:sans-serif">
@@ -138,10 +138,10 @@ export async function POST(req: NextRequest) {
 
     // 5. User confirmation
     const userSubject = reward_type === 'discount_code'
-      ? `Your ${brand_name} promo code is here! 🎉`
+      ? `Your ${brand_name} promo code is here!`
       : reward_type === 'affiliate_link'
-      ? `Your ${brand_name} reward is ready! 🎉`
-      : `Your ${product_name} gift card is on its way! 🎉`
+      ? `Your ${brand_name} reward is ready!`
+      : `Your ${product_name} gift card is on its way!`
 
     await sendEmail(
       user_email,
@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
       `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
           <h2 style="color:#B5593C">
-            ${reward_type === 'gift_card' ? 'Your gift card is coming' : 'Your reward is ready'}, ${user_name}! 🎁
+            ${reward_type === 'gift_card' ? 'Your gift card is coming' : 'Your reward is ready'}, ${user_name}!
           </h2>
           <p>You redeemed <strong>${points_spent.toLocaleString()} pts</strong> for
           <strong>${product_name}</strong> from <strong>${brand_name}</strong>.</p>
