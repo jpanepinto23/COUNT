@@ -75,9 +75,9 @@ export async function GET(req: NextRequest) {
         {/* Stats row */}
         <div style={{ display: 'flex', gap: 16, flex: 1 }}>
           {[
-            { label: '🔥 Day Streak', value: streak,     accent: '#F5F0EA' },
-            { label: '💪 Sessions',   value: sessions,   accent: '#F5F0EA' },
-            { label: '💰 Points',     value: ptsDisplay, accent: color     },
+            { label: 'Day Streak', value: streak,     accent: '#F5F0EA' },
+            { label: 'Sessions',   value: sessions,   accent: '#F5F0EA' },
+            { label: 'Points',     value: ptsDisplay, accent: color     },
           ].map(stat => (
             <div
               key={stat.label}
