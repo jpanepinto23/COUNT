@@ -9,7 +9,7 @@ export interface Mission {
   key: string           // unique per day, e.g. "2026-04-14_log_workout"
   title: string
   description: string
-  emoji: string
+  icon: string
   difficulty: MissionDifficulty
   reward: number        // bonus coins
   completed: boolean
@@ -20,7 +20,7 @@ interface MissionTemplate {
   id: string
   title: string
   description: string
-  emoji: string
+  icon: string
   difficulty: MissionDifficulty
   reward: number
   check: (ctx: MissionContext) => boolean
@@ -65,7 +65,7 @@ function getMissionTemplates(targetType: WorkoutType): MissionTemplate[] {
       id: 'log_workout',
       title: 'Show Up',
       description: 'Log any workout today',
-      emoji: '💪',
+      icon: 'Dumbbell',
       difficulty: 'easy',
       reward: 20,
       check: (ctx) => ctx.hasLoggedToday,
@@ -74,7 +74,7 @@ function getMissionTemplates(targetType: WorkoutType): MissionTemplate[] {
       id: `log_${targetType}`,
       title: `${WORKOUT_LABELS[targetType]} Day`,
       description: `Log a ${WORKOUT_LABELS[targetType]} workout`,
-      emoji: '🎯',
+      icon: 'Target',
       difficulty: 'easy',
       reward: 25,
       check: (ctx) => ctx.todayWorkoutType === targetType,
@@ -84,7 +84,7 @@ function getMissionTemplates(targetType: WorkoutType): MissionTemplate[] {
       id: 'verified_session',
       title: 'Prove It',
       description: 'Log a verified workout',
-      emoji: '✅',
+      icon: 'ShieldCheck',
       difficulty: 'medium',
       reward: 50,
       check: (ctx) => ctx.todayVerified,
@@ -93,7 +93,7 @@ function getMissionTemplates(targetType: WorkoutType): MissionTemplate[] {
       id: 'high_effort',
       title: 'Go Hard',
       description: 'Rate your effort 4+ out of 5',
-      emoji: '🔥',
+      icon: 'Flame',
       difficulty: 'medium',
       reward: 40,
       check: (ctx) => ctx.todayEffort >= 4,
@@ -102,7 +102,7 @@ function getMissionTemplates(targetType: WorkoutType): MissionTemplate[] {
       id: 'earn_300',
       title: 'Big Earner',
       description: 'Earn 300+ points in one session',
-      emoji: '💰',
+      icon: 'Coins',
       difficulty: 'medium',
       reward: 50,
       check: (ctx) => ctx.todayPoints >= 300,
@@ -111,7 +111,7 @@ function getMissionTemplates(targetType: WorkoutType): MissionTemplate[] {
       id: 'week_3',
       title: 'Midweek Push',
       description: 'Hit 3 workouts this week',
-      emoji: '📅',
+      icon: 'CalendarDays',
       difficulty: 'medium',
       reward: 45,
       check: (ctx) => ctx.weekSessionCount >= 3,
@@ -121,7 +121,7 @@ function getMissionTemplates(targetType: WorkoutType): MissionTemplate[] {
       id: 'streak_7',
       title: 'Week Warrior',
       description: 'Reach a 7-day streak',
-      emoji: '⚡',
+      icon: 'Zap',
       difficulty: 'hard',
       reward: 100,
       check: (ctx) => ctx.currentStreak >= 7,
@@ -130,7 +130,7 @@ function getMissionTemplates(targetType: WorkoutType): MissionTemplate[] {
       id: 'streak_14',
       title: 'Unstoppable',
       description: 'Reach a 14-day streak',
-      emoji: '🏆',
+      icon: 'Trophy',
       difficulty: 'hard',
       reward: 120,
       check: (ctx) => ctx.currentStreak >= 14,
@@ -139,7 +139,7 @@ function getMissionTemplates(targetType: WorkoutType): MissionTemplate[] {
       id: 'week_5',
       title: 'Five-a-Week',
       description: 'Log 5 workouts this week',
-      emoji: '👑',
+      icon: 'Crown',
       difficulty: 'hard',
       reward: 80,
       check: (ctx) => ctx.weekSessionCount >= 5,
@@ -148,7 +148,7 @@ function getMissionTemplates(targetType: WorkoutType): MissionTemplate[] {
       id: 'earn_500',
       title: 'Point Machine',
       description: 'Earn 500+ points in one session',
-      emoji: '🚀',
+      icon: 'Rocket',
       difficulty: 'hard',
       reward: 100,
       check: (ctx) => ctx.todayPoints >= 500,
@@ -190,7 +190,7 @@ export function generateDailyMissions(
       key,
       title: template.title,
       description: template.description,
-      emoji: template.emoji,
+      icon: template.icon,
       difficulty: template.difficulty,
       reward: template.reward,
       completed: template.check(context),
