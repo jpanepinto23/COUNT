@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
-import { getTierLabel, getTierMultiplier } from '@/lib/points'
+import { getTierLabel, getTierMultiplier } from 'A/lib/points'
 import Icon from '@/components/Icon'
 import type { Redemption } from '@/lib/types'
 
@@ -71,7 +71,7 @@ export default function ProfilePage() {
         .then(({ data }) => { if (data) setDevices(data) })
     }
     if (params.get('error')) {
-      setConnectMessage({ text: 'Connection failed â please try again.', ok: false })
+      setConnectMessage({ text: 'Connection failed — please try again.', ok: false })
       window.history.replaceState({}, '', '/profile')
     }
   }, [user?.id]) // eslint-disable-line
@@ -163,7 +163,7 @@ export default function ProfilePage() {
             {avatarUrl ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 24, fontWeight: 900, color: tierColor }}>{user.name.charAt(0).toUpperCase()}</span>}
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 22, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <span style={{ color: '#fff', fontSize: 8, fontWeight: 800, letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 3 }}>
-                {uploadingAvatar ? 'â â¦' : <><Icon emoji="Camera" size={12} /> EDIT</>}
+                {uploadingAvatar ? '↑ …' : <><Icon emoji="Camera" size={12} /> EDIT</>}
               </span>
             </div>
             <input ref={avatarInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarUpload} />
@@ -217,9 +217,9 @@ export default function ProfilePage() {
           }} style={{ fontSize: 12, color: '#B5593C', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px' }}>Edit</button>
         </div>
         <div style={{ display: 'flex', gap: 20 }}>
-          {(() => { const age = localAge !== undefined ? localAge : u.age; return age ? <StatInline label="Age" value={`${age} yr`} /> : <StatInline label="Age" value="â" /> })()}
-          {(() => { const h = localHeight !== undefined ? localHeight : u.height; return h != null ? <StatInline label="Height" value={`${Math.floor(h)}'${Math.round((h % 1) * 12)}"`} /> : <StatInline label="Height" value="â" /> })()}
-          {(() => { const w = localWeight !== undefined ? localWeight : u.weight; return w ? <StatInline label="Weight" value={`${w} lbs`} /> : <StatInline label="Weight" value="â" /> })()}
+          {(() => { const age = localAge !== undefined ? localAge : u.age; return age ? <StatInline label="Age" value={`${age} yr`} /> : <StatInline label="Age" value="—" /> })()}
+          {(() => { const h = localHeight !== undefined ? localHeight : u.height; return h != null ? <StatInline label="Height" value={`${Math.floor(h)}'${Math.round((h % 1) * 12)}"`} /> : <StatInline label="Height" value="—" /> })()}
+          {(() => { const w = localWeight !== undefined ? localWeight : u.weight; return w ? <StatInline label="Weight" value={`${w} lbs`} /> : <StatInline label="Weight" value="—" /> })()}
         </div>
       </div>
 
@@ -242,10 +242,10 @@ export default function ProfilePage() {
                   <span style={{ display: 'flex' }}><Icon emoji={info.icon} size={22} /></span>
                   <div>
                     <p style={{ fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>{info.label}</p>
-                    <p style={{ fontSize: 11, color: '#8A8478' }}>{isConnected ? 'Connected â workouts auto-verified' : 'Tap to connect'}</p>
+                    <p style={{ fontSize: 11, color: '#8A8478' }}>{isConnected ? 'Connected — workouts auto-verified' : 'Tap to connect'}</p>
                   </div>
                 </div>
-                {isConnected ? (
+                { isConnected ? (
                   <button onClick={() => handleDisconnect(type)} disabled={isLoading} style={{ fontSize: 11, fontWeight: 700, color: '#f87171', background: 'transparent', border: '1px solid rgba(252,165,165,0.3)', borderRadius: 6, padding: '5px 10px', cursor: 'pointer', opacity: isLoading ? 0.5 : 1 }}>
                     {isLoading ? '...' : 'Disconnect'}
                   </button>
@@ -256,13 +256,13 @@ export default function ProfilePage() {
                 )}
               </div>
             )
-          })}
+          }}
         </div>
         <div style={{ marginTop: 10, padding: '10px 14px', borderRadius: 12, background: 'rgba(22,163,74,0.10)', border: '1.5px solid rgba(34,197,94,0.25)', display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ display: 'flex' }}><Icon emoji="MapPin" size={20} /></span>
           <div>
             <p style={{ fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>GPS Check-in</p>
-            <p style={{ fontSize: 11, color: '#8A8478' }}>Always active â auto-used when logging</p>
+            <p style={{ fontSize: 11, color: '#8A8478' }}>Always active — auto-used when logging</p>
           </div>
         </div>
       </div>
@@ -345,39 +345,28 @@ export default function ProfilePage() {
         </div>
       )}
     </div>
-  )
-}
+  
+  
+  
+�A5��A��T�H�S�S��T�ۜ�[�[[�]��XX�������\�Y\�H�^�K\�^N�	؛�����Y�	�L	I�X\��[���
+�Y[�Έ	�LL�	��ܙ\��	�K�\��Y�ؘJ�
+K����L�I���ܙ\��Y]\Έ�۝�^�N�MK�۝�[Z[N�	ҙ]��Z[��[ۛ�[ۛ��X�I���۝�ZY��
+��X��ܛ�[��	��PLPLN	���܎�	�эQ�PI��B���[��[ۈ�]�\�
+�X�[�[YK[�]X��[�N��X�[���[����[YN���[���[X�\��[�]���[���X��[�Έ��[��JH�]\��
+�]��[O^���X��ܛ�[��	��LLLLL	��ܙ\��	�K�\��Y�ؘJ�
+K����
+I��ܙ\��Y]\ΈL�Y[�Έ	�L�L	�^[Yێ�	��[�\��_O���[O^���۝�^�N�K�۝�ZY����܎�	��N
 
-const modalInput: React.CSSProperties = {
-  flex: 1, display: 'block', width: '100%', marginTop: 4,
-  padding: '10px 12px', border: '1.5px solid rgba(245,240,234,0.12)',
-  borderRadius: 8, fontSize: 15, fontFamily: 'JetBrains Mono, monospace',
-  fontWeight: 700, background: '#1A1A18', color: '#F5F0EA',
-}
+�	�^�[�ٛܛN�	�\\��\�I�]\��X�[�ΈKX\��[����N�
+_O��X�[O����[O^���۝�[Z[N�	ҙ]��Z[��[ۛ�[ۛ��X�I��۝�^�N�M��۝�ZY��L��܎�X��[���	�эQ�PI�[�RZY��H_O�ݘ[Y_O����[O^���۝�^�N�K��܎�	��N
 
-function StatCard({ label, value, unit, accent }: { label: string; value: string | number; unit: string; accent?: string }) {
-  return (
-    <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '12px 10px', textAlign: 'center' }}>
-      <p style={{ fontSize: 9, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>{label}</p>
-      <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 16, fontWeight: 900, color: accent ?? '#F5F0EA', lineHeight: 1 }}>{value}</p>
-      <p style={{ fontSize: 9, color: '#8A8478', marginTop: 3 }}>{unit}</p>
-    </div>
-  )
-}
+�	�X\��[����_O��[�]O����]���
+B�B���[��[ۈ�][�[�J�X�[�[YHN��X�[���[����[YN���[��JH�]\��
+�]����[O^���۝�^�N�L�۝�ZY��
+���܎�	��N
 
-function StatInline({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p style={{ fontSize: 10, fontWeight: 700, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 2 }}>{label}</p>
-      <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14, fontWeight: 900, color: '#F5F0EA' }}>{value}</p>
-    </div>
-  )
-}
-
-function TierStar({ color }: { color: string }) {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill={color}>
-      <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-    </svg>
-  )
-}
+�	�^�[�ٛܛN�	�\\��\�I�]\��X�[�ΈKX\��[����N��_O��X�[O����[O^���۝�[Z[N�	ҙ]��Z[��[ۛ�[ۛ��X�I��۝�^�N�M�۝�ZY��L��܎�	�эQ�PI�_O�ݘ[Y_O����]���
+B�B���[��[ۈY\��\����܈N����܎���[��JH�]\��
+�ݙ��YH�M�ZY�H�M��Y]Л�H�����[^���ܟO���Y�ۈ�[��H�L��MK�K�����K���M�M�MN�N�K��L�Mˍ��
+K���K��
+�M�M�K����LK����ς��ݙς�������������������������������������������������������������������������������������������
