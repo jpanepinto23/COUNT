@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import { getTierLabel, getTierMultiplier } from '@/lib/points'
+import Icon from '@/components/Icon'
 import type { Redemption } from '@/lib/types'
 
 const TIER_COLORS: Record<string, string> = {
@@ -14,11 +15,11 @@ const TIER_COLORS: Record<string, string> = {
   platinum: '#7C3AED',
 }
 
-const DEVICE_INFO: Record<string, { label: string; emoji: string; provider: string }> = {
-  strava:     { label: 'Strava',             emoji: '🏊', provider: 'STRAVA' },
-  google_fit: { label: 'Google Fit',         emoji: '🏃', provider: 'GOOGLE' },
-  gps:        { label: 'GPS Check-in',       emoji: '📍', provider: '' },
-  photo:      { label: 'Photo Verification', emoji: '📸', provider: '' },
+const DEVICE_INFO: Record<string, { label: string; icon: string; provider: string }> = {
+  strava:     { label: 'Strava',             icon: 'Activity', provider: 'STRAVA' },
+  google_fit: { label: 'Google Fit',         icon: 'Activity', provider: 'GOOGLE' },
+  gps:        { label: 'GPS Check-in',       icon: 'MapPin', provider: '' },
+  photo:      { label: 'Photo Verification', icon: 'Camera', provider: '' },
 }
 
 export default function ProfilePage() {
@@ -70,7 +71,7 @@ export default function ProfilePage() {
         .then(({ data }) => { if (data) setDevices(data) })
     }
     if (params.get('error')) {
-      setConnectMessage({ text: 'Connection failed — please try again.', ok: false })
+      setConnectMessage({ text: 'Connection failed â please try again.', ok: false })
       window.history.replaceState({}, '', '/profile')
     }
   }, [user?.id]) // eslint-disable-line
@@ -161,7 +162,9 @@ export default function ProfilePage() {
           <div onClick={() => avatarInputRef.current?.click()} title="Tap to change photo" style={{ width: 68, height: 68, borderRadius: '50%', flexShrink: 0, cursor: 'pointer', border: `2.5px solid ${tierColor}`, position: 'relative', background: avatarUrl ? 'transparent' : tierColor + '30', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
             {avatarUrl ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 24, fontWeight: 900, color: tierColor }}>{user.name.charAt(0).toUpperCase()}</span>}
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 22, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ color: '#fff', fontSize: 8, fontWeight: 800, letterSpacing: 0.5 }}>{uploadingAvatar ? '↑ …' : '📷 EDIT'}</span>
+              <span style={{ color: '#fff', fontSize: 8, fontWeight: 800, letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 3 }}>
+                {uploadingAvatar ? 'â â¦' : <><Icon emoji="Camera" size={12} /> EDIT</>}
+              </span>
             </div>
             <input ref={avatarInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarUpload} />
           </div>
@@ -179,15 +182,21 @@ export default function ProfilePage() {
         <div style={{ display: 'flex', gap: 20, marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
           <div>
             <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 20, fontWeight: 900, color: '#F5F0EA', lineHeight: 1 }}>{user.current_streak}</p>
-            <p style={{ fontSize: 9, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 }}>🔥 streak</p>
+            <p style={{ fontSize: 9, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2, display: 'flex', alignItems: 'center', gap: 3 }}>
+              <Icon emoji="Flame" size={12} /> streak
+            </p>
           </div>
           <div>
             <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 20, fontWeight: 900, color: '#F5F0EA', lineHeight: 1 }}>{user.longest_streak}</p>
-            <p style={{ fontSize: 9, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 }}>⚡ best</p>
+            <p style={{ fontSize: 9, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2, display: 'flex', alignItems: 'center', gap: 3 }}>
+              <Icon emoji="Zap" size={12} /> best
+            </p>
           </div>
           <div>
             <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 20, fontWeight: 900, color: '#B5593C', lineHeight: 1 }}>{user.points_balance.toLocaleString()}</p>
-            <p style={{ fontSize: 9, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 }}>💰 balance</p>
+            <p style={{ fontSize: 9, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2, display: 'flex', alignItems: 'center', gap: 3 }}>
+              <Icon emoji="Coins" size={12} /> balance
+            </p>
           </div>
         </div>
       </div>
@@ -208,9 +217,9 @@ export default function ProfilePage() {
           }} style={{ fontSize: 12, color: '#B5593C', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px' }}>Edit</button>
         </div>
         <div style={{ display: 'flex', gap: 20 }}>
-          {(() => { const age = localAge !== undefined ? localAge : u.age; return age ? <StatInline label="Age" value={`${age} yr`} /> : <StatInline label="Age" value="—" /> })()}
-          {(() => { const h = localHeight !== undefined ? localHeight : u.height; return h != null ? <StatInline label="Height" value={`${Math.floor(h)}'${Math.round((h % 1) * 12)}"`} /> : <StatInline label="Height" value="—" /> })()}
-          {(() => { const w = localWeight !== undefined ? localWeight : u.weight; return w ? <StatInline label="Weight" value={`${w} lbs`} /> : <StatInline label="Weight" value="—" /> })()}
+          {(() => { const age = localAge !== undefined ? localAge : u.age; return age ? <StatInline label="Age" value={`${age} yr`} /> : <StatInline label="Age" value="â" /> })()}
+          {(() => { const h = localHeight !== undefined ? localHeight : u.height; return h != null ? <StatInline label="Height" value={`${Math.floor(h)}'${Math.round((h % 1) * 12)}"`} /> : <StatInline label="Height" value="â" /> })()}
+          {(() => { const w = localWeight !== undefined ? localWeight : u.weight; return w ? <StatInline label="Weight" value={`${w} lbs`} /> : <StatInline label="Weight" value="â" /> })()}
         </div>
       </div>
 
@@ -230,10 +239,10 @@ export default function ProfilePage() {
             return (
               <div key={type} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderRadius: 12, background: isConnected ? 'rgba(22,163,74,0.10)' : '#1A1A18', border: `1.5px solid ${isConnected ? 'rgba(34,197,94,0.25)' : 'rgba(245,240,234,0.08)'}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontSize: 22 }}>{info.emoji}</span>
+                  <span style={{ display: 'flex' }}><Icon emoji={info.icon} size={22} /></span>
                   <div>
                     <p style={{ fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>{info.label}</p>
-                    <p style={{ fontSize: 11, color: '#8A8478' }}>{isConnected ? 'Connected — workouts auto-verified' : 'Tap to connect'}</p>
+                    <p style={{ fontSize: 11, color: '#8A8478' }}>{isConnected ? 'Connected â workouts auto-verified' : 'Tap to connect'}</p>
                   </div>
                 </div>
                 {isConnected ? (
@@ -250,10 +259,10 @@ export default function ProfilePage() {
           })}
         </div>
         <div style={{ marginTop: 10, padding: '10px 14px', borderRadius: 12, background: 'rgba(22,163,74,0.10)', border: '1.5px solid rgba(34,197,94,0.25)', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 20 }}>📍</span>
+          <span style={{ display: 'flex' }}><Icon emoji="MapPin" size={20} /></span>
           <div>
             <p style={{ fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>GPS Check-in</p>
-            <p style={{ fontSize: 11, color: '#8A8478' }}>Always active — auto-used when logging</p>
+            <p style={{ fontSize: 11, color: '#8A8478' }}>Always active â auto-used when logging</p>
           </div>
         </div>
       </div>
@@ -265,7 +274,7 @@ export default function ProfilePage() {
             {devices.filter(d => d.type !== 'gps').map((d, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontSize: 20 }}>{DEVICE_INFO[d.type]?.emoji ?? '📱'}</span>
+                  <span style={{ display: 'flex' }}><Icon emoji={DEVICE_INFO[d.type]?.icon ?? 'Grip'} size={20} /></span>
                   <div>
                     <p style={{ fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>{DEVICE_INFO[d.type]?.label ?? d.type}</p>
                     <p style={{ fontSize: 11, color: '#8A8478' }}>Connected {new Date(d.connected_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
@@ -371,4 +380,4 @@ function TierStar({ color }: { color: string }) {
       <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
     </svg>
   )
-                 }
+}
