@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useAuth } from 'A/lib/auth-context'
+import { useAuth } from '@/lib/auth-context'
 import { getReferralPoints } from '@/lib/points'
-import { createClient } from 'A/lib/supabase'
+import { createClient } from '@/lib/supabase'
 import Icon from '@/components/Icon'
 
 interface ReferralRow {
