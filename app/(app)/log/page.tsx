@@ -275,7 +275,7 @@ export default function LogPage() {
     // Icon (drawing via canvas, using a simple placeholder)
     // Note: For actual icon rendering, consider using SVG overlay instead
     ctx.font = '170px serif'
-    ctx.fillText('â', 76, 474)
+    ctx.fillText('⚙', 76, 474)
 
     // Workout name
     ctx.fillStyle = '#F5F0EA'
@@ -338,7 +338,7 @@ export default function LogPage() {
       const file = new File([blob], 'count-workout.png', { type: 'image/png' })
       try {
         if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `${wt.label} ÃÂ· +${earnedPoints} pts` })
+          await navigator.share({ files: [file], title: `${wt.label} · +${earnedPoints} pts` })
         } else {
           const url = URL.createObjectURL(blob)
           const a = document.createElement('a')
@@ -385,7 +385,7 @@ export default function LogPage() {
           </div>
           {verificationSource && (
             <div style={{ background: 'rgba(22,163,74,0.12)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 10, padding: '8px 16px', marginBottom: 20, fontSize: 12, color: '#4ade80', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span>â</span> Verified via {VERIFICATION_LABELS[verificationSource] ?? verificationSource}
+              <span>✓</span> Verified via {VERIFICATION_LABELS[verificationSource] ?? verificationSource}
             </div>
           )}
           {/* Mystery bonus card */}
@@ -484,7 +484,7 @@ export default function LogPage() {
           <button onClick={handleShare} style={{ width: '100%', padding: '13px 0', background: shareCopied ? 'rgba(93,187,99,0.15)' : 'rgba(181,89,60,0.1)', border: `1.5px solid ${shareCopied? 'rgba(93,187,99,0.4)' : 'rgba(181,89,60,0.3)'}`, borderRadius: 10, color: shareCopied ? '#5DBB63' : '#B5593C', fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer', marginBottom: 10, transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
             {shareCopied ? (
               <>
-                <span>â</span> Copied to clipboard
+                <span>✓</span> Copied to clipboard
               </>
             ) : (
               <>
@@ -492,7 +492,7 @@ export default function LogPage() {
               </>
             )}
           </button>
-          {/* Post-workout referral nudge â enhanced on streak milestones */}
+          {/* Post-workout referral nudge — enhanced on streak milestones */}
           {user?.referral_code && (() => {
             const isStreakMilestone = [3, 7, 14, 21, 30].includes(sharedStreak)
             return isStreakMilestone ? (
@@ -504,7 +504,7 @@ export default function LogPage() {
                   </div>
                   <p style={{ fontSize: 15, fontWeight: 900, color: '#F5F0EA', fontFamily: "'Archivo', sans-serif", marginBottom: 4 }}>Challenge a friend to match it</p>
                   <p style={{ fontSize: 12, color: 'rgba(245,240,234,0.5)', marginBottom: 10 }}>Invite them and you BOTH earn <span style={{ color: '#22c55e', fontWeight: 700 }}>500 bonus coins</span></p>
-                  <span style={{ display: 'inline-block', padding: '8px 20px', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.30)', borderRadius: 8, color: '#22c55e', fontSize: 13, fontWeight: 800 }}>Invite a Friend â</span>
+                  <span style={{ display: 'inline-block', padding: '8px 20px', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.30)', borderRadius: 8, color: '#22c55e', fontSize: 13, fontWeight: 800 }}>Invite a Friend →</span>
                 </div>
               </Link>
             ) : (
@@ -517,7 +517,7 @@ export default function LogPage() {
                     <p style={{ fontSize: 13, fontWeight: 800, color: '#F5F0EA', marginBottom: 2 }}>Bring a friend along!</p>
                     <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.5)' }}>You both earn <span style={{ color: '#22c55e', fontWeight: 700 }}>500 bonus coins</span> when they join</p>
                   </div>
-                  <span style={{ fontSize: 16, color: 'rgba(245,240,234,0.3)', flexShrink: 0 }}>âº</span>
+                  <span style={{ fontSize: 16, color: 'rgba(245,240,234,0.3)', flexShrink: 0 }}>›</span>
                 </div>
               </Link>
             )
@@ -557,7 +557,7 @@ export default function LogPage() {
                 }}>
                   <div style={{ position: 'absolute', inset: 0, background: isSelected ? 'linear-gradient(to top, rgba(181,89,60,0.65) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0.10) 100%)' : 'linear-gradient(to top, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.20) 60%, rgba(0,0,0,0.08) 100%)', borderRadius: 10, transition: 'background 0.15s' }} />
                   {isSelected && (
-                    <div style={{ position: 'absolute', top: 6, right: 6, width: 18, height: 18, borderRadius: '50%', background: '#B5593C', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'white', fontWeight: 900, lineHeight: 1 }}>â</div>
+                    <div style={{ position: 'absolute', top: 6, right: 6, width: 18, height: 18, borderRadius: '50%', background: '#B5593C', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'white', fontWeight: 900, lineHeight: 1 }}>✓</div>
                   )}
                   <div style={{ position: 'absolute', top: 8, left: 8, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))' }}>
                     <Icon emoji={t.icon} size={20} />
@@ -572,22 +572,22 @@ export default function LogPage() {
             <input placeholder="Session name" value={customName} onChange={e => setCustomName(e.target.value)} style={{ ...inputStyle, marginBottom: 16 }} />
           )}
 
-          <button onClick={() => setStep('details')} style={btnPrimary}>Next â</button>
+          <button onClick={() => setStep('details')} style={btnPrimary}>Next →</button>
 
           <div style={{ background: '#111110', border: '1px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '14px 16px', marginTop: 12 }}>
             <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(245,240,234,0.4)', marginBottom: 10 }}>How it works</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                 <Trophy size={16} style={{ flexShrink: 0, marginTop: 2 }} color="#F5F0EA" />
-                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Earn points every session</strong> â each workout adds to your score and moves you up the leaderboard.</span>
+                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Earn points every session</strong> — each workout adds to your score and moves you up the leaderboard.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                 <Dumbbell size={16} style={{ flexShrink: 0, marginTop: 2 }} color="#F5F0EA" />
                 <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Verify with a wearable</strong> (Apple Health, Garmin, Fitbit, Google Fit) to earn <strong>100% of your points</strong>.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <span style={{ flexShrink: 0, marginTop: 2 }}>â</span>
-                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Unverified sessions earn 10%</strong> â still worth logging, verified is always better.</span>
+                <span style={{ flexShrink: 0, marginTop: 2 }}>✅</span>
+                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Unverified sessions earn 10%</strong> — still worth logging, verified is always better.</span>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                 <Lock size={16} style={{ flexShrink: 0, marginTop: 2 }} color="#F5F0EA" />
@@ -687,16 +687,16 @@ export default function LogPage() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: 'rgba(245,240,234,0.7)' }}>
-                <Activity size={14} style={{ flexShrink: 0 }} /><span><strong>Wearable</strong> â Apple Health, Garmin, Fitbit, or Google Fit</span>
+                <Activity size={14} style={{ flexShrink: 0 }} /><span><strong>Wearable</strong> — Apple Health, Garmin, Fitbit, or Google Fit</span>
               </div>
             </div>
             <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.5)', marginTop: 8, marginBottom: 0 }}>Verified sessions earn <strong>100% of your points</strong>. Unverified sessions earn <strong>10%</strong>.</p>
           </div>
 
           <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={() => setStep('type')} style={btnSecondary}>â Back</button>
+            <button onClick={() => setStep('type')} style={btnSecondary}>← Back</button>
             <button onClick={handleLog} disabled={loading} style={{ ...btnPrimary, flex: 2 }}>
-              {loading ? 'Logging...' : 'Log Session â'}
+              {loading ? 'Logging...' : 'Log Session ✓'}
             </button>
           </div>
         </>
