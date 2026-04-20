@@ -378,8 +378,11 @@ function StatCard({ label, value, unit, color }: { label: string; value: number;
       <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 20, fontWeight: 900, color, lineHeight: 1 }}>{value.toLocaleString()}</p>
       <p style={{ fontSize: 9, color: '#8A8478', marginTop: 2 }}>{unit}</p>
     </div>
-  
-  p>
+  )
+}
+
+function BigStat({ label, value, suffix, color }: { label: string; value: number; suffix: string; color: string }) {
+  return (
     <div style={{ background: '#1A1A18', borderRadius: 10, padding: '12px 14px' }}>
       <p style={{ fontSize: 10, fontWeight: 700, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>{label}</p>
       <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 24, fontWeight: 900, color, lineHeight: 1 }}>
