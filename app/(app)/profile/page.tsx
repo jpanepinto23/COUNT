@@ -256,7 +256,7 @@ export default function ProfilePage() {
                 )}
               </div>
             )
-          )}
+          })}
         </div>
         <div style={{ marginTop: 10, padding: '10px 14px', borderRadius: 12, background: 'rgba(22,163,74,0.10)', border: '1.5px solid rgba(34,197,94,0.25)', display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ display: 'flex' }}><Icon emoji="MapPin" size={20} /></span>
@@ -325,8 +325,7 @@ export default function ProfilePage() {
               </label>
               <label style={{ fontSize: 11, fontWeight: 700, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1 }}>
                 Height
-                <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-                  <input type="number" value={statsForm.heightFt} onChange={e => setStatsForm(f => ({ ...f, heightFt: e.target.value }))} placeholder="6" style={{ ...modalInput, marginTop: 0 }} />
+                })}                  <input type="number" value={statsForm.heightFt} onChange={e => setStatsForm(f => ({ ...f, heightFt: e.target.value }))} placeholder="6" style={{ ...modalInput, marginTop: 0 }} />
                   <span style={{ alignSelf: 'center', fontSize: 13, color: '#8A8478' }}>ft</span>
                   <input type="number" value={statsForm.heightIn} onChange={e => setStatsForm(f => ({ ...f, heightIn: e.target.value }))} placeholder="0" min="0" max="11" style={{ ...modalInput, marginTop: 0 }} />
                   <span style={{ alignSelf: 'center', fontSize: 13, color: '#8A8478' }}>in</span>
