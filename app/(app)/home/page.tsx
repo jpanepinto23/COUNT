@@ -155,7 +155,7 @@ export default function HomePage() {
     const tier = user.tier ?? 'bronze'
     const ogUrl = `https://countfitness.app/api/og?name=${encodeURIComponent(user.name)}&tier=${tier}&streak=${user.current_streak}&sessions=${user.lifetime_sessions}&points=${user.points_balance}`
     if (navigator.share) {
-      await navigator.share({ title: 'My COUNT Stats', text: `${user.current_streak}-day streak Â· ${user.lifetime_sessions} sessions on COUNT`, url: ogUrl })
+      await navigator.share({ title: 'My COUNT Stats', text: `${user.current_streak}-day streak · ${user.lifetime_sessions} sessions on COUNT`, url: ogUrl })
     } else {
       await navigator.clipboard.writeText(ogUrl)
     }
@@ -229,9 +229,9 @@ export default function HomePage() {
             <Camera size={20} color="#B5593C" />
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 13, fontWeight: 800, color: '#B5593C', marginBottom: 1 }}>Add your profile photo</p>
-              <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.45)' }}>Make COUNT yours â tap to upload a photo</p>
+              <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.45)' }}>Make COUNT yours — tap to upload a photo</p>
             </div>
-            <span style={{ color: '#C5B9AC', fontSize: 18 }}>âº</span>
+            <span style={{ color: '#C5B9AC', fontSize: 18 }}>›</span>
           </div>
         </Link>
       )}
@@ -245,13 +245,13 @@ export default function HomePage() {
             <p style={{ fontSize: 11, color: '#9A3412' }}>Log today to keep your {user.current_streak}-day streak alive</p>
           </div>
           <Link href="/log" style={{ textDecoration: 'none' }}>
-            <span style={{ fontSize: 12, fontWeight: 800, color: '#B5593C', whiteSpace: 'nowrap' }}>Log now â</span>
+            <span style={{ fontSize: 12, fontWeight: 800, color: '#B5593C', whiteSpace: 'nowrap' }}>Log now →</span>
           </Link>
           {isFrozen ? (
-            <p style={{ fontSize: 11, color: '#92400e', fontWeight: 700, marginTop: 8, display: 'flex', alignItems: 'center', gap: 4 }}><Snowflake size={13} /> Streak frozen â safe through tonight!</p>
+            <p style={{ fontSize: 11, color: '#92400e', fontWeight: 700, marginTop: 8, display: 'flex', alignItems: 'center', gap: 4 }}><Snowflake size={13} /> Streak frozen — safe through tonight!</p>
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-              <p style={{ fontSize: 11, color: '#92400e' }}>Protect it Â· {FREEZE_COST} pts</p>
+              <p style={{ fontSize: 11, color: '#92400e' }}>Protect it · {FREEZE_COST} pts</p>
               <button onClick={handleFreezeStreak} disabled={freezing || user.points_balance < FREEZE_COST} style={{ background: '#F97316', border: 'none', borderRadius: 8, padding: '5px 12px', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer', opacity: (freezing || user.points_balance < FREEZE_COST) ? 0.5 : 1 }}>
                 {freezing ? '...' : freezeSuccess ? 'Done!' : 'Freeze'}
               </button>
@@ -267,7 +267,7 @@ export default function HomePage() {
             <p style={{ fontSize: 13, fontWeight: 800, color: '#F5F0EA', marginBottom: 1 }}>Enable streak reminders</p>
             <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.5)' }}>Get notified before your streak breaks</p>
           </div>
-          <span style={{ color: 'rgba(245,240,234,0.3)', fontSize: 18 }}>âº</span>
+          <span style={{ color: 'rgba(245,240,234,0.3)', fontSize: 18 }}>›</span>
         </button>
       )}
       {/* Points card */}
@@ -279,12 +279,12 @@ export default function HomePage() {
             {user.points_balance.toLocaleString()}
           </p>
           <p style={{ color: 'rgba(245,240,234,0.55)', fontSize: 12 }}>
-            {user.points_lifetime_earned.toLocaleString()} lifetime Â· {getTierMultiplier(tier)}x multiplier
+            {user.points_lifetime_earned.toLocaleString()} lifetime · {getTierMultiplier(tier)}x multiplier
           </p>
         </div>
       </div>
 
-      {/* ââ Compact week strip ââ */}
+      {/* ── Compact week strip ── */}
       <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '10px 14px', marginBottom: 14 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 7 }}>
           <p style={{ fontSize: 10, fontWeight: 800, color: 'rgba(245,240,234,0.4)', textTransform: 'uppercase', letterSpacing: 1.5 }}>This Week</p>
@@ -305,7 +305,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ââ Goals row: weekly + monthly side by side ââ */}
+      {/* ── Goals row: weekly + monthly side by side ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
         {/* Weekly goal */}
         <div style={{ background: weekSessionCount >= WEEKLY_GOAL ? '#F0FDF4' : '#111110', border: 'none', borderRadius: 14, padding: '14px 14px' }}>
@@ -338,7 +338,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ââ Daily Missions ââ */}
+      {/* ── Daily Missions ── */}
       {missions.length > 0 && (
         <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
@@ -418,7 +418,7 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* ââ Rank card â dark ââ */}
+      {/* ── Rank card — dark ── */}
       {userRank !== null && (
         <Link href="/leaderboard" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
           <div style={{ background: '#111110', borderRadius: 16, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -436,7 +436,7 @@ export default function HomePage() {
                   <div style={{ height: 4, background: 'rgba(245,240,234,0.1)', borderRadius: 99, overflow: 'hidden', marginBottom: 6 }}>
                     <div style={{ height: '100%', width: `${Math.max(4, 100 - Math.min((pointsToPassAbove / Math.max(user.points_lifetime_earned, 1)) * 200, 94))}%`, background: tierColor, borderRadius: 99 }} />
                   </div>
-                  <p style={{ fontSize: 9, color: 'rgba(245,240,234,0.3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>Tap to view leaderboard â</p>
+                  <p style={{ fontSize: 9, color: 'rgba(245,240,234,0.3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>Tap to view leaderboard →</p>
                 </>
               ) : (
                 <>
@@ -450,7 +450,7 @@ export default function HomePage() {
         </Link>
       )}
 
-      {/* ââ Next reward â warm gradient ââ */}
+      {/* ── Next reward — warm gradient ── */}
       {nextReward && (
         <Link href="/rewards" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
           <div style={{ background: `linear-gradient(135deg, ${tierColor} 0%, #C2410C 100%)`, borderRadius: 16, padding: '18px 20px', position: 'relative', overflow: 'hidden' }}>
@@ -474,11 +474,11 @@ export default function HomePage() {
         </Link>
       )}
 
-      {/* ââ Tier progress ââ */}
+      {/* ── Tier progress ── */}
       <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '14px 16px', marginBottom: 14 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <p style={{ fontSize: 10, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5 }}>Tier Progress</p>
-          <Link href="/rank" style={{ fontSize: 11, color: tierColor, fontWeight: 700, textDecoration: 'none' }}>View rank âº</Link>
+          <Link href="/rank" style={{ fontSize: 11, color: tierColor, fontWeight: 700, textDecoration: 'none' }}>View rank ›</Link>
         </div>
         <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
           <StatCard label="Sessions" value={user.lifetime_sessions} unit="total" accent={tierColor} />
@@ -495,7 +495,7 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* Referral â enhanced CTA */}
+      {/* Referral — enhanced CTA */}
       {user.referral_code && (
         <div style={{ background: 'linear-gradient(135deg, #1C1209 0%, #111110 40%, #0E0E0D 100%)', border: '1.5px solid rgba(181,89,60,0.25)', borderRadius: 18, padding: '20px 18px', marginBottom: 14, position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: -40, right: -40, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,89,60,0.20) 0%, transparent 70%)' }} />
@@ -517,15 +517,15 @@ export default function HomePage() {
             </div>
             {referralCount > 0 && (
               <p style={{ fontSize: 11, color: '#8A8478', textAlign: 'center', marginBottom: 10 }}>
-                {referralCount} friend{referralCount !== 1 ? 's' : ''} joined so far â keep going!
+                {referralCount} friend{referralCount !== 1 ? 's' : ''} joined so far — keep going!
               </p>
             )}
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={handleShare} style={{ flex: 1, padding: '13px', background: 'linear-gradient(135deg, #B5593C 0%, #D4734F 100%)', color: '#F5F0EA', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: "'Archivo', sans-serif" }}>
-                {copied ? 'â Copied!' : 'Share Invite Link'}
+                {copied ? '✓ Copied!' : 'Share Invite Link'}
               </button>
               <Link href="/invite" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '13px 16px', background: 'rgba(181,89,60,0.12)', border: '1.5px solid rgba(181,89,60,0.25)', borderRadius: 12, color: '#B5593C', fontSize: 13, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                Details â
+                Details →
               </Link>
             </div>
           </div>
@@ -536,7 +536,7 @@ export default function HomePage() {
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <p style={{ fontSize: 10, fontWeight: 800, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1.5 }}>Recent</p>
-          <Link href="/log" style={{ fontSize: 11, color: '#B5593C', fontWeight: 700, textDecoration: 'none' }}>Log workout âº</Link>
+          <Link href="/log" style={{ fontSize: 11, color: '#B5593C', fontWeight: 700, textDecoration: 'none' }}>Log workout ›</Link>
         </div>
         {recentWorkouts.length === 0 ? (
           <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: '20px', textAlign: 'center' }}>
@@ -553,7 +553,7 @@ export default function HomePage() {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontSize: 13, fontWeight: 800, color: '#F5F0EA', marginBottom: 1 }}>{w.custom_name || w.type.replace('_', ' ')}</p>
-                  <p style={{ fontSize: 11, color: '#8A8478' }}>{formatDate(w.logged_at)} Â· {w.duration_minutes}min</p>
+                  <p style={{ fontSize: 11, color: '#8A8478' }}>{formatDate(w.logged_at)} · {w.duration_minutes}min</p>
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
                   <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 900, color: tierColor }}>+{w.total_points_earned}</p>
@@ -571,7 +571,7 @@ export default function HomePage() {
           <p style={{ fontSize: 14, fontWeight: 800, color: '#F5F0EA', fontFamily: 'Archivo, sans-serif', marginBottom: 2 }}>Share your stats</p>
           <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.45)' }}>Show off your streak &amp; progress</p>
         </div>
-        <span style={{ fontSize: 18, color: 'rgba(245,240,234,0.3)' }}>âº</span>
+        <span style={{ fontSize: 18, color: 'rgba(245,240,234,0.3)' }}>›</span>
       </button>
 
     </div>
