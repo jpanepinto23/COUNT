@@ -8,6 +8,43 @@ import { getTierLabel, getTierMultiplier } from '@/lib/points'
 import Icon from '@/components/Icon'
 import type { Redemption } from '@/lib/types'
 
+const modalInput: React.CSSProperties = {
+  background: '#1A1A19',
+  border: '1px solid rgba(245,240,234,0.12)',
+  borderRadius: 8,
+  padding: '8px 10px',
+  color: '#F5F0EA',
+  fontSize: 14,
+  fontFamily: 'JetBrains Mono, monospace',
+  outline: 'none',
+  marginTop: 4,
+  width: '100%',
+  boxSizing: 'border-box' as const,
+}
+
+function TierStar({ color }: { color: string }) {
+  return <span style={{ color, display: 'flex' }}><Icon emoji="Star" size={16} /></span>
+}
+
+function StatInline({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14, fontWeight: 700, color: '#F5F0EA', lineHeight: 1, margin: 0 }}>{value}</p>
+      <p style={{ fontSize: 9, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 3, margin: '3px 0 0 0' }}>{label}</p>
+    </div>
+  )
+}
+
+function StatCard({ label, value, unit, accent }: { label: string; value: string | number; unit: string; accent?: string }) {
+  return (
+    <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '12px 10px', textAlign: 'center' }}>
+      <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 18, fontWeight: 900, color: accent || '#F5F0EA', lineHeight: 1, margin: 0 }}>{value}</p>
+      <p style={{ fontSize: 9, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 4, margin: '4px 0 0 0' }}>{label}</p>
+      <p style={{ fontSize: 8, color: '#555', marginTop: 2, margin: '2px 0 0 0' }}>{unit}</p>
+    </div>
+  )
+}
+
 const TIER_COLORS: Record<string, string> = {
   bronze:   '#B5593C',
   silver:   '#6B7280',
