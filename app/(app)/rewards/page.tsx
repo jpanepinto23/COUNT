@@ -1,9 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { useAuth } from 'A/lib/auth-context'
+import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
-import Icon from 'A/components/Icon'
-import type { Reward, RewardType } from 'A/lib/types'
+import Icon from '@/components/Icon'
+import type { Reward, RewardType } from '@/lib/types'
 import { getStreakMultiplierLabel } from '@/lib/points'
 
 const BG = '#0E0E0D'
