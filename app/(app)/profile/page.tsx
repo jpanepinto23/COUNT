@@ -325,7 +325,7 @@ export default function ProfilePage() {
               </label>
               <label style={{ fontSize: 11, fontWeight: 700, color: '#8A8478', textTransform: 'uppercase', letterSpacing: 1 }}>
                 Height
-                })}                  <input type="number" value={statsForm.heightFt} onChange={e => setStatsForm(f => ({ ...f, heightFt: e.target.value }))} placeholder="6" style={{ ...modalInput, marginTop: 0 }} />
+                <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>                  <input type="number" value={statsForm.heightFt} onChange={e => setStatsForm(f => ({ ...f, heightFt: e.target.value }))} placeholder="6" style={{ ...modalInput, marginTop: 0 }} />
                   <span style={{ alignSelf: 'center', fontSize: 13, color: '#8A8478' }}>ft</span>
                   <input type="number" value={statsForm.heightIn} onChange={e => setStatsForm(f => ({ ...f, heightIn: e.target.value }))} placeholder="0" min="0" max="11" style={{ ...modalInput, marginTop: 0 }} />
                   <span style={{ alignSelf: 'center', fontSize: 13, color: '#8A8478' }}>in</span>
