@@ -230,7 +230,5 @@ export default function RankPage() {
       )}
     </div>
   
-)=
+)}
 
-
-  'window._fullB64 stored";
