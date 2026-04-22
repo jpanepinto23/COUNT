@@ -265,7 +265,7 @@ function RewardCard({ reward, userBalance, redeeming, onRedeem }: {
             {reward.is_new && !reward.is_hot && <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 5px', borderRadius: 20, background: 'rgba(168,85,247,0.15)', color: '#c084fc' }}>New</span>}
           </div>
           <p style={{ fontSize: 12, color: STONE, margin: 0 }}>
-            {reward.brand_name}{reward.description ? ' Â· ' + reward.description : ''}
+            {reward.brand_name}{reward.description ? ' · ' + reward.description : ''}
           </p>
           <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 700, color: accent, margin: '4px 0 0' }}>
             {reward.point_cost.toLocaleString()} coins
