@@ -31,7 +31,7 @@ const REWARD_CATALOG = [
   { name: 'Thorne',            status: 'live',        note: 'Available now',  color: '#1A7A4C', logo: 'https://cdn.brandfetch.io/thorne.com/w/256/h/256' },
   { name: 'Momentous',         status: 'live',        note: 'Available now',  color: '#1E3A5F', logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
   { name: 'Vuori',             status: 'coming_soon', note: 'In talks',       color: '#4A7C59', logo: 'https://cdn.brandfetch.io/vuoriclothing.com/w/256/h/256' },
-  { name: 'NOBULL',            status: 'coming_soon', note: 'In talks',       color: '#1A1A19', logo: 'https://cdn.brandfetch.io/nobullproject.com/w/256/h/256' },
+  { name: 'NOBULL',            status: 'live',        note: 'Available now',  color: '#1A1A19', logo: '/nobull-logo-square.png' },
   { name: 'Transparent Labs',  status: 'coming_soon', note: 'In talks',       color: '#3B82F6', logo: 'https://cdn.brandfetch.io/transparentlabs.com/w/256/h/256' },
   { name: 'AG1',               status: 'coming_soon', note: 'In talks',       color: '#1B5E20', logo: 'https://cdn.brandfetch.io/drinkag1.com/w/256/h/256' },
 ]
