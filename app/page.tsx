@@ -23,7 +23,7 @@ const TIERS = [
 
 const HOW_IT_WORKS = [
   { step: '01', title: 'Log Your Workout', desc: 'Open COUNT after your session. Tap to confirm. Takes 30 seconds.' },
-  { step: '02', title: 'Earn Points',      desc: 'Every session earns 200 base points. Move up tiers for up to 3x and build streaks for up to 2x — they stack.' },
+  { step: '02', title: 'Earn Points',      desc: 'Every session earns 200 base points. Move up tiers for up to 3x and build streaks for up to 2x â they stack.' },
   { step: '03', title: 'Redeem Rewards',   desc: 'Real protein, pre-workout, and gear from brands you already buy. Free.' },
 ]
 
@@ -31,7 +31,7 @@ const REWARD_CATALOG = [
   { name: 'Thorne',            status: 'live',        note: 'Available now',  color: '#1A7A4C', logo: 'https://cdn.brandfetch.io/thorne.com/w/256/h/256' },
   { name: 'Momentous',         status: 'live',        note: 'Available now',  color: '#1E3A5F', logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
   { name: 'Vuori',             status: 'coming_soon', note: 'In talks',       color: '#4A7C59', logo: 'https://cdn.brandfetch.io/vuoriclothing.com/w/256/h/256' },
-  { name: 'NOBULL',            status: 'coming_soon', note: 'In talks',       color: '#1A1A19', logo: 'https://cdn.brandfetch.io/nobullproject.com/w/256/h/256' },
+  { name: 'NOBULL',            status: 'live',        note: 'Available now',  color: '#1A1A19', logo: '/nobull-logo-square.png' },
   { name: 'Transparent Labs',  status: 'coming_soon', note: 'In talks',       color: '#3B82F6', logo: 'https://cdn.brandfetch.io/transparentlabs.com/w/256/h/256' },
   { name: 'AG1',               status: 'coming_soon', note: 'In talks',       color: '#1B5E20', logo: 'https://cdn.brandfetch.io/drinkag1.com/w/256/h/256' },
 ]
@@ -56,14 +56,14 @@ const COMPARISON = [
 ]
 
 const FAQ_ITEMS = [
-  { q: 'Is COUNT really free?', a: 'Yes. No subscription, no hidden fees. Sign up, log workouts, and earn rewards â all completely free.' },
-  { q: 'How do I earn points?', a: 'Every workout you log earns 200 base points. Move up tiers (Bronze to Platinum) for up to 3x and build streaks for up to 2x â meaning up to 1,200 points per session.' },
-  { q: 'What kind of rewards can I get?', a: 'Real products â protein, pre-workout, gear, and apparel from brands like Thorne, Momentous, and more. No gift cards or digital badges.' },
-  { q: 'How does verification work?', a: 'You can sync with Strava, Apple Health, Garmin, or Google Fit for verified sessions. Unverified sessions still earn points â just at a reduced rate.' },
+  { q: 'Is COUNT really free?', a: 'Yes. No subscription, no hidden fees. Sign up, log workouts, and earn rewards Ã¢ÂÂ all completely free.' },
+  { q: 'How do I earn points?', a: 'Every workout you log earns 200 base points. Move up tiers (Bronze to Platinum) for up to 3x and build streaks for up to 2x Ã¢ÂÂ meaning up to 1,200 points per session.' },
+  { q: 'What kind of rewards can I get?', a: 'Real products Ã¢ÂÂ protein, pre-workout, gear, and apparel from brands like Thorne, Momentous, and more. No gift cards or digital badges.' },
+  { q: 'How does verification work?', a: 'You can sync with Strava, Apple Health, Garmin, or Google Fit for verified sessions. Unverified sessions still earn points Ã¢ÂÂ just at a reduced rate.' },
   { q: 'When do new brands get added?', a: 'We\'re onboarding new brands regularly. Drop your email in the waitlist to get notified when new rewards go live.' },
 ]
 
-/* Hero background images â mixed gender, diverse athletes */
+/* Hero background images Ã¢ÂÂ mixed gender, diverse athletes */
 const HERO_IMAGES = [
   { id: '1517836357463', pos: 'center 30%' },
   { id: '1571019614242', pos: 'center 40%' },
@@ -140,7 +140,7 @@ export default function LandingPage() {
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       `}</style>
 
-      {/* ââ BURGER MENU OVERLAY ââ */}
+      {/* Ã¢ÂÂÃ¢ÂÂ BURGER MENU OVERLAY Ã¢ÂÂÃ¢ÂÂ */}
       {menuOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 100 }}>
           {/* Backdrop */}
@@ -198,7 +198,7 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* ââ HERO ââ */}
+      {/* Ã¢ÂÂÃ¢ÂÂ HERO Ã¢ÂÂÃ¢ÂÂ */}
       <div id="home" style={{ position: 'relative', overflow: 'hidden', background: '#0E0D0C', height: '60vw', minHeight: 340, maxHeight: 560 }}>
         {/* Video background */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
@@ -253,7 +253,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ââ VALUE PROP ââ */}
+      {/* Ã¢ÂÂÃ¢ÂÂ VALUE PROP Ã¢ÂÂÃ¢ÂÂ */}
       <div style={{ padding: '36px 24px 40px', background: '#111110' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(181,89,60,0.12)', border: '1px solid rgba(181,89,60,0.25)', borderRadius: 20, padding: '5px 12px', marginBottom: 20 }}>
           <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#B5593C' }} />
@@ -285,7 +285,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ââ SOCIAL PROOF ââ */}
+      {/* Ã¢ÂÂÃ¢ÂÂ SOCIAL PROOF Ã¢ÂÂÃ¢ÂÂ */}
       <div style={{ padding: '32px 24px', background: '#0A0A09', borderTop: '1px solid #1C1C1B', borderBottom: '1px solid #1C1C1B' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, maxWidth: 420, margin: '0 auto' }}>
           {[
@@ -301,7 +301,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ââ HOW IT WORKS ââ */}
+      {/* Ã¢ÂÂÃ¢ÂÂ HOW IT WORKS Ã¢ÂÂÃ¢ÂÂ */}
       <div id="how" style={{ padding: '40px 24px', borderTop: '1px solid #1C1C1B' }}>
         <p style={{ color: '#444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 24, fontFamily: 'JetBrains Mono, monospace' }}>How it works</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -319,7 +319,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ââ OUR PARTNERS ââ */}
+      {/* Ã¢ÂÂÃ¢ÂÂ OUR PARTNERS Ã¢ÂÂÃ¢ÂÂ */}
       <div id="partners" style={{ padding: '44px 24px', background: '#111110', borderTop: '1px solid #1C1C1B', borderBottom: '1px solid #1C1C1B' }}>
         <p style={{ color: '#444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 6, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>Our Partners</p>
         <p style={{ color: '#3A3A38', fontSize: 12, textAlign: 'center', marginBottom: 28, fontFamily: 'JetBrains Mono, monospace' }}>Brands that believe in rewarding the grind</p>
@@ -367,6 +367,49 @@ export default function LandingPage() {
           </div>
         </a>
 
+        <a
+          href="https://nobull.pxf.io/c/7109408/3869793/13069"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: 'block', textDecoration: 'none', maxWidth: 420, margin: '0 auto' }}
+        >
+          <div style={{
+            background: 'linear-gradient(145deg, #1C1B19 0%, #141413 100%)',
+            border: '1.5px solid rgba(181,89,60,0.3)',
+            borderRadius: 18,
+            padding: '28px 24px',
+            position: 'relative',
+            overflow: 'hidden',
+            transition: 'border-color 0.2s ease',
+          }}>
+            <div style={{ position: 'absolute', top: -40, right: -40, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,89,60,0.08) 0%, transparent 70%)' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+              <div style={{
+                width: 60, height: 60, borderRadius: 14,
+                background: 'linear-gradient(135deg, rgba(181,89,60,0.15) 0%, rgba(181,89,60,0.05) 100%)',
+                border: '1.5px solid rgba(181,89,60,0.25)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <img src="https://cdn.brandfetch.io/nobullproject.com/w/256/h/256" alt="NOBULL" style={{ width: '65%', height: '65%', objectFit: 'contain', borderRadius: 4 }} />
+              </div>
+              <div>
+                <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, color: '#F5F0EA', letterSpacing: -0.3, marginBottom: 4 }}>NOBULL</p>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(93,187,99,0.1)', border: '1px solid rgba(93,187,99,0.2)', borderRadius: 6, padding: '3px 8px' }}>
+                  <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#5DBB63' }} />
+                  <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#5DBB63', letterSpacing: 0.5, textTransform: 'uppercase' }}>Official Partner</span>
+                </div>
+              </div>
+            </div>
+            <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 14, color: '#9A9087', lineHeight: 1.6, marginBottom: 16 }}>
+              Premium training shoes, apparel, and gear — built for athletes who train hard. COUNT members save 30%.
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 13, fontWeight: 800, color: '#B5593C', letterSpacing: 0.3 }}>Shop NOBULL</span>
+              <span style={{ color: '#B5593C', fontSize: 16 }}>&rarr;</span>
+            </div>
+          </div>
+        </a>
+
         {/* Integrations inline */}
         <div style={{ marginTop: 32 }}>
           <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2.5, textTransform: 'uppercase', color: '#444', marginBottom: 16, textAlign: 'center', fontFamily: 'JetBrains Mono, monospace' }}>Syncs with</p>
@@ -383,7 +426,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ââ STRAVA COMPARISON HOOK ââ */}
+      {/* Ã¢ÂÂÃ¢ÂÂ STRAVA COMPARISON HOOK Ã¢ÂÂÃ¢ÂÂ */}
       <div style={{ padding: '36px 24px', background: '#0D0D0C', borderTop: '1px solid #1C1C1B' }}>
         <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, color: '#F5F0EA', lineHeight: 1.25, marginBottom: 14 }}>
           Strava claps for you.<br />
@@ -394,7 +437,7 @@ export default function LandingPage() {
         </p>
       </div>
 
-      {/* ââ REWARD CATALOG ââ */}
+      {/* Ã¢ÂÂÃ¢ÂÂ REWARD CATALOG Ã¢ÂÂÃ¢ÂÂ */}
       <div id="rewards" style={{ padding: '36px 24px 40px', background: '#0D0D0C', borderTop: '1px solid #1C1C1B' }}>
         <p style={{ color: '#444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 4, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>Reward catalog</p>
         <p style={{ color: '#3A3A38', fontSize: 12, textAlign: 'center', marginBottom: 12, fontFamily: 'JetBrains Mono, monospace' }}>Live now + brands we&apos;re onboarding</p>
@@ -440,7 +483,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ââ COMPARISON TABLE ââ */}
+      {/* Ã¢ÂÂÃ¢ÂÂ COMPARISON TABLE Ã¢ÂÂÃ¢ÂÂ */}
       <div id="compare" style={{ padding: '40px 24px', background: '#0D0D0C', borderTop: '1px solid #1C1C1B' }}>
         <p style={{ color: '#444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 4, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>How we stack up</p>
         <p style={{ color: '#3A3A38', fontSize: 12, textAlign: 'center', marginBottom: 24, fontFamily: 'JetBrains Mono, monospace' }}>vs. Strava, MFP, Nike, Whoop</p>
@@ -467,7 +510,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ââ TIER SYSTEM ââ */}
+      {/* Ã¢ÂÂÃ¢ÂÂ TIER SYSTEM Ã¢ÂÂÃ¢ÂÂ */}
       <div id="tiers" style={{ padding: '40px 24px', borderTop: '1px solid #1C1C1B' }}>
         <p style={{ color: '#444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 6, fontFamily: 'JetBrains Mono, monospace' }}>Tier system</p>
         <p style={{ color: '#666', fontSize: 13, marginBottom: 20, fontFamily: 'Archivo, sans-serif' }}>Show up more. Multiply your points.</p>
@@ -482,7 +525,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ââ WAITLIST ââ */}
+      {/* Ã¢ÂÂÃ¢ÂÂ WAITLIST Ã¢ÂÂÃ¢ÂÂ */}
       <div style={{ padding: '40px 24px', borderTop: '1px solid #1C1C1B', background: '#0D0D0C' }}>
         <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 20, fontWeight: 800, color: '#F5F0EA', marginBottom: 6 }}>
           Not ready to sign up?
@@ -512,7 +555,7 @@ export default function LandingPage() {
         )}
       </div>
 
-      {/* ââ FAQ ââ */}
+      {/* Ã¢ÂÂÃ¢ÂÂ FAQ Ã¢ÂÂÃ¢ÂÂ */}
       <div id="faq" style={{ padding: '40px 24px', borderTop: '1px solid #1C1C1B' }}>
         <p style={{ color: '#444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 24, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>Frequently asked questions</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxWidth: 480, margin: '0 auto' }}>
@@ -535,7 +578,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ââ FOOTER ââ */}
+      {/* Ã¢ÂÂÃ¢ÂÂ FOOTER Ã¢ÂÂÃ¢ÂÂ */}
       <div style={{ padding: '32px 24px 44px', borderTop: '1px solid #1A1A19', background: '#0A0A09' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 16 }}>
           <div style={{ position: 'relative', width: 20, height: 17 }}>
