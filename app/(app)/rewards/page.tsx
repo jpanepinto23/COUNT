@@ -17,6 +17,14 @@ const STONE = '#8A8478'
 const COPPER = '#B5593C'
 const GREEN = '#16a34a'
 
+// Local logo overrides for branded reward partners (takes precedence over reward.image_url)
+const BRAND_LOGO_OVERRIDES: Record<string, string> = {
+  NOBULL: '/nobull-logo-square.png',
+}
+function logoFor(brand: string, fallback?: string | null): string | undefined {
+  return BRAND_LOGO_OVERRIDES[brand] || fallback || undefined
+}
+
 interface FulfillmentData {
   reward_type: RewardType
   fulfillment_value?: string
@@ -245,8 +253,8 @@ function RewardCard({ reward, userBalance, redeeming, onRedeem }: {
     <div style={{ background: CARD, border: '1.5px solid ' + (canAfford ? BORDER_A : BORDER), borderRadius: 14, padding: '14px 16px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ width: 52, height: 52, borderRadius: 12, flexShrink: 0, background: accent + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-          {reward.image_url
-            ? <img src={reward.image_url} alt={reward.brand_name} style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 6 }} />
+          {logoFor(reward.brand_name, reward.image_url)
+            ? <img src={logoFor(reward.brand_name, reward.image_url)} alt={reward.brand_name} style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 6 }} />
             : <div style={{ width: 14, height: 14, borderRadius: '50%', background: accent }} />
           }
         </div>
