@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
-import Icon from '@/components/Icon'
 import type { Reward, RewardType } from '@/lib/types'
 import { getStreakMultiplierLabel } from '@/lib/points'
 
@@ -147,7 +146,9 @@ function Hero({
 
         <div style={{ display: 'flex', gap: 8, marginTop: 18, alignItems: 'center' }}>
           <div style={chipStyle()}>
-            <Icon name="flame" size={12} color={TOK.copper} />
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={TOK.copper} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+            </svg>
             <span style={{ color: TOK.copper, fontWeight: 600, marginLeft: 6 }}>{multiplier.toFixed(1)}×</span>
             <span style={{ color: TOK.muted, marginLeft: 4 }}>streak</span>
           </div>
@@ -1258,7 +1259,6 @@ export default function RewardsPage() {
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
-                cursor: 'pointer',
               }}
             >
               Back to Shop
