@@ -39,12 +39,29 @@ const BRAND_ACCENT: Record<string, string> = {
 }
 const accentFor = (brand: string) => BRAND_ACCENT[brand] || TOK.copper
 
-// Local logo overrides (takes precedence is set via fallback || override pattern below)
-const BRAND_LOGO_OVERRIDES: Record<string, string> = {
-  NOBULL: '/nobull-logo-square.png',
+// Brand logos — resolved via Clearbit Logo API with each brand's canonical domain.
+// Override wins over any stale Supabase `image_url`. Unknown brands fall back to
+// Supabase, then to the typographic `BrandMark`.
+const BRAND_DOMAINS: Record<string, string> = {
+  NOBULL: 'nobullproject.com',
+  Thorne: 'thorne.com',
+  Momentous: 'livemomentous.com',
+  Kane: 'kane11.com',
+  LMNT: 'drinklmnt.com',
+  AG1: 'drinkag1.com',
+  'Athletic Greens': 'drinkag1.com',
+  YoungLA: 'youngla.com',
+  Vuori: 'vuoriclothing.com',
+  'Ten Thousand': 'tenthousand.cc',
+  Legends: 'legends.com',
+  'Create Wellness': 'createwellness.com',
+  Amazon: 'amazon.com',
 }
+const BRAND_LOGO_OVERRIDES: Record<string, string> = Object.fromEntries(
+  Object.entries(BRAND_DOMAINS).map(([brand, domain]) => [brand, `https://logo.clearbit.com/${domain}?size=200`]),
+)
 function logoFor(brand: string, fallback?: string | null): string | undefined {
-  return fallback || BRAND_LOGO_OVERRIDES[brand] || undefined
+  return BRAND_LOGO_OVERRIDES[brand] || fallback || undefined
 }
 
 interface FulfillmentData {
@@ -868,6 +885,23 @@ export default function RewardsPage() {
         if (data) setRewards(data as Reward[])
       })
   }, [])
+
+  // Always refresh the user's coin balance when landing on Rewards, and again
+  // when the tab regains focus (PWA / switched-away case). Fixes the stale
+  // balance after logging a workout in a different tab or returning from
+  // background.
+  useEffect(() => {
+    refreshUser()
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') refreshUser()
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    window.addEventListener('focus', onVisible)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('focus', onVisible)
+    }
+  }, [refreshUser])
 
   useEffect(() => {
     if (!user) return
