@@ -58,10 +58,10 @@ const BRAND_DOMAINS: Record<string, string> = {
   Amazon: 'amazon.com',
 }
 const BRAND_LOGO_OVERRIDES: Record<string, string> = Object.fromEntries(
-  Object.entries(BRAND_DOMAINS).map(([brand, domain]) => [brand, `https://logo.clearbit.com/${domain}?size=200`]),
+  Object.entries(BRAND_DOMAINS).map(([brand, domain]) => [brand, `https://icons.duckduckgo.com/ip3/${domain}.ico`]),
 )
 function logoFor(brand: string, fallback?: string | null): string | undefined {
-  return BRAND_LOGO_OVERRIDES[brand] || fallback || undefined
+  return fallback || BRAND_LOGO_OVERRIDES[brand] || undefined
 }
 
 interface FulfillmentData {
@@ -912,7 +912,7 @@ export default function RewardsPage() {
       .from('workouts')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id)
-      .gte('completed_at', since.toISOString())
+      .gte('logged_at', since.toISOString())
       .then(({ count }) => setWeeklyWorkouts(count || 0))
   }, [user])
 
