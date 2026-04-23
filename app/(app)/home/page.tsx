@@ -346,7 +346,7 @@ export default function HomePage() {
   const [weeklyCount, setWeeklyCount] = useState(0)
   const [monthlyCount, setMonthlyCount] = useState(0)
   const [weekDone, setWeekDone] = useState<boolean[]>([false, false, false, false, false, false, false])
-  const [recentWorkouts, setRecentWorkouts] = useState<Array<{ id: string; type: string; completed_at: string; points_earned?: number }>>([])
+  const [recentWorkouts, setRecentWorkouts] = useState<Array<{ id: string; type: string; logged_at: string; points_earned?: number }>>([])
   const [totalSessions, setTotalSessions] = useState(0)
   const [freezing, setFreezing] = useState(false)
   const [freezeError, setFreezeError] = useState<string | null>(null)
@@ -365,15 +365,15 @@ export default function HomePage() {
     // Weekly count + per-day map
     supabase
       .from('workouts')
-      .select('id, completed_at')
+      .select('id, logged_at')
       .eq('user_id', user.id)
-      .gte('completed_at', weekStart.toISOString())
+      .gte('logged_at', weekStart.toISOString())
       .then(({ data }) => {
         const rows = data || []
         setWeeklyCount(rows.length)
         const done = [false, false, false, false, false, false, false]
         rows.forEach((r: any) => {
-          const d = new Date(r.completed_at)
+          const d = new Date(r.logged_at)
           const idx = d.getDay() === 0 ? 6 : d.getDay() - 1
           done[idx] = true
         })
@@ -385,7 +385,7 @@ export default function HomePage() {
       .from('workouts')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id)
-      .gte('completed_at', monthStart.toISOString())
+      .gte('logged_at', monthStart.toISOString())
       .then(({ count }) => setMonthlyCount(count || 0))
 
     // Total sessions all-time
@@ -398,9 +398,9 @@ export default function HomePage() {
     // Recent 3 workouts
     supabase
       .from('workouts')
-      .select('id, type, completed_at, points_earned')
+      .select('id, type, logged_at, points_earned')
       .eq('user_id', user.id)
-      .order('completed_at', { ascending: false })
+      .order('logged_at', { ascending: false })
       .limit(3)
       .then(({ data }) => {
         if (data) setRecentWorkouts(data as any[])
@@ -910,7 +910,7 @@ export default function HomePage() {
                     {w.type ?? 'Workout'}
                   </div>
                   <div style={{ fontFamily: 'var(--mono)', fontSize: 10, color: TOK.muted, letterSpacing: '0.06em', marginTop: 2 }}>
-                    {new Date(w.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    {new Date(w.logged_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </div>
                 </div>
                 {w.points_earned != null && (
