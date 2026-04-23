@@ -145,18 +145,18 @@ function Hero({
         </div>
 
         <div style={{ display: 'flex', gap: 8, marginTop: 18, alignItems: 'center' }}>
-          <div style={chipStyle()}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={TOK.copper} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <div style={chipStyle(workoutsDone > 0)}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={workoutsDone > 0 ? '#fff' : TOK.copper} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
               <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
             </svg>
-            <span style={{ color: TOK.copper, fontWeight: 600, marginLeft: 6 }}>{multiplier.toFixed(1)}×</span>
-            <span style={{ color: TOK.muted, marginLeft: 4 }}>streak</span>
+            <span style={{ color: workoutsDone > 0 ? '#fff' : TOK.copper, fontWeight: 600, marginLeft: 6 }}>{multiplier.toFixed(1)}×</span>
+            <span style={{ color: workoutsDone > 0 ? 'rgba(255,255,255,0.75)' : TOK.muted, marginLeft: 4 }}>streak</span>
           </div>
-          <div style={chipStyle()}>
-            <span style={{ color: TOK.fg, fontWeight: 600 }}>
+          <div style={chipStyle(workoutsDone > 0)}>
+            <span style={{ color: workoutsDone > 0 ? '#fff' : TOK.fg, fontWeight: 600 }}>
               {workoutsDone}/{workoutsGoal}
             </span>
-            <span style={{ color: TOK.muted, marginLeft: 4 }}>this week</span>
+            <span style={{ color: workoutsDone > 0 ? 'rgba(255,255,255,0.75)' : TOK.muted, marginLeft: 4 }}>this week</span>
           </div>
         </div>
 
@@ -185,18 +185,79 @@ function Hero({
   )
 }
 
-function chipStyle(): React.CSSProperties {
+function chipStyle(filled = false): React.CSSProperties {
   return {
     display: 'flex',
     alignItems: 'center',
     padding: '7px 11px',
     borderRadius: 999,
-    background: 'rgba(245,240,234,0.04)',
-    border: `1px solid ${TOK.hairline}`,
+    background: filled ? TOK.copper : 'rgba(245,240,234,0.04)',
+    border: `1px solid ${filled ? TOK.copper : TOK.hairline}`,
     fontFamily: 'var(--mono)',
     fontSize: 11,
     letterSpacing: '0.02em',
+    transition: 'background 200ms, border-color 200ms',
   }
+}
+
+// ===== COUNT logo (matches landing page — 4 tally bars + copper slash + Archivo wordmark) =====
+function CountLogo({ size = 'sm' }: { size?: 'sm' | 'md' }) {
+  const scale = size === 'md' ? 1.4 : 1
+  const markW = 35.2 * scale
+  const markH = 28.8 * scale
+  const barW = 3.2 * scale
+  const barH = 22.4 * scale
+  const barTop = 3.2 * scale
+  const slashW = 38.4 * scale
+  const slashH = 2.8 * scale
+  const slashTop = 12.8 * scale
+  const slashLeft = -1.6 * scale
+  const fontSize = 16 * scale
+  const gap = 9.6 * scale
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap, justifyContent: 'center' }}>
+      <div style={{ position: 'relative', width: markW, height: markH }}>
+        {[4.8, 11.2, 17.6, 24].map((leftBase, i) => (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              left: leftBase * scale,
+              top: barTop,
+              width: barW,
+              height: barH,
+              background: TOK.fg,
+              borderRadius: 2,
+            }}
+          />
+        ))}
+        <div
+          style={{
+            position: 'absolute',
+            top: slashTop,
+            left: slashLeft,
+            width: slashW,
+            height: slashH,
+            background: TOK.copper,
+            borderRadius: 2,
+            transform: 'rotate(-30deg)',
+          }}
+        />
+      </div>
+      <span
+        style={{
+          fontFamily: 'Archivo, var(--sans), sans-serif',
+          fontSize,
+          fontWeight: 900,
+          letterSpacing: '0.3em',
+          textTransform: 'uppercase',
+          color: TOK.fg,
+        }}
+      >
+        COUNT
+      </span>
+    </div>
+  )
 }
 
 // ===== CoinPill =====
@@ -889,7 +950,7 @@ export default function RewardsPage() {
       }}
     >
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
         :root {
           --sans: 'Geist', system-ui, -apple-system, sans-serif;
           --mono: 'Geist Mono', ui-monospace, monospace;
@@ -911,10 +972,23 @@ export default function RewardsPage() {
         }
       `}</style>
 
-      {/* Header */}
+      {/* Top brand bar */}
       <div
         style={{
-          padding: '12px 20px 4px',
+          padding: '14px 20px 6px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderBottom: `1px solid ${TOK.hairline}`,
+        }}
+      >
+        <CountLogo />
+      </div>
+
+      {/* Page header */}
+      <div
+        style={{
+          padding: '14px 20px 4px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -1259,6 +1333,7 @@ export default function RewardsPage() {
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
+                cursor: 'pointer',
               }}
             >
               Back to Shop
