@@ -1,44 +1,255 @@
 'use client'
-
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { HandMetal, Dumbbell, Footprints, Bike, Zap, Activity, Flame, Pencil, TrendingUp, Medal, Trophy, Gift, Sparkles, Target, Share2, Lock, Apple, Heart, MapPin, CircleDot } from 'lucide-react'
-import Icon from '@/components/Icon'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import { calculatePoints, getTier, getTierLabel, getReferralPoints, generateMysteryBonus } from '@/lib/points'
 import type { WorkoutType, Tier } from '@/lib/types'
 
-const WORKOUT_TYPES: { value: WorkoutType; label: string; photo: string; icon: string }[] = [
-  { value: 'push',      label: 'Push',      photo: '4488764', icon: 'HandMetal' },
-  { value: 'pull',      label: 'Pull',      photo: '6922157', icon: 'Dumbbell' },
-  { value: 'legs',      label: 'Legs',      photo: '8846443',  icon: 'Footprints' },
-  { value: 'upper',     label: 'Upper',     photo: '3916766', icon: 'Dumbbell' },
-  { value: 'lower',     label: 'Lower',     photo: '4944435', icon: 'Bike' },
-  { value: 'full_body', label: 'Full Body', photo: '6628962', icon: 'Zap' },
-  { value: 'cardio',    label: 'Cardio',    photo: '5327545', icon: 'Activity' },
-  { value: 'hiit',      label: 'HIIT',      photo: '2261481', icon: 'Flame' },
-  { value: 'custom',    label: 'Custom',    photo: '3999606', icon: 'Pencil' },
+// ===== Design tokens (per Claude Design handoff) =====
+const TOK = {
+  bg: '#0E0E0D',
+  fg: '#F5F0EA',
+  copper: '#B5593C',
+  copper2: '#D47858',
+  copperDim: '#5a2c1e',
+  muted: '#8A8680',
+  dim: '#3a3833',
+  card: '#181714',
+  card2: '#1f1d19',
+  hairline: 'rgba(245,240,234,0.08)',
+  hairline2: 'rgba(245,240,234,0.14)',
+  green: '#16a34a',
+  red: '#ef4444',
+}
+
+type WT = { value: WorkoutType; label: string; photo: string }
+const WORKOUT_TYPES: WT[] = [
+  { value: 'push', label: 'Push', photo: '4488764' },
+  { value: 'pull', label: 'Pull', photo: '6922157' },
+  { value: 'legs', label: 'Legs', photo: '8846443' },
+  { value: 'upper', label: 'Upper', photo: '3916766' },
+  { value: 'lower', label: 'Lower', photo: '4944435' },
+  { value: 'full_body', label: 'Full Body', photo: '6628962' },
+  { value: 'cardio', label: 'Cardio', photo: '5327545' },
+  { value: 'hiit', label: 'HIIT', photo: '2261481' },
+  { value: 'custom', label: 'Custom', photo: '3999606' },
 ]
+
+// First 4 are shown as tall "featured" tiles (2x2)
+const FEATURED_ORDER: WorkoutType[] = ['push', 'legs', 'cardio', 'pull']
 
 const DURATIONS = [30, 45, 60, 75, 90]
 
-const MILESTONES: Record<number, { icon: string; title: string; message: string }> = {
-  1:   { icon: 'TrendingUp', title: 'First session!',     message: "Every legend starts somewhere. You just took your first step." },
-  5:   { icon: 'Flame', title: '5 sessions strong!', message: "You're building a habit. Keep showing up." },
-  10:  { icon: 'Dumbbell', title: '10 sessions down!',  message: "Double digits. You're officially consistent." },
-  25:  { icon: 'Medal', title: '25 sessions!',        message: "A quarter century of workouts. You're in the top tier of commitment." },
-  50:  { icon: 'Zap', title: '50 sessions!',         message: "Fifty sessions. Most people quit at 5. You didn't." },
-  100: { icon: 'Trophy', title: '100 sessions!',       message: "One hundred. You are a COUNT legend. Truly elite." },
+const EFFORT_LABELS = ['', 'Recovery', 'Easy', 'Moderate', 'Hard', 'Max effort']
+
+type MilestoneMeta = { title: string; message: string; Icon: () => React.ReactElement }
+const StarIcon = () => (
+  <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1 3-6z" />
+  </svg>
+)
+const FireIcon = () => (
+  <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+  </svg>
+)
+const TrophyIcon = () => (
+  <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8 21h8M12 17v4M17 4h3v4a5 5 0 0 1-5 5M7 4H4v4a5 5 0 0 0 5 5M17 4H7v9a5 5 0 0 0 10 0V4z" />
+  </svg>
+)
+const MedalIcon = () => (
+  <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="15" r="6" />
+    <path d="M9 21l3-3 3 3M7 4l5 5 5-5" />
+  </svg>
+)
+
+const MILESTONES: Record<number, MilestoneMeta> = {
+  1: { title: 'First session!', message: 'Every legend starts somewhere. You just took your first step.', Icon: StarIcon },
+  5: { title: '5 sessions strong!', message: 'You\u2019re building a habit. Keep showing up.', Icon: FireIcon },
+  10: { title: '10 sessions down!', message: 'Double digits. You\u2019re officially consistent.', Icon: StarIcon },
+  25: { title: '25 sessions!', message: 'A quarter century of workouts. Top-tier commitment.', Icon: MedalIcon },
+  50: { title: '50 sessions!', message: 'Fifty sessions. Most people quit at 5. You didn\u2019t.', Icon: TrophyIcon },
+  100: { title: '100 sessions!', message: 'One hundred. You are a COUNT legend. Truly elite.', Icon: TrophyIcon },
 }
 
+const VERIFICATION_LABELS: Record<string, string> = {
+  apple_health: 'Apple Health',
+  garmin: 'Garmin',
+  fitbit: 'Fitbit',
+  google_fit: 'Google Fit',
+  gps: 'GPS',
+  gps_denied: 'GPS Blocked',
+  strava: 'Strava',
+}
+
+function pexelsUrl(id: string) {
+  return `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2`
+}
+
+// ===== COUNT logo (matches rewards/home/profile) =====
+function CountLogo({ size = 'sm' }: { size?: 'sm' | 'md' }) {
+  const scale = size === 'md' ? 1.4 : 1
+  const markW = 35.2 * scale
+  const markH = 28.8 * scale
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 9.6 * scale, justifyContent: 'center' }}>
+      <div style={{ position: 'relative', width: markW, height: markH }}>
+        {[4.8, 11.2, 17.6, 24].map((leftBase, i) => (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              left: leftBase * scale,
+              top: 3.2 * scale,
+              width: 3.2 * scale,
+              height: 22.4 * scale,
+              background: TOK.fg,
+              borderRadius: 2,
+            }}
+          />
+        ))}
+        <div
+          style={{
+            position: 'absolute',
+            top: 12.8 * scale,
+            left: -1.6 * scale,
+            width: 38.4 * scale,
+            height: 2.8 * scale,
+            background: TOK.copper,
+            borderRadius: 2,
+            transform: 'rotate(-30deg)',
+          }}
+        />
+      </div>
+      <span
+        style={{
+          fontFamily: 'Archivo, var(--sans), sans-serif',
+          fontSize: 16 * scale,
+          fontWeight: 900,
+          letterSpacing: '0.3em',
+          textTransform: 'uppercase',
+          color: TOK.fg,
+        }}
+      >
+        COUNT
+      </span>
+    </div>
+  )
+}
+
+// ===== Photo tile (featured or small) =====
+function PhotoTile({
+  type,
+  variant,
+  pointsPreview,
+  onClick,
+}: {
+  type: WT
+  variant: 'featured' | 'small'
+  pointsPreview?: number
+  onClick: () => void
+}) {
+  const h = variant === 'featured' ? 160 : 100
+  const radius = variant === 'featured' ? 18 : 14
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        position: 'relative',
+        height: h,
+        borderRadius: radius,
+        overflow: 'hidden',
+        border: `1px solid ${TOK.hairline}`,
+        backgroundImage: `url(${pexelsUrl(type.photo)})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        padding: 0,
+        cursor: 'pointer',
+        textAlign: 'left',
+        color: TOK.fg,
+        width: '100%',
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background:
+            'linear-gradient(180deg, rgba(14,14,13,0.10) 0%, rgba(14,14,13,0.55) 65%, rgba(14,14,13,0.90) 100%)',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage:
+            'repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0 2px, transparent 2px 10px)',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          padding: variant === 'featured' ? '14px 16px' : '10px 12px',
+        }}
+      >
+        <div
+          style={{
+            fontFamily: 'var(--mono)',
+            fontSize: variant === 'featured' ? 9 : 8,
+            letterSpacing: '0.22em',
+            textTransform: 'uppercase',
+            color: 'rgba(245,240,234,0.7)',
+          }}
+        >
+          {type.value === 'cardio' || type.value === 'hiit' || type.value === 'custom' ? type.value === 'custom' ? 'Log your own' : 'Cardio' : 'Strength'}
+        </div>
+        <div
+          style={{
+            fontFamily: 'var(--serif)',
+            fontSize: variant === 'featured' ? 24 : 18,
+            letterSpacing: '-0.015em',
+            lineHeight: 1.1,
+            color: TOK.fg,
+            marginTop: 2,
+          }}
+        >
+          {type.label}
+        </div>
+        {variant === 'featured' && pointsPreview != null && (
+          <div
+            style={{
+              fontFamily: 'var(--mono)',
+              fontSize: 9,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: TOK.copper2,
+              marginTop: 6,
+              fontWeight: 600,
+            }}
+          >
+            +{pointsPreview} coins
+          </div>
+        )}
+      </div>
+    </button>
+  )
+}
+
+// ===== Main page =====
 export default function LogPage() {
   const { user, refreshUser } = useAuth()
   const router = useRouter()
   const supabase = createClient()
 
-  const [step, setStep] = useState<'type' | 'details' | 'confirm' | 'success'>('type')
+  const [step, setStep] = useState<'select' | 'success'>('select')
+  const [sheetOpen, setSheetOpen] = useState(false)
   const [workoutType, setWorkoutType] = useState<WorkoutType>('push')
   const [customName, setCustomName] = useState('')
   const [duration, setDuration] = useState(60)
@@ -57,7 +268,7 @@ export default function LogPage() {
   if (!user) return null
 
   const tier = getTier(user.lifetime_sessions)
-  const { base, multiplier, total, verifiedBonus, streakMultiplier } = calculatePoints({
+  const { total, multiplier } = calculatePoints({
     verified: false,
     lifetimeSessions: user.lifetime_sessions,
     currentStreak: user.current_streak,
@@ -68,8 +279,22 @@ export default function LogPage() {
     currentStreak: user.current_streak,
   })
 
+  function openSheet(value: WorkoutType) {
+    setWorkoutType(value)
+    setEffortRating(0)
+    setNotes('')
+    setDuration(60)
+    setCustomName('')
+    setError('')
+    setSheetOpen(true)
+  }
+
   async function handleLog() {
     if (!user) return
+    if (workoutType === 'custom' && !customName.trim()) {
+      setError('Name your custom session first.')
+      return
+    }
     setLoading(true)
     setError('')
 
@@ -83,7 +308,7 @@ export default function LogPage() {
       .limit(1)
 
     if (todaySession && todaySession.length > 0) {
-      setError("You've already logged a session today. One per day maximum.")
+      setError('You\u2019ve already logged a session today. One per day.')
       setLoading(false)
       return
     }
@@ -105,13 +330,13 @@ export default function LogPage() {
       verified = true
       const provider = terraActivity[0].provider?.toUpperCase()
       verificationMethod =
-        provider === 'APPLE'  ? 'apple_health' :
+        provider === 'APPLE' ? 'apple_health' :
         provider === 'GARMIN' ? 'garmin' :
         provider === 'FITBIT' ? 'fitbit' :
         provider === 'GOOGLE' ? 'google_fit' :
         provider?.toLowerCase() ?? 'unverified'
       heartRateAvg = terraActivity[0].heart_rate_avg
-      calories     = terraActivity[0].calories
+      calories = terraActivity[0].calories
     }
 
     if (!verified) {
@@ -123,8 +348,8 @@ export default function LogPage() {
 
       if (stravaConn && new Date(stravaConn.token_expires_at) > new Date()) {
         try {
-          const _today  = new Date()
-          const _after  = Math.floor(new Date(_today.getFullYear(), _today.getMonth(), _today.getDate()).getTime() / 1000)
+          const _today = new Date()
+          const _after = Math.floor(new Date(_today.getFullYear(), _today.getMonth(), _today.getDate()).getTime() / 1000)
           const _stravaRes = await fetch(
             `https://www.strava.com/api/v3/athlete/activities?after=${_after}&before=${_after + 86400}&per_page=1`,
             { headers: { Authorization: `Bearer ${stravaConn.access_token}` } }
@@ -136,7 +361,9 @@ export default function LogPage() {
               verificationMethod = 'strava'
             }
           }
-        } catch { /* strava check is best-effort */ }
+        } catch {
+          /* strava check is best-effort */
+        }
       }
     }
 
@@ -147,22 +374,26 @@ export default function LogPage() {
     })
 
     const { error: workoutError } = await supabase.from('workouts').insert({
-      user_id:             user.id,
-      type:                workoutType,
-      custom_name:         workoutType === 'custom' ? customName : null,
-      duration_minutes:    duration,
+      user_id: user.id,
+      type: workoutType,
+      custom_name: workoutType === 'custom' ? customName : null,
+      duration_minutes: duration,
       verification_method: verificationMethod,
       verified,
-      heart_rate_avg:      heartRateAvg,
+      heart_rate_avg: heartRateAvg,
       calories,
-      base_points:         pts.base,
-      multiplier_applied:  pts.multiplier,
+      base_points: pts.base,
+      multiplier_applied: pts.multiplier,
       total_points_earned: pts.total,
-      effort_rating:       effortRating || null,
-      notes:               notes.trim() || null,
+      effort_rating: effortRating || null,
+      notes: notes.trim() || null,
     })
 
-    if (workoutError) { setError(workoutError.message); setLoading(false); return }
+    if (workoutError) {
+      setError(workoutError.message)
+      setLoading(false)
+      return
+    }
 
     const newSessions = user.lifetime_sessions + 1
     const newTier = getTier(newSessions)
@@ -176,25 +407,27 @@ export default function LogPage() {
       .select('id')
       .eq('user_id', user.id)
       .gte('logged_at', yesterday.toISOString())
-      .lt('logged_at', new Date(new Date().setHours(0,0,0,0)).toISOString())
+      .lt('logged_at', new Date(new Date().setHours(0, 0, 0, 0)).toISOString())
       .limit(1)
 
-    const newStreak  = (yesterdaySession && yesterdaySession.length > 0) ? user.current_streak + 1 : 1
+    const newStreak = yesterdaySession && yesterdaySession.length > 0 ? user.current_streak + 1 : 1
     const newLongest = Math.max(user.longest_streak, newStreak)
 
-    // Generate mystery bonus
     const bonus = generateMysteryBonus(newStreak)
     const totalWithBonus = pts.total + bonus.amount
 
-    await supabase.from('users').update({
-      lifetime_sessions:         newSessions,
-      tier:                      newTier,
-      multiplier:                tierMultipliers[newTier],
-      points_balance:            user.points_balance + totalWithBonus,
-      points_lifetime_earned:    user.points_lifetime_earned + totalWithBonus,
-      current_streak:            newStreak,
-      longest_streak:            newLongest,
-      }).eq('id', user.id)
+    await supabase
+      .from('users')
+      .update({
+        lifetime_sessions: newSessions,
+        tier: newTier,
+        multiplier: tierMultipliers[newTier],
+        points_balance: user.points_balance + totalWithBonus,
+        points_lifetime_earned: user.points_lifetime_earned + totalWithBonus,
+        current_streak: newStreak,
+        longest_streak: newLongest,
+      })
+      .eq('id', user.id)
 
     if (user.lifetime_sessions === 0 && user.referred_by && !user.referral_bonus_claimed) {
       const { data: referrer } = await supabase
@@ -203,12 +436,16 @@ export default function LogPage() {
         .eq('id', user.referred_by)
         .single()
       if (referrer) {
-        await supabase.from('users').update({
-          points_balance:         referrer.points_balance + getReferralPoints(referrer.tier as Tier),
-          points_lifetime_earned: referrer.points_lifetime_earned + getReferralPoints(referrer.tier as Tier),
-        }).eq('id', referrer.id)
+        await supabase
+          .from('users')
+          .update({
+            points_balance: referrer.points_balance + getReferralPoints(referrer.tier as Tier),
+            points_lifetime_earned: referrer.points_lifetime_earned + getReferralPoints(referrer.tier as Tier),
+          })
+          .eq('id', referrer.id)
         await supabase.from('users').update({ referral_bonus_claimed: true }).eq('id', user.id)
-        await supabase.from('referrals')
+        await supabase
+          .from('referrals')
           .update({ bonus_awarded: true, bonus_awarded_at: new Date().toISOString() })
           .eq('referred_id', user.id)
       }
@@ -222,21 +459,12 @@ export default function LogPage() {
     setBonusRevealed(false)
     await refreshUser()
     setLoading(false)
+    setSheetOpen(false)
     setStep('success')
   }
 
-  const VERIFICATION_LABELS: Record<string, string> = {
-    apple_health: 'Apple Health',
-    garmin:       'Garmin',
-    fitbit:       'Fitbit',
-    google_fit:   'Google Fit',
-    gps:          'GPS',
-    gps_denied:   'GPS Blocked',
-    strava:       'Strava',
-  }
-
-  const handleShare = async () => {
-    const wt = WORKOUT_TYPES.find(t => t.value === workoutType)!
+  async function handleShare() {
+    const wt = WORKOUT_TYPES.find((t) => t.value === workoutType)!
     await document.fonts.ready
 
     const SIZE = 1080
@@ -245,100 +473,88 @@ export default function LogPage() {
     canvas.height = SIZE
     const ctx = canvas.getContext('2d')!
 
-    // Background gradient
     const bg = ctx.createLinearGradient(0, 0, SIZE, SIZE)
     bg.addColorStop(0, '#1C1B19')
     bg.addColorStop(1, '#0E0D0C')
     ctx.fillStyle = bg
     ctx.fillRect(0, 0, SIZE, SIZE)
 
-    // Border
     ctx.strokeStyle = 'rgba(181,89,60,0.35)'
     ctx.lineWidth = 3
     ctx.strokeRect(44, 44, SIZE - 88, SIZE - 88)
 
-    // COUNT wordmark
     ctx.fillStyle = '#B5593C'
     ctx.font = '900 78px Archivo, sans-serif'
     ctx.fillText('COUNT', 84, 158)
 
-    // Tagline
     ctx.fillStyle = '#2A2A28'
-    ctx.font = '500 26px "JetBrains Mono", monospace'
+    ctx.font = '500 26px "Geist Mono", "JetBrains Mono", monospace'
     ctx.fillText('MAKE IT COUNT', 86, 204)
 
-    // Divider
     ctx.strokeStyle = 'rgba(245,240,234,0.07)'
     ctx.lineWidth = 1
-    ctx.beginPath(); ctx.moveTo(84, 238); ctx.lineTo(SIZE - 84, 238); ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(84, 238)
+    ctx.lineTo(SIZE - 84, 238)
+    ctx.stroke()
 
-    // Icon (drawing via canvas, using a simple placeholder)
-    // Note: For actual icon rendering, consider using SVG overlay instead
-    ctx.font = '170px serif'
-    ctx.fillText('⚙', 76, 474)
-
-    // Workout name
     ctx.fillStyle = '#F5F0EA'
-    ctx.font = '900 96px Archivo, sans-serif'
-    ctx.fillText(wt.label.toUpperCase(), 84, 592)
+    ctx.font = '400 144px "Instrument Serif", Georgia, serif'
+    ctx.fillText(wt.label, 84, 440)
 
-    // Session label
     ctx.fillStyle = '#444442'
-    ctx.font = '500 30px "JetBrains Mono", monospace'
-    ctx.fillText('SESSION LOGGED', 84, 642)
+    ctx.font = '500 30px "Geist Mono", "JetBrains Mono", monospace'
+    ctx.fillText('SESSION LOGGED', 84, 490)
 
-    // Divider
     ctx.strokeStyle = 'rgba(245,240,234,0.07)'
     ctx.lineWidth = 1
-    ctx.beginPath(); ctx.moveTo(84, 678); ctx.lineTo(SIZE - 84, 678); ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(84, 528)
+    ctx.lineTo(SIZE - 84, 528)
+    ctx.stroke()
 
-    // Points box
     ctx.fillStyle = 'rgba(181,89,60,0.1)'
     ctx.beginPath()
-    ctx.roundRect(84, 706, 460, 230, 18)
+    ctx.roundRect(84, 560, 460, 230, 18)
     ctx.fill()
     ctx.strokeStyle = 'rgba(181,89,60,0.2)'
     ctx.lineWidth = 1
     ctx.stroke()
 
     ctx.fillStyle = '#444442'
-    ctx.font = '500 27px "JetBrains Mono", monospace'
-    ctx.fillText('POINTS EARNED', 114, 754)
+    ctx.font = '500 27px "Geist Mono", "JetBrains Mono", monospace'
+    ctx.fillText('COINS EARNED', 114, 608)
     ctx.fillStyle = '#B5593C'
-    ctx.font = '900 108px "JetBrains Mono", monospace'
-    ctx.fillText(`+${earnedPoints}`, 114, 884)
+    ctx.font = '400 140px "Instrument Serif", Georgia, serif'
+    ctx.fillText(`+${earnedPoints}`, 114, 748)
 
-    // Streak box
     if (sharedStreak > 0) {
       ctx.fillStyle = '#1A1A18'
       ctx.beginPath()
-      ctx.roundRect(564, 706, 432, 230, 18)
+      ctx.roundRect(564, 560, 432, 230, 18)
       ctx.fill()
       ctx.strokeStyle = 'rgba(245,240,234,0.07)'
       ctx.lineWidth = 1
       ctx.stroke()
 
       ctx.fillStyle = '#444442'
-      ctx.font = '500 27px "JetBrains Mono", monospace'
-      ctx.fillText('STREAK', 594, 754)
+      ctx.font = '500 27px "Geist Mono", "JetBrains Mono", monospace'
+      ctx.fillText('STREAK', 594, 608)
       ctx.fillStyle = '#F5F0EA'
-      ctx.font = '900 90px "JetBrains Mono", monospace'
-      ctx.fillText(`${sharedStreak}`, 594, 876)
-      // Note: Fire icon would be rendered here - consider SVG overlay for better quality
+      ctx.font = '400 132px "Instrument Serif", Georgia, serif'
+      ctx.fillText(`${sharedStreak}`, 594, 748)
     }
 
-    // URL
     ctx.fillStyle = '#252523'
-    ctx.font = '500 26px "JetBrains Mono", monospace'
+    ctx.font = '500 26px "Geist Mono", "JetBrains Mono", monospace'
     ctx.fillText('countfitness.app', 84, SIZE - 66)
 
-    // Generate PNG and share
     canvas.toBlob(async (blob) => {
       if (!blob) return
       const file = new File([blob], 'count-workout.png', { type: 'image/png' })
       try {
         if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `${wt.label} · +${earnedPoints} pts` })
+          await navigator.share({ files: [file], title: `${wt.label} · +${earnedPoints} coins` })
         } else {
           const url = URL.createObjectURL(blob)
           const a = document.createElement('a')
@@ -351,395 +567,1174 @@ export default function LogPage() {
           setShareCopied(true)
           setTimeout(() => setShareCopied(false), 2500)
         }
-      } catch { /* dismissed */ }
+      } catch {
+        /* dismissed */
+      }
     }, 'image/png')
   }
+
+  // ===== Success screen =====
   if (step === 'success') {
     const milestone = MILESTONES[newSessionCount]
-    const wt = WORKOUT_TYPES.find(t => t.value === workoutType)!
+    const wt = WORKOUT_TYPES.find((t) => t.value === workoutType)!
+    const MilestoneIcon = milestone?.Icon
+    const isStreakMilestone = [3, 7, 14, 21, 30].includes(sharedStreak)
+    const bonusColor =
+      mysteryBonus?.rarity === 'epic' ? '#A855F7' :
+      mysteryBonus?.rarity === 'rare' ? '#EAB308' :
+      TOK.copper
     return (
-      <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#0E0E0D' }}>
-        <div style={{ textAlign: 'center', width: '100%', maxWidth: 360 }}>
-          {milestone && (
-            <div style={{ background: 'linear-gradient(135deg, #B5593C 0%, #D97706 100%)', borderRadius: 16, padding: '20px 24px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: -20, right: -20, opacity: 0.15, lineHeight: 1 }}>
-                <Icon emoji={milestone.icon} size={80} />
-              </div>
-              <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2, color: 'rgba(255,255,255,0.75)', marginBottom: 6 }}>Milestone Unlocked</p>
-              <div style={{ fontSize: 32, marginBottom: 6 }}>
-                <Icon emoji={milestone.icon} size={32} />
-              </div>
-              <p style={{ fontSize: 22, fontWeight: 900, color: '#fff', fontFamily: 'Archivo, sans-serif', marginBottom: 6 }}>{milestone.title}</p>
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', lineHeight: 1.4 }}>{milestone.message}</p>
-            </div>
-          )}
-          <div style={{ marginBottom: 12 }}>
-            <Trophy size={milestone ? 40 : 56} color="#B5593C" />
+      <div
+        style={{
+          background: TOK.bg,
+          minHeight: '100dvh',
+          color: TOK.fg,
+          fontFamily: 'var(--sans)',
+          paddingBottom: 120,
+        }}
+      >
+        <style jsx global>{`
+          @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+          :root {
+            --sans: 'Geist', system-ui, -apple-system, sans-serif;
+            --mono: 'Geist Mono', ui-monospace, monospace;
+            --serif: 'Instrument Serif', Georgia, serif;
+          }
+          @keyframes sheetUp {
+            from {
+              transform: translateY(100%);
+            }
+            to {
+              transform: translateY(0);
+            }
+          }
+          @keyframes shimmer {
+            0% {
+              background-position: 200% 0;
+            }
+            100% {
+              background-position: -200% 0;
+            }
+          }
+        `}</style>
+
+        <div
+          style={{
+            padding: '14px 20px 6px',
+            display: 'flex',
+            justifyContent: 'center',
+            borderBottom: `1px solid ${TOK.hairline}`,
+          }}
+        >
+          <CountLogo />
+        </div>
+
+        <div style={{ padding: '22px 20px 0', textAlign: 'left' }}>
+          <div
+            style={{
+              fontFamily: 'var(--mono)',
+              fontSize: 9,
+              letterSpacing: '0.24em',
+              textTransform: 'uppercase',
+              color: TOK.muted,
+            }}
+          >
+            Session logged
           </div>
-          <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, marginBottom: 8, fontFamily: 'Archivo, sans-serif' }}>Session logged!</h2>
-          <p style={{ color: 'rgba(245,240,234,0.5)', marginBottom: 20 }}>You showed up. That&apos;s what counts.</p>
-          <div style={{ background: '#111110', borderRadius: 16, padding: '20px 32px', marginBottom: verificationSource ? 12 : 24, display: 'inline-block', width: '100%' }}>
-            <p style={{ color: '#8A8478', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 }}>Points Earned</p>
-            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 44, fontWeight: 900, color: '#B5593C', lineHeight: 1 }}>+{earnedPoints}</p>
-            <p style={{ color: '#8A8478', fontSize: 12, marginTop: 4 }}>{getTierLabel(tier)} tier &middot; {multiplier}x multiplier</p>
+          <div
+            style={{
+              fontFamily: 'var(--serif)',
+              fontSize: 32,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.05,
+              marginTop: 3,
+            }}
+          >
+            Nice work.
           </div>
-          {verificationSource && (
-            <div style={{ background: 'rgba(22,163,74,0.12)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 10, padding: '8px 16px', marginBottom: 20, fontSize: 12, color: '#4ade80', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span>✓</span> Verified via {VERIFICATION_LABELS[verificationSource] ?? verificationSource}
+          <div style={{ fontFamily: 'var(--sans)', fontSize: 13, color: TOK.muted, marginTop: 6 }}>
+            You showed up. That’s what counts.
+          </div>
+        </div>
+
+        {/* Milestone banner */}
+        {milestone && MilestoneIcon && (
+          <div style={{ padding: '16px 16px 0' }}>
+            <div
+              style={{
+                position: 'relative',
+                borderRadius: 18,
+                overflow: 'hidden',
+                border: `1px solid ${TOK.hairline}`,
+                background: `linear-gradient(160deg, ${TOK.copper} 0%, ${TOK.copperDim} 55%, ${TOK.bg} 110%)`,
+                padding: '18px 20px',
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundImage:
+                    'repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0 2px, transparent 2px 10px)',
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  top: -24,
+                  right: -18,
+                  opacity: 0.18,
+                  transform: 'scale(4)',
+                  transformOrigin: 'top right',
+                }}
+              >
+                <MilestoneIcon />
+              </div>
+              <div
+                style={{
+                  position: 'relative',
+                  fontFamily: 'var(--mono)',
+                  fontSize: 10,
+                  letterSpacing: '0.22em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(245,240,234,0.8)',
+                }}
+              >
+                Milestone unlocked
+              </div>
+              <div
+                style={{
+                  position: 'relative',
+                  fontFamily: 'var(--serif)',
+                  fontSize: 28,
+                  letterSpacing: '-0.015em',
+                  lineHeight: 1.1,
+                  marginTop: 4,
+                }}
+              >
+                {milestone.title}
+              </div>
+              <div
+                style={{
+                  position: 'relative',
+                  fontFamily: 'var(--sans)',
+                  fontSize: 13,
+                  color: 'rgba(245,240,234,0.82)',
+                  marginTop: 6,
+                  lineHeight: 1.4,
+                }}
+              >
+                {milestone.message}
+              </div>
             </div>
-          )}
-          {/* Mystery bonus card */}
-          {mysteryBonus && (
+          </div>
+        )}
+
+        {/* Points card */}
+        <div style={{ padding: '14px 16px 0' }}>
+          <div
+            style={{
+              background: TOK.card,
+              border: `1px solid ${TOK.hairline}`,
+              borderRadius: 18,
+              padding: '20px 22px',
+            }}
+          >
+            <div
+              style={{
+                fontFamily: 'var(--mono)',
+                fontSize: 10,
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: TOK.muted,
+              }}
+            >
+              Coins earned
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 4 }}>
+              <span
+                style={{
+                  fontFamily: 'var(--serif)',
+                  fontSize: 64,
+                  color: TOK.copper,
+                  letterSpacing: '-0.04em',
+                  lineHeight: 1,
+                  fontFeatureSettings: '"tnum"',
+                }}
+              >
+                +{earnedPoints}
+              </span>
+            </div>
+            <div style={{ fontFamily: 'var(--sans)', fontSize: 12, color: TOK.muted, marginTop: 6 }}>
+              {getTierLabel(tier)} tier · {multiplier}× multiplier
+            </div>
+            {verificationSource && (
+              <div
+                style={{
+                  marginTop: 12,
+                  padding: '6px 10px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: 'rgba(22,163,74,0.10)',
+                  border: '1px solid rgba(34,197,94,0.25)',
+                  borderRadius: 999,
+                  fontFamily: 'var(--mono)',
+                  fontSize: 10,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: '#86efac',
+                }}
+              >
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#86efac' }} />
+                Verified · {VERIFICATION_LABELS[verificationSource] ?? verificationSource}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Mystery bonus */}
+        {mysteryBonus && (
+          <div style={{ padding: '14px 16px 0' }}>
             <button
               onClick={() => setBonusRevealed(true)}
+              disabled={bonusRevealed}
               style={{
                 width: '100%',
-                background: bonusRevealed
-                  ? mysteryBonus.rarity === 'epic' ? 'linear-gradient(135deg, rgba(168,85,247,0.2) 0%, rgba(236,72,153,0.2) 100%)'
-                  : mysteryBonus.rarity === 'rare' ? 'linear-gradient(135deg, rgba(234,179,8,0.15) 0%, rgba(245,158,11,0.15) 100%)'
-                  : 'rgba(181,89,60,0.1)'
-                  : 'linear-gradient(135deg, #1C1B19 0%, #1A1917 100%)',
-                border: bonusRevealed
-                  ? `1.5px solid ${mysteryBonus.rarity === 'epic' ? 'rgba(168,85,247,0.5)' : mysteryBonus.rarity === 'rare' ? 'rgba(234,179,8,0.4)' : 'rgba(181,89,60,0.3)'}`
-                  : '1.5px solid rgba(181,89,60,0.35)',
-                borderRadius: 14,
-                padding: '16px 20px',
-                marginBottom: 16,
-                cursor: bonusRevealed ? 'default' : 'pointer',
-                textAlign: 'center',
-                transition: 'all 0.4s ease',
                 position: 'relative',
                 overflow: 'hidden',
+                background: bonusRevealed
+                  ? `linear-gradient(135deg, ${bonusColor}22 0%, ${bonusColor}11 100%)`
+                  : TOK.card,
+                border: `1px solid ${bonusRevealed ? `${bonusColor}66` : TOK.hairline2}`,
+                borderRadius: 16,
+                padding: '18px 20px',
+                textAlign: 'left',
+                cursor: bonusRevealed ? 'default' : 'pointer',
+                transition: 'all 0.4s ease',
+                color: TOK.fg,
               }}
             >
               {!bonusRevealed ? (
                 <>
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, transparent 0%, rgba(181,89,60,0.08) 50%, transparent 100%)', animation: 'shimmer 2s infinite', backgroundSize: '200% 100%' }} />
-                  <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2, color: '#B5593C', marginBottom: 6 }}>Mystery Bonus</p>
-                  <div style={{ marginBottom: 4 }}>
-                    <Gift size={28} color="#B5593C" />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      backgroundImage:
+                        'linear-gradient(90deg, transparent 0%, rgba(181,89,60,0.10) 50%, transparent 100%)',
+                      backgroundSize: '200% 100%',
+                      animation: 'shimmer 2.2s infinite linear',
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: 'relative',
+                      fontFamily: 'var(--mono)',
+                      fontSize: 10,
+                      letterSpacing: '0.22em',
+                      textTransform: 'uppercase',
+                      color: TOK.copper,
+                    }}
+                  >
+                    Mystery bonus
                   </div>
-                  <p style={{ fontSize: 13, color: 'rgba(245,240,234,0.6)', fontWeight: 600 }}>Tap to reveal your bonus coins</p>
+                  <div
+                    style={{
+                      position: 'relative',
+                      fontFamily: 'var(--serif)',
+                      fontSize: 20,
+                      letterSpacing: '-0.015em',
+                      lineHeight: 1.1,
+                      marginTop: 4,
+                    }}
+                  >
+                    Tap to reveal your bonus coins
+                  </div>
                 </>
               ) : (
                 <>
-                  <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2, color: mysteryBonus.rarity === 'epic' ? '#A855F7' : mysteryBonus.rarity === 'rare' ? '#EAB308' : mysteryBonus.rarity === 'uncommon' ? '#B5593C' : '#8A8478', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
-                    {mysteryBonus.rarity === 'epic' ? (
-                      <>
-                        <Zap size={14} /> Epic Bonus!
-                      </>
-                    ) : mysteryBonus.rarity === 'rare' ? (
-                      <>
-                        <Sparkles size={14} /> Rare Bonus!
-                      </>
-                    ) : mysteryBonus.rarity === 'uncommon' ? (
-                      <>
-                        <Target size={14} /> Nice Bonus!
-                      </>
-                    ) : (
-                      <>
-                        <Gift size={14} /> Bonus Coins
-                      </>
-                    )}
+                  <div
+                    style={{
+                      fontFamily: 'var(--mono)',
+                      fontSize: 10,
+                      letterSpacing: '0.22em',
+                      textTransform: 'uppercase',
+                      color: bonusColor,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {mysteryBonus.rarity === 'epic'
+                      ? 'Epic bonus!'
+                      : mysteryBonus.rarity === 'rare'
+                        ? 'Rare bonus!'
+                        : mysteryBonus.rarity === 'uncommon'
+                          ? 'Nice bonus!'
+                          : 'Bonus coins'}
                   </div>
-                  <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 36, fontWeight: 900, color: mysteryBonus.rarity === 'epic' ? '#A855F7' : mysteryBonus.rarity === 'rare' ? '#EAB308' : '#B5593C', lineHeight: 1, marginBottom: 4 }}>+{mysteryBonus.amount}</p>
-                  <p style={{ fontSize: 12, color: 'rgba(245,240,234,0.5)' }}>bonus coins added</p>
+                  <div
+                    style={{
+                      fontFamily: 'var(--serif)',
+                      fontSize: 44,
+                      color: bonusColor,
+                      letterSpacing: '-0.04em',
+                      lineHeight: 1,
+                      marginTop: 4,
+                      fontFeatureSettings: '"tnum"',
+                    }}
+                  >
+                    +{mysteryBonus.amount}
+                  </div>
+                  <div style={{ fontFamily: 'var(--sans)', fontSize: 12, color: TOK.muted, marginTop: 6 }}>
+                    bonus coins added to your balance
+                  </div>
                 </>
               )}
             </button>
-          )}
-          {/* Share card */}
-          <div style={{ background: 'linear-gradient(145deg, #1C1B19 0%, #141413 100%)', border: '1px solid rgba(181,89,60,0.25)', borderRadius: 16, padding: '18px 20px', marginBottom: 14, textAlign: 'left', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', top: -24, right: -24, opacity: 0.06, lineHeight: 1, userSelect: 'none' }}>
-              <Icon emoji={wt.icon} size={80} />
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-              <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 12, fontWeight: 900, letterSpacing: '0.2em', color: '#B5593C', textTransform: 'uppercase' }}>COUNT</span>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#333', letterSpacing: 1, textTransform: 'uppercase' }}>make it count</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-              <Icon emoji={wt.icon} size={26} />
-              <div>
-                <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#555', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 2 }}>Session logged</p>
-                <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 18, fontWeight: 900, color: '#F5F0EA', lineHeight: 1 }}>{wt.label}</p>
+          </div>
+        )}
+
+        {/* Share card */}
+        <div style={{ padding: '14px 16px 0' }}>
+          <div
+            style={{
+              background: TOK.card,
+              border: `1px solid ${TOK.hairline}`,
+              borderRadius: 16,
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                position: 'relative',
+                height: 120,
+                backgroundImage: `url(${pexelsUrl(wt.photo)})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background:
+                    'linear-gradient(180deg, rgba(14,14,13,0.25) 0%, rgba(14,14,13,0.85) 100%)',
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  padding: '12px 16px',
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: 'var(--mono)',
+                    fontSize: 9,
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(245,240,234,0.7)',
+                  }}
+                >
+                  Session
+                </div>
+                <div
+                  style={{
+                    fontFamily: 'var(--serif)',
+                    fontSize: 22,
+                    letterSpacing: '-0.015em',
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {workoutType === 'custom' && customName ? customName : wt.label}
+                </div>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-              <div style={{ flex: 1, background: 'rgba(181,89,60,0.1)', border: '1px solid rgba(181,89,60,0.2)', borderRadius: 10, padding: '10px 12px' }}>
-                <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#555', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3 }}>Earned</p>
-                <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 22, fontWeight: 900, color: '#B5593C', lineHeight: 1 }}>+{earnedPoints}{bonusRevealed && mysteryBonus ? ` +${mysteryBonus.amount}` : ''}</p>
+            <div style={{ display: 'flex', padding: '14px 16px', gap: 10 }}>
+              <div style={{ flex: 1 }}>
+                <div
+                  style={{
+                    fontFamily: 'var(--mono)',
+                    fontSize: 9,
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    color: TOK.muted,
+                  }}
+                >
+                  Earned
+                </div>
+                <div
+                  style={{
+                    fontFamily: 'var(--serif)',
+                    fontSize: 26,
+                    color: TOK.copper,
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1,
+                    marginTop: 4,
+                    fontFeatureSettings: '"tnum"',
+                  }}
+                >
+                  +{earnedPoints}
+                  {bonusRevealed && mysteryBonus ? (
+                    <span style={{ fontSize: 14, color: bonusColor, marginLeft: 6 }}>
+                      +{mysteryBonus.amount}
+                    </span>
+                  ) : null}
+                </div>
               </div>
               {sharedStreak > 0 && (
-                <div style={{ flex: 1, background: '#1A1A18', border: '1px solid rgba(245,240,234,0.07)', borderRadius: 10, padding: '10px 12px' }}>
-                  <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#555', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3 }}>Streak</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 22, fontWeight: 900, color: '#F5F0EA', lineHeight: 1 }}>{sharedStreak}</p>
-                    <Flame size={20} color="#F5F0EA" />
+                <div style={{ flex: 1, borderLeft: `1px solid ${TOK.hairline}`, paddingLeft: 14 }}>
+                  <div
+                    style={{
+                      fontFamily: 'var(--mono)',
+                      fontSize: 9,
+                      letterSpacing: '0.22em',
+                      textTransform: 'uppercase',
+                      color: TOK.muted,
+                    }}
+                  >
+                    Streak
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: 'var(--serif)',
+                      fontSize: 26,
+                      color: TOK.fg,
+                      letterSpacing: '-0.02em',
+                      lineHeight: 1,
+                      marginTop: 4,
+                      fontFeatureSettings: '"tnum"',
+                    }}
+                  >
+                    {sharedStreak}
+                    <span style={{ fontFamily: 'var(--mono)', fontSize: 11, color: TOK.muted, marginLeft: 4 }}>
+                      {sharedStreak === 1 ? 'day' : 'days'}
+                    </span>
                   </div>
                 </div>
               )}
             </div>
-            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#2E2E2C', letterSpacing: 0.8, textAlign: 'center' }}>countfitness.app</p>
           </div>
-          <button onClick={handleShare} style={{ width: '100%', padding: '13px 0', background: shareCopied ? 'rgba(93,187,99,0.15)' : 'rgba(181,89,60,0.1)', border: `1.5px solid ${shareCopied? 'rgba(93,187,99,0.4)' : 'rgba(181,89,60,0.3)'}`, borderRadius: 10, color: shareCopied ? '#5DBB63' : '#B5593C', fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer', marginBottom: 10, transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-            {shareCopied ? (
-              <>
-                <span>✓</span> Copied to clipboard
-              </>
-            ) : (
-              <>
-                <Share2 size={16} /> Share your workout
-              </>
-            )}
+          <button
+            onClick={handleShare}
+            style={{
+              width: '100%',
+              marginTop: 10,
+              padding: '13px 14px',
+              background: shareCopied ? 'rgba(22,163,74,0.12)' : 'transparent',
+              color: shareCopied ? '#86efac' : TOK.copper,
+              border: `1px solid ${shareCopied ? 'rgba(34,197,94,0.35)' : `${TOK.copper}66`}`,
+              borderRadius: 12,
+              fontFamily: 'var(--mono)',
+              fontSize: 11,
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            {shareCopied ? 'Copied to clipboard' : 'Share your workout →'}
           </button>
-          {/* Post-workout referral nudge — enhanced on streak milestones */}
-          {user?.referral_code && (() => {
-            const isStreakMilestone = [3, 7, 14, 21, 30].includes(sharedStreak)
-            return isStreakMilestone ? (
-              <Link href="/invite" style={{ display: 'block', textDecoration: 'none', marginBottom: 10 }}>
-                <div style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.10) 0%, rgba(181,89,60,0.10) 100%)', border: '1.5px solid rgba(34,197,94,0.25)', borderRadius: 14, padding: '16px 18px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-                  <div style={{ position: 'absolute', top: -30, right: -30, width: 100, height: 100, borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,197,94,0.12) 0%, transparent 70%)' }} />
-                  <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2, color: '#22c55e', marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                    <Flame size={14} /> {sharedStreak}-day streak!
+        </div>
+
+        {/* Referral nudge */}
+        {user.referral_code && (
+          <div style={{ padding: '14px 16px 0' }}>
+            <Link href="/invite" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div
+                style={{
+                  background: isStreakMilestone
+                    ? 'linear-gradient(135deg, rgba(34,197,94,0.10) 0%, rgba(181,89,60,0.10) 100%)'
+                    : TOK.card,
+                  border: `1px solid ${isStreakMilestone ? 'rgba(34,197,94,0.28)' : TOK.hairline}`,
+                  borderRadius: 14,
+                  padding: '14px 16px',
+                }}
+              >
+                {isStreakMilestone ? (
+                  <>
+                    <div
+                      style={{
+                        fontFamily: 'var(--mono)',
+                        fontSize: 10,
+                        letterSpacing: '0.22em',
+                        textTransform: 'uppercase',
+                        color: '#86efac',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {sharedStreak}-day streak!
+                    </div>
+                    <div
+                      style={{
+                        fontFamily: 'var(--serif)',
+                        fontSize: 20,
+                        letterSpacing: '-0.015em',
+                        lineHeight: 1.1,
+                        marginTop: 4,
+                      }}
+                    >
+                      Challenge a friend to match it
+                    </div>
+                    <div style={{ fontFamily: 'var(--sans)', fontSize: 12, color: TOK.muted, marginTop: 6 }}>
+                      You both earn <span style={{ color: '#86efac', fontWeight: 600 }}>500 bonus coins</span> when they join.
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div
+                        style={{
+                          fontFamily: 'var(--mono)',
+                          fontSize: 9,
+                          letterSpacing: '0.22em',
+                          textTransform: 'uppercase',
+                          color: TOK.muted,
+                        }}
+                      >
+                        Bring a friend
+                      </div>
+                      <div style={{ fontFamily: 'var(--sans)', fontSize: 13, color: TOK.fg, fontWeight: 500, marginTop: 2 }}>
+                        Invite and both earn <span style={{ color: '#86efac', fontWeight: 600 }}>500 coins</span>
+                      </div>
+                    </div>
+                    <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={TOK.muted} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="9 6 15 12 9 18" />
+                    </svg>
                   </div>
-                  <p style={{ fontSize: 15, fontWeight: 900, color: '#F5F0EA', fontFamily: "'Archivo', sans-serif", marginBottom: 4 }}>Challenge a friend to match it</p>
-                  <p style={{ fontSize: 12, color: 'rgba(245,240,234,0.5)', marginBottom: 10 }}>Invite them and you BOTH earn <span style={{ color: '#22c55e', fontWeight: 700 }}>500 bonus coins</span></p>
-                  <span style={{ display: 'inline-block', padding: '8px 20px', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.30)', borderRadius: 8, color: '#22c55e', fontSize: 13, fontWeight: 800 }}>Invite a Friend →</span>
-                </div>
-              </Link>
-            ) : (
-              <Link href="/invite" style={{ display: 'block', textDecoration: 'none', marginBottom: 10 }}>
-                <div style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.06) 0%, rgba(181,89,60,0.06) 100%)', border: '1px solid rgba(34,197,94,0.15)', borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(34,197,94,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <Share2 size={18} color="#22c55e" />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 13, fontWeight: 800, color: '#F5F0EA', marginBottom: 2 }}>Bring a friend along!</p>
-                    <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.5)' }}>You both earn <span style={{ color: '#22c55e', fontWeight: 700 }}>500 bonus coins</span> when they join</p>
-                  </div>
-                  <span style={{ fontSize: 16, color: 'rgba(245,240,234,0.3)', flexShrink: 0 }}>›</span>
-                </div>
-              </Link>
-            )
-          })()}
-          <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={() => router.push('/home')} style={{ flex: 1, padding: 15, background: '#111110', color: '#F5F0EA', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}>Back to Home</button>
-            <button onClick={() => router.push('/rewards')} style={{ flex: 1, padding: 15, background: 'transparent', color: '#B5593C', border: '1.5px solid #B5593C', borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer' }}>Shop Rewards</button>
+                )}
+              </div>
+            </Link>
           </div>
+        )}
+
+        {/* Actions */}
+        <div style={{ padding: '18px 16px 0', display: 'flex', gap: 10 }}>
+          <button
+            onClick={() => router.push('/home')}
+            style={{
+              flex: 1,
+              padding: '14px 16px',
+              background: TOK.card,
+              color: TOK.fg,
+              border: `1px solid ${TOK.hairline2}`,
+              borderRadius: 12,
+              fontFamily: 'var(--mono)',
+              fontSize: 11,
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            Home
+          </button>
+          <button
+            onClick={() => router.push('/rewards')}
+            style={{
+              flex: 1,
+              padding: '14px 16px',
+              background: TOK.copper,
+              color: '#fff',
+              border: 'none',
+              borderRadius: 12,
+              fontFamily: 'var(--mono)',
+              fontSize: 11,
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            Shop rewards
+          </button>
         </div>
       </div>
     )
   }
 
+  // ===== Select screen =====
+  const featured = FEATURED_ORDER.map((v) => WORKOUT_TYPES.find((t) => t.value === v)!)
+  const rest = WORKOUT_TYPES.filter((t) => !FEATURED_ORDER.includes(t.value))
+  const sheetType = WORKOUT_TYPES.find((t) => t.value === workoutType)!
+
   return (
-    <div style={{ padding: '20px 16px', minHeight: '100dvh', background: '#0E0E0D' }}>
-      <div style={{ marginBottom: 24 }}>
-        <p style={{ color: '#8A8478', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5 }}>Log Workout</p>
-        <h1 style={{ fontSize: 24, fontWeight: 900, letterSpacing: -0.5, fontFamily: 'Archivo, sans-serif', color: '#F5F0EA' }}>What did you do?</h1>
+    <div
+      style={{
+        background: TOK.bg,
+        minHeight: '100dvh',
+        color: TOK.fg,
+        fontFamily: 'var(--sans)',
+        paddingBottom: 120,
+      }}
+    >
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+        :root {
+          --sans: 'Geist', system-ui, -apple-system, sans-serif;
+          --mono: 'Geist Mono', ui-monospace, monospace;
+          --serif: 'Instrument Serif', Georgia, serif;
+        }
+        @keyframes sheetUp {
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+
+      {/* Top brand bar */}
+      <div
+        style={{
+          padding: '14px 20px 6px',
+          display: 'flex',
+          justifyContent: 'center',
+          borderBottom: `1px solid ${TOK.hairline}`,
+        }}
+      >
+        <CountLogo />
       </div>
 
-      {step === 'type' && (
-        <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 24 }}>
-            {WORKOUT_TYPES.map(t => {
-              const isSelected = workoutType === t.value
-              return (
-                <button key={t.value} onClick={() => setWorkoutType(t.value)} style={{
-                  position: 'relative', height: 120,
-                  backgroundImage: `url(https://images.pexels.com/photos/${t.photo}/pexels-photo-${t.photo}.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2)`,
-                  backgroundSize: 'cover', backgroundPosition: 'center',
-                  border: isSelected ? '2.5px solid #B5593C' : '2px solid transparent',
-                  borderRadius: 12, cursor: 'pointer', overflow: 'hidden', padding: 0, outline: 'none',
-                  transform: isSelected ? 'scale(1.04)' : 'scale(1)',
-                  transition: 'transform 0.15s ease, border-color 0.15s ease',
-                  boxShadow: isSelected ? '0 4px 16px rgba(181,89,60,0.35)' : 'none',
-                  zIndex: isSelected ? 1 : 0,
-                }}>
-                  <div style={{ position: 'absolute', inset: 0, background: isSelected ? 'linear-gradient(to top, rgba(181,89,60,0.65) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0.10) 100%)' : 'linear-gradient(to top, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.20) 60%, rgba(0,0,0,0.08) 100%)', borderRadius: 10, transition: 'background 0.15s' }} />
-                  {isSelected && (
-                    <div style={{ position: 'absolute', top: 6, right: 6, width: 18, height: 18, borderRadius: '50%', background: '#B5593C', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'white', fontWeight: 900, lineHeight: 1 }}>✓</div>
-                  )}
-                  <div style={{ position: 'absolute', top: 8, left: 8, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))' }}>
-                    <Icon emoji={t.icon} size={20} />
-                  </div>
-                  <span style={{ position: 'absolute', bottom: 8, left: 0, right: 0, textAlign: 'center', fontSize: 11, fontWeight: 900, color: '#FFFFFF', fontFamily: 'Archivo, sans-serif', letterSpacing: 0.5, textTransform: 'uppercase', textShadow: '0 1px 4px rgba(0,0,0,0.7)' }}>{t.label}</span>
-                </button>
-              )
-            })}
+      {/* Hero */}
+      <div style={{ padding: '18px 20px 0' }}>
+        <div
+          style={{
+            fontFamily: 'var(--mono)',
+            fontSize: 9,
+            letterSpacing: '0.22em',
+            textTransform: 'uppercase',
+            color: TOK.muted,
+          }}
+        >
+          For you · Today
+        </div>
+        <div
+          style={{
+            fontFamily: 'var(--serif)',
+            fontSize: 34,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.02,
+            marginTop: 4,
+          }}
+        >
+          What’d you do<br />today?
+        </div>
+        <div style={{ fontFamily: 'var(--sans)', fontSize: 13, color: TOK.muted, marginTop: 8 }}>
+          Tap one — log it in three seconds.
+        </div>
+      </div>
+
+      {/* Featured 2x2 */}
+      <div
+        style={{
+          padding: '16px 16px 0',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 10,
+        }}
+      >
+        {featured.map((t) => (
+          <PhotoTile key={t.value} type={t} variant="featured" pointsPreview={total} onClick={() => openSheet(t.value)} />
+        ))}
+      </div>
+
+      {/* More types */}
+      <div style={{ padding: '20px 20px 8px' }}>
+        <div
+          style={{
+            fontFamily: 'var(--mono)',
+            fontSize: 9,
+            letterSpacing: '0.22em',
+            textTransform: 'uppercase',
+            color: TOK.muted,
+          }}
+        >
+          More types
+        </div>
+        <div
+          style={{
+            fontFamily: 'var(--serif)',
+            fontSize: 22,
+            letterSpacing: '-0.015em',
+            lineHeight: 1.1,
+            marginTop: 3,
+          }}
+        >
+          Everything else
+        </div>
+      </div>
+      <div
+        style={{
+          padding: '0 16px',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 8,
+        }}
+      >
+        {rest.map((t) => (
+          <PhotoTile key={t.value} type={t} variant="small" onClick={() => openSheet(t.value)} />
+        ))}
+      </div>
+
+      {/* How it works */}
+      <div style={{ padding: '22px 16px 0' }}>
+        <div
+          style={{
+            background: TOK.card,
+            border: `1px solid ${TOK.hairline}`,
+            borderRadius: 14,
+            padding: '16px 18px',
+          }}
+        >
+          <div
+            style={{
+              fontFamily: 'var(--mono)',
+              fontSize: 9,
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: TOK.muted,
+              marginBottom: 12,
+            }}
+          >
+            How it works
           </div>
+          <HowRow
+            title="Earn every session"
+            body="Each workout adds to your coin balance."
+            icon={
+              <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l3 2" />
+              </svg>
+            }
+          />
+          <HowRow
+            title="Verify for full coins"
+            body="Apple Health, Garmin, Fitbit, Google Fit, or Strava."
+            icon={
+              <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 13l4 4L19 7" />
+              </svg>
+            }
+          />
+          <HowRow
+            title="Unverified earn 10%"
+            body="Still worth logging. Verified is always better."
+            icon={
+              <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="5" y="11" width="14" height="10" rx="2" />
+                <path d="M8 11V8a4 4 0 1 1 8 0v3" />
+              </svg>
+            }
+            last
+          />
+        </div>
+      </div>
 
-          {workoutType === 'custom' && (
-            <input placeholder="Session name" value={customName} onChange={e => setCustomName(e.target.value)} style={{ ...inputStyle, marginBottom: 16 }} />
-          )}
+      {/* ===== Bottom sheet ===== */}
+      {sheetOpen && (
+        <div
+          onClick={() => !loading && setSheetOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            background: 'rgba(0,0,0,0.55)',
+            backdropFilter: 'blur(4px)',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: 480,
+              background: '#121211',
+              borderTopLeftRadius: 28,
+              borderTopRightRadius: 28,
+              border: `1px solid ${TOK.hairline2}`,
+              borderBottom: 'none',
+              animation: 'sheetUp 280ms cubic-bezier(.2,.8,.2,1)',
+              maxHeight: '92vh',
+              overflowY: 'auto',
+            }}
+          >
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(245,240,234,0.2)', margin: '12px auto 8px' }} />
 
-          <button onClick={() => setStep('details')} style={btnPrimary}>Next →</button>
-
-          <div style={{ background: '#111110', border: '1px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '14px 16px', marginTop: 12 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(245,240,234,0.4)', marginBottom: 10 }}>How it works</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <Trophy size={16} style={{ flexShrink: 0, marginTop: 2 }} color="#F5F0EA" />
-                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Earn points every session</strong> — each workout adds to your score and moves you up the leaderboard.</span>
-              </div>
-              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <Dumbbell size={16} style={{ flexShrink: 0, marginTop: 2 }} color="#F5F0EA" />
-                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Verify with a wearable</strong> (Apple Health, Garmin, Fitbit, Google Fit) to earn <strong>100% of your points</strong>.</span>
-              </div>
-              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <span style={{ flexShrink: 0, marginTop: 2 }}>✅</span>
-                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Unverified sessions earn 10%</strong> — still worth logging, verified is always better.</span>
-              </div>
-              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <Lock size={16} style={{ flexShrink: 0, marginTop: 2 }} color="#F5F0EA" />
-                <span style={{ fontSize: 12, color: '#F5F0EA' }}><strong>Why verify?</strong> It keeps the leaderboard fair and honest for everyone competing.</span>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {step === 'details' && (
-        <>
-          <div style={{ marginBottom: 20 }}>
-            <p style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12, color: '#F5F0EA' }}>Duration</p>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {DURATIONS.map(d => (
-                <button key={d} onClick={() => setDuration(d)} style={{
-                  flex: 1, padding: '14px 0',
-                  background: duration === d ? '#B5593C' : '#1A1A18',
-                  border: `1.5px solid ${duration === d ? '#B5593C' : 'rgba(245,240,234,0.1)'}`,
-                  borderRadius: 10, cursor: 'pointer',
-                   fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700, color: '#F5F0EA',
-                }}>{d}</button>
-              ))}
-            </div>
-            <p style={{ color: '#8A8478', fontSize: 11, marginTop: 6 }}>minutes</p>
-          </div>
-
-          <div style={{ background: '#111110', border: '1.5px solid rgba(245,240,234,0.08)', borderRadius: 14, padding: 16, marginBottom: 20 }}>
-            <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10, color: 'rgba(245,240,234,0.4)' }}>Points Preview</p>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-              <span style={{ fontSize: 13, color: '#8A8478' }}>Base (flat)</span>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>200 pts</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-              <span style={{ fontSize: 13, color: '#8A8478' }}>{getTierLabel(tier)} tier</span>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700, color: '#F5F0EA' }}>{multiplier}x</span>
-            </div>
-            <div style={{ height: 1, background: 'rgba(245,240,234,0.08)', margin: '10px 0' }} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-              <span style={{ fontSize: 14, fontWeight: 800, color: '#F5F0EA' }}>You earn</span>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 18, fontWeight: 900, color: '#B5593C' }}>{total} pts</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 12, color: '#22c55e' }}>Connect Strava for bonus</span>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 700, color: '#22c55e' }}>+{verifiedPoints.total - total} pts</span>
-            </div>
-          </div>
-
-          <div style={{ marginBottom: 20 }}>
-            <p style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12, color: '#F5F0EA' }}>
-              How hard was it?
-              {effortRating > 0 && <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, color: '#B5593C', marginLeft: 8 }}>
-                {['', 'Recovery', 'Easy', 'Moderate', 'Hard', 'Max Effort'][effortRating]}
-              </span>}
-            </p>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {[1,2,3,4,5].map(n => (
-                <button key={n} onClick={() => setEffortRating(effortRating === n ? 0 : n)} style={{
-                  flex: 1, padding: '12px 0',
-                  background: n <= effortRating ? 'rgba(181,89,60,0.15)' : '#1A1A18',
-                  border: `1.5px solid ${n <= effortRating ? '#B5593C' : 'rgba(245,240,234,0.1)'}`,
-                  borderRadius: 10, cursor: 'pointer',
-                  opacity: effortRating > 0 && n > effortRating ? 0.35 : 1,
-                  transition: 'all 0.15s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                  <Flame size={22} color={n <= effortRating ? '#B5593C' : 'rgba(245,240,234,0.5)'} />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ marginBottom: 20 }}>
-            <textarea
-              placeholder="What did you crush? (optional)"
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-              maxLength={280}
-              rows={2}
+            {/* Sheet hero w/ photo */}
+            <div
               style={{
-                ...inputStyle,
-                resize: 'none',
-                lineHeight: 1.5,
-                fontSize: 14,
+                position: 'relative',
+                height: 140,
+                margin: '0 16px',
+                borderRadius: 18,
+                overflow: 'hidden',
+                backgroundImage: `url(${pexelsUrl(sheetType.photo)})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                border: `1px solid ${TOK.hairline}`,
               }}
-            />
-          </div>
-
-          {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12 }}>{error}</p>}
-
-          <div style={{ background: '#111110', border: '1px solid rgba(245,240,234,0.08)', borderRadius: 12, padding: '12px 14px', marginBottom: 16 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#F5F0EA', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Lock size={14} /> Verify your workout for full points
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: 'rgba(245,240,234,0.7)' }}>
-                <Activity size={14} style={{ flexShrink: 0 }} /><span><strong>Wearable</strong> — Apple Health, Garmin, Fitbit, or Google Fit</span>
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background:
+                    'linear-gradient(180deg, rgba(14,14,13,0.15) 0%, rgba(14,14,13,0.90) 100%)',
+                }}
+              />
+              <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: '14px 16px' }}>
+                <div
+                  style={{
+                    fontFamily: 'var(--mono)',
+                    fontSize: 9,
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(245,240,234,0.7)',
+                  }}
+                >
+                  Log session
+                </div>
+                <div
+                  style={{
+                    fontFamily: 'var(--serif)',
+                    fontSize: 28,
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {sheetType.label}
+                </div>
               </div>
             </div>
-            <p style={{ fontSize: 11, color: 'rgba(245,240,234,0.5)', marginTop: 8, marginBottom: 0 }}>Verified sessions earn <strong>100% of your points</strong>. Unverified sessions earn <strong>10%</strong>.</p>
-          </div>
 
-          <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={() => setStep('type')} style={btnSecondary}>← Back</button>
-            <button onClick={handleLog} disabled={loading} style={{ ...btnPrimary, flex: 2 }}>
-              {loading ? 'Logging...' : 'Log Session ✓'}
-            </button>
+            <div style={{ padding: '16px 20px 24px' }}>
+              {/* Custom name */}
+              {workoutType === 'custom' && (
+                <div style={{ marginBottom: 16 }}>
+                  <div
+                    style={{
+                      fontFamily: 'var(--mono)',
+                      fontSize: 9,
+                      letterSpacing: '0.22em',
+                      textTransform: 'uppercase',
+                      color: TOK.muted,
+                      marginBottom: 6,
+                    }}
+                  >
+                    Session name
+                  </div>
+                  <input
+                    placeholder="e.g. Yoga, Climbing, Swim"
+                    value={customName}
+                    onChange={(e) => setCustomName(e.target.value)}
+                    style={inputStyle()}
+                  />
+                </div>
+              )}
+
+              {/* Duration */}
+              <div style={{ marginBottom: 16 }}>
+                <div
+                  style={{
+                    fontFamily: 'var(--mono)',
+                    fontSize: 9,
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    color: TOK.muted,
+                    marginBottom: 8,
+                  }}
+                >
+                  Duration
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {DURATIONS.map((d) => {
+                    const on = duration === d
+                    return (
+                      <button
+                        key={d}
+                        onClick={() => setDuration(d)}
+                        style={{
+                          flex: 1,
+                          padding: '12px 0',
+                          background: on ? TOK.copper : TOK.card,
+                          border: `1px solid ${on ? TOK.copper : TOK.hairline}`,
+                          borderRadius: 10,
+                          fontFamily: 'var(--mono)',
+                          fontSize: 13,
+                          fontWeight: 500,
+                          color: on ? '#fff' : TOK.fg,
+                          cursor: 'pointer',
+                          letterSpacing: '0.02em',
+                        }}
+                      >
+                        {d}
+                        <span style={{ marginLeft: 3, fontSize: 9, opacity: 0.65, letterSpacing: '0.12em' }}>m</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Effort */}
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
+                  <div
+                    style={{
+                      fontFamily: 'var(--mono)',
+                      fontSize: 9,
+                      letterSpacing: '0.22em',
+                      textTransform: 'uppercase',
+                      color: TOK.muted,
+                    }}
+                  >
+                    Effort
+                  </div>
+                  {effortRating > 0 && (
+                    <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: TOK.copper, letterSpacing: '0.1em' }}>
+                      {EFFORT_LABELS[effortRating]}
+                    </div>
+                  )}
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {[1, 2, 3, 4, 5].map((n) => {
+                    const active = n <= effortRating
+                    return (
+                      <button
+                        key={n}
+                        onClick={() => setEffortRating(effortRating === n ? 0 : n)}
+                        style={{
+                          flex: 1,
+                          padding: '12px 0',
+                          background: active ? `${TOK.copper}22` : TOK.card,
+                          border: `1px solid ${active ? TOK.copper : TOK.hairline}`,
+                          borderRadius: 10,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          opacity: effortRating > 0 && !active ? 0.35 : 1,
+                          color: active ? TOK.copper : TOK.muted,
+                        }}
+                      >
+                        <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+                        </svg>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div style={{ marginBottom: 16 }}>
+                <div
+                  style={{
+                    fontFamily: 'var(--mono)',
+                    fontSize: 9,
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    color: TOK.muted,
+                    marginBottom: 6,
+                  }}
+                >
+                  Notes · optional
+                </div>
+                <textarea
+                  placeholder="What did you crush?"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  maxLength={280}
+                  rows={2}
+                  style={{ ...inputStyle(), resize: 'none', lineHeight: 1.45, fontFamily: 'var(--sans)' }}
+                />
+              </div>
+
+              {/* Points preview */}
+              <div
+                style={{
+                  background: TOK.card,
+                  border: `1px solid ${TOK.hairline}`,
+                  borderRadius: 14,
+                  padding: '14px 16px',
+                  marginBottom: 14,
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                  <div
+                    style={{
+                      fontFamily: 'var(--mono)',
+                      fontSize: 9,
+                      letterSpacing: '0.22em',
+                      textTransform: 'uppercase',
+                      color: TOK.muted,
+                    }}
+                  >
+                    You’ll earn
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                    <span
+                      style={{
+                        fontFamily: 'var(--serif)',
+                        fontSize: 28,
+                        color: TOK.copper,
+                        letterSpacing: '-0.02em',
+                        lineHeight: 1,
+                        fontFeatureSettings: '"tnum"',
+                      }}
+                    >
+                      {total}
+                    </span>
+                    <span style={{ fontFamily: 'var(--mono)', fontSize: 10, color: TOK.muted, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+                      coins
+                    </span>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    marginTop: 8,
+                    fontFamily: 'var(--mono)',
+                    fontSize: 10,
+                    color: TOK.muted,
+                    letterSpacing: '0.04em',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <span>
+                    {getTierLabel(tier)} tier · {multiplier}×
+                  </span>
+                  <span style={{ color: '#86efac' }}>
+                    +{verifiedPoints.total - total} if verified
+                  </span>
+                </div>
+              </div>
+
+              {error && (
+                <div
+                  style={{
+                    background: 'rgba(220,38,38,0.10)',
+                    border: '1px solid rgba(220,38,38,0.30)',
+                    borderRadius: 10,
+                    padding: '10px 12px',
+                    fontFamily: 'var(--mono)',
+                    fontSize: 11,
+                    color: '#fca5a5',
+                    marginBottom: 12,
+                  }}
+                >
+                  {error}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button
+                  onClick={() => !loading && setSheetOpen(false)}
+                  disabled={loading}
+                  style={{
+                    flex: '0 0 auto',
+                    padding: '14px 18px',
+                    borderRadius: 14,
+                    background: 'transparent',
+                    color: TOK.muted,
+                    border: `1px solid ${TOK.hairline2}`,
+                    fontFamily: 'var(--mono)',
+                    fontSize: 11,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    fontWeight: 600,
+                    cursor: loading ? 'default' : 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleLog}
+                  disabled={loading}
+                  style={{
+                    flex: 1,
+                    padding: '14px 18px',
+                    borderRadius: 14,
+                    background: TOK.copper,
+                    color: '#fff',
+                    border: 'none',
+                    fontFamily: 'var(--mono)',
+                    fontSize: 12,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    fontWeight: 700,
+                    cursor: loading ? 'default' : 'pointer',
+                    opacity: loading ? 0.6 : 1,
+                  }}
+                >
+                  {loading ? 'Logging\u2026' : `Log · +${total} coins`}
+                </button>
+              </div>
+            </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   )
 }
 
-const inputStyle: React.CSSProperties = {
-  padding: '14px 16px',
-  border: '1.5px solid rgba(245,240,234,0.12)',
-  borderRadius: 10,
-  fontSize: 15,
-  fontFamily: 'Archivo, sans-serif',
-  background: '#1A1A18',
-  color: '#F5F0EA',
-  outline: 'none',
-  width: '100%',
+function HowRow({ title, body, icon, last }: { title: string; body: string; icon: React.ReactNode; last?: boolean }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 12,
+        paddingBottom: last ? 0 : 10,
+        marginBottom: last ? 0 : 10,
+        borderBottom: last ? 'none' : `1px solid ${TOK.hairline}`,
+      }}
+    >
+      <div
+        style={{
+          width: 28,
+          height: 28,
+          borderRadius: 8,
+          background: TOK.card2,
+          border: `1px solid ${TOK.hairline}`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          color: TOK.copper,
+          marginTop: 1,
+        }}
+      >
+        {icon}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontFamily: 'var(--sans)', fontSize: 13, color: TOK.fg, fontWeight: 500 }}>{title}</div>
+        <div style={{ fontFamily: 'var(--mono)', fontSize: 10, color: TOK.muted, letterSpacing: '0.02em', marginTop: 2 }}>
+          {body}
+        </div>
+      </div>
+    </div>
+  )
 }
 
-const btnPrimary: React.CSSProperties = {
-  flex: 1,
-  width: '100%',
-  padding: 15,
-  background: '#B5593C',
-  color: '#F5F0EA',
-  border: 'none',
-  borderRadius: 10,
-  fontSize: 15,
-  fontWeight: 800,
-  fontFamily: 'Archivo, sans-serif',
-  cursor: 'pointer',
-}
-
-const btnSecondary: React.CSSProperties = {
-  flex: 1,
-  padding: 15,
-  background: '#1A1A18',
-  color: '#F5F0EA',
-  border: '1.5px solid rgba(245,240,234,0.12)',
-  borderRadius: 10,
-  fontSize: 15,
-  fontWeight: 800,
-  fontFamily: 'Archivo, sans-serif',
-  cursor: 'pointer',
+function inputStyle(): React.CSSProperties {
+  return {
+    background: '#1A1A19',
+    border: `1px solid ${TOK.hairline2}`,
+    borderRadius: 10,
+    padding: '12px 14px',
+    color: TOK.fg,
+    fontFamily: 'var(--mono)',
+    fontSize: 13,
+    outline: 'none',
+    width: '100%',
+    boxSizing: 'border-box' as const,
+  }
 }
