@@ -9,49 +9,157 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const supabase = createClient()
 
   async function handleReset(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
-    await supabase.auth.resetPasswordForEmail(email, {
+    setError('')
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset-password`,
     })
-    setSent(true)
+
+    if (error) {
+      // Surface rate-limit errors with a friendlier message
+      if (
+        error.status === 429 ||
+        error.message.toLowerCase().includes('rate limit') ||
+        error.message.toLowerCase().includes('too many')
+      ) {
+        setError(
+          'Too many requests — please wait a few minutes before trying again.'
+        )
+      } else {
+        setError(error.message)
+      }
+    } else {
+      setSent(true)
+    }
+
     setLoading(false)
   }
 
   return (
-    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#FAF8F4' }}>
+    <div
+      style={{
+        minHeight: '100dvh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 24,
+        background: '#FAF8F4',
+      }}
+    >
       <div style={{ width: '100%', maxWidth: 380 }}>
         {sent ? (
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 40, marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+            <div
+              style={{
+                fontSize: 40,
+                marginBottom: 16,
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
               <Icon emoji="Mail" size={48} />
             </div>
-            <h2 style={{ fontSize: 22, fontWeight: 900, marginBottom: 8, fontFamily: 'Archivo, sans-serif' }}>Check your email</h2>
-            <p style={{ color: '#8A8478', marginBottom: 24 }}>We sent a reset link to <strong>{email}</strong></p>
-            <Link href="/auth/login" style={{ color: '#B5593C', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>← Back to login</Link>
+            <h2
+              style={{
+                fontSize: 22,
+                fontWeight: 900,
+                marginBottom: 8,
+                fontFamily: 'Archivo, sans-serif',
+              }}
+            >
+              Check your email
+            </h2>
+            <p style={{ color: '#8A8478', marginBottom: 8 }}>
+              We sent a reset link to <strong>{email}</strong>
+            </p>
+            <p style={{ color: '#8A8478', fontSize: 13, marginBottom: 24 }}>
+              Don&apos;t see it? Check your spam folder, or{' '}
+              <button
+                onClick={() => { setSent(false); setError('') }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#B5593C',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  padding: 0,
+                  fontSize: 13,
+                  fontFamily: 'Archivo, sans-serif',
+                }}
+              >
+                try again
+              </button>
+              .
+            </p>
+            <Link
+              href="/auth/login"
+              style={{
+                color: '#B5593C',
+                fontSize: 14,
+                fontWeight: 700,
+                textDecoration: 'none',
+              }}
+            >
+              ← Back to login
+            </Link>
           </div>
         ) : (
           <>
-            <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif' }}>Reset Password</h1>
-            <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>Enter your email and we&apos;ll send a reset link.</p>
-            <form onSubmit={handleReset} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <h1
+              style={{
+                fontSize: 26,
+                fontWeight: 900,
+                letterSpacing: -1,
+                marginBottom: 6,
+                fontFamily: 'Archivo, sans-serif',
+              }}
+            >
+              Reset Password
+            </h1>
+            <p
+              style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}
+            >
+              Enter your email and we&apos;ll send a reset link.
+            </p>
+            <form
+              onSubmit={handleReset}
+              style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
+            >
               <input
                 type="email"
                 placeholder="Email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 style={inputStyle}
               />
+              {error && (
+                <p style={{ color: '#ef4444', fontSize: 13, margin: 0 }}>
+                  {error}
+                </p>
+              )}
               <button type="submit" disabled={loading} style={btnStyle}>
                 {loading ? 'Sending...' : 'Send Reset Link'}
               </button>
             </form>
             <div style={{ marginTop: 16, textAlign: 'center' }}>
-              <Link href="/auth/login" style={{ color: '#8A8478', fontSize: 13, textDecoration: 'none' }}>← Back to login</Link>
+              <Link
+                href="/auth/login"
+                style={{
+                  color: '#8A8478',
+                  fontSize: 13,
+                  textDecoration: 'none',
+                }}
+              >
+                ← Back to login
+              </Link>
             </div>
           </>
         )}
