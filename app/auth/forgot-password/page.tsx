@@ -22,17 +22,14 @@ export default function ForgotPasswordPage() {
     })
 
     if (error) {
-      // Surface rate-limit errors with a friendlier message
       if (
         error.status === 429 ||
         error.message.toLowerCase().includes('rate limit') ||
         error.message.toLowerCase().includes('too many')
       ) {
-        setError(
-          'Too many requests — please wait a few minutes before trying again.'
-        )
+        setError('Too many requests — please wait a few minutes before trying again.')
       } else {
-        setError(error.message)
+        setError('Something went wrong. Please try again in a moment.')
       }
     } else {
       setSent(true)
@@ -72,6 +69,7 @@ export default function ForgotPasswordPage() {
                 fontWeight: 900,
                 marginBottom: 8,
                 fontFamily: 'Archivo, sans-serif',
+                color: '#111110',
               }}
             >
               Check your email
@@ -119,6 +117,7 @@ export default function ForgotPasswordPage() {
                 letterSpacing: -1,
                 marginBottom: 6,
                 fontFamily: 'Archivo, sans-serif',
+                color: '#111110',
               }}
             >
               Reset Password
