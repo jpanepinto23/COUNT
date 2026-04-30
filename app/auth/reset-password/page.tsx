@@ -77,7 +77,7 @@ function ResetPasswordForm() {
             </div>
           ) : (
             <>
-              <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif' }}>New Password</h1>
+              <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#111110' }}>New Password</h1>
               <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>Choose a new password for your account.</p>
               <form onSubmit={handleReset} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 <input type="password" placeholder="New password (min 6 chars)" value={password} onChange={e => setPassword(e.target.value)} required style={inputStyle} />
