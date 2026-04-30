@@ -25,13 +25,21 @@ function ResetPasswordForm() {
           setReady(true)
         }
       })
-    } else {
-      // Fallback: implicit / hash-based flow
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-        if (event === 'PASSWORD_RECOVERY') setReady(true)
-      })
-      return () => subscription.unsubscribe()
+      return
     }
+
+    // Server-side confirm flow (/auth/confirm verifyOtp) — session is already set
+    // via cookies; no PASSWORD_RECOVERY event will fire, so check for an
+    // existing session directly.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setReady(true)
+    })
+
+    // Fallback: implicit / hash-based flow (legacy)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') setReady(true)
+    })
+    return () => subscription.unsubscribe()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleReset(e: React.FormEvent) {
