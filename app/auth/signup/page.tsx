@@ -12,12 +12,6 @@ function generateReferralCode(name: string): string {
   return prefix + suffix
 }
 
-function formatHeight(totalInches: number): string {
-  const ft = Math.floor(totalInches / 12)
-  const inches = totalInches % 12
-  return `${ft}' ${inches}"`
-}
-
 function Stepper({ value, onChange, min, max, format, label }: {
   value: number; onChange: (v: number) => void; min: number; max: number;
   format: (v: number) => string; label: string
@@ -47,8 +41,6 @@ function SignupContent() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [age, setAge] = useState(25)
-  const [heightInches, setHeightInches] = useState(70)
-  const [weight, setWeight] = useState('')
   const [refCode, setRefCode] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -93,8 +85,8 @@ function SignupContent() {
       email,
       name,
       age: age,
-      height: heightInches,
-      weight: weight ? parseFloat(weight) : null,
+      height: null,
+      weight: null,
       current_streak: 0,
       longest_streak: 0,
       lifetime_sessions: 0,
@@ -143,7 +135,7 @@ function SignupContent() {
 
         {step === 1 && (
           <>
-            <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif' }}>Create account</h1>
+            <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#111110' }}>Create account</h1>
             <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>Every rep counts. Start earning today.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <input type="text" placeholder="Full name" value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
@@ -162,7 +154,7 @@ function SignupContent() {
                 />
                 {refCode && (
                   <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 11, color: '#22c55e', fontWeight: 700 }}>
-                    +500 pts Ã°ÂÂÂ
+                    +500 pts ✨
                   </span>
                 )}
               </div>
@@ -184,17 +176,10 @@ function SignupContent() {
 
         {step === 2 && (
           <form onSubmit={handleSignup}>
-            <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif' }}>Your stats</h1>
-            <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>Optional — used for your profile.</p>
+            <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#111110' }}>One last thing</h1>
+            <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>We just need your age to confirm you&apos;re 13+.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div style={{ display: 'flex', gap: 10 }}>
-                <Stepper value={age} onChange={setAge} min={13} max={100} format={v => `${v} yr`} label="Age" />
-                <Stepper value={heightInches} onChange={setHeightInches} min={48} max={95} format={formatHeight} label="Height" />
-              </div>
-              <div style={{ position: 'relative' }}>
-                <input type="number" placeholder="Weight" value={weight} onChange={e => setWeight(e.target.value)} style={{ ...inputStyle, paddingRight: 36 }} />
-                <span style={unitStyle}>lbs</span>
-              </div>
+              <Stepper value={age} onChange={setAge} min={13} max={100} format={v => `${v} yr`} label="Age" />
               {error && <p style={{ color: '#ef4444', fontSize: 13 }}>{error}</p>}
               <button type="submit" disabled={loading} style={btnStyle}>
                 {loading ? 'Creating account...' : 'Start Counting →'}
@@ -259,16 +244,4 @@ const btnStyle: React.CSSProperties = {
   border: 'none',
   borderRadius: 10,
   cursor: 'pointer',
-}
-
-const unitStyle: React.CSSProperties = {
-  position: 'absolute',
-  right: 14,
-  top: '50%',
-  transform: 'translateY(-50%)',
-  color: '#8A8478',
-  fontSize: 12,
-  fontFamily: 'JetBrains Mono, monospace',
-  fontWeight: 600,
-  pointerEvents: 'none',
 }
