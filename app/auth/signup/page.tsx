@@ -114,7 +114,7 @@ function SignupContent() {
         bonus_points: 300, // bronze default
         bonus_awarded: false,
       })
-    }>
+    }
       <div style={{ marginBottom: 36 }}>
         <TallyLogo />
       </div>
