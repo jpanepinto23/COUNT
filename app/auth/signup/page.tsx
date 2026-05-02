@@ -115,6 +115,12 @@ function SignupContent() {
         bonus_awarded: false,
       })
     }
+
+    router.replace('/home')
+  }
+
+  return (
+    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', background: '#FAF8F4' }}>
       <div style={{ marginBottom: 36 }}>
         <TallyLogo />
       </div>
