@@ -92,12 +92,12 @@ function SignupContent() {
       lifetime_sessions: 0,
       tier: 'bronze',
       multiplier: 1.0,
-      points_balance: referrerId ? 25 : 0,
-      points_lifetime_earned: referrerId ? 25 : 0,
+      points_balance: 0,
+      points_lifetime_earned: 0,
       free_unverified_remaining: 5,
       referral_code: myReferralCode,
       referred_by: referrerId,
-      referral_bonus_claimed: !!referrerId,
+      referral_bonus_claimed: false,
     })
 
     if (profileError) {
@@ -114,24 +114,7 @@ function SignupContent() {
         bonus_points: 300, // bronze default
         bonus_awarded: false,
       })
-    }
-
-      // Tier evaluation: server-side route awards points + pings Slack on milestones
-      try {
-        await fetch('/api/referrals/award', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ referrer_id: referrerId, referred_id: userId }),
-        })
-      } catch (err) {
-        console.error('[referrals/award] client call failed:', err)
-      }
-
-    router.replace('/home')
-  }
-
-  return (
-    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', background: '#FAF8F4' }}>
+    }>
       <div style={{ marginBottom: 36 }}>
         <TallyLogo />
       </div>
