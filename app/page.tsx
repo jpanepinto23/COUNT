@@ -247,6 +247,8 @@ export default function LandingPage() {
               pointerEvents: 'none',
             }}
           />
+            {/* Mask YouTube title overlay top-left */}
+            <div style={{ position: 'absolute', top: 0, left: 0, width: 320, height: 80, background: 'linear-gradient(135deg, #0E0D0C 0%, #0E0D0C 35%, rgba(14,13,12,0.7) 65%, rgba(14,13,12,0) 100%)', pointerEvents: 'none' }} />
         </div>
         {/* Fallback rotating images behind video */}
         {HERO_IMAGES.map((img, i) => (

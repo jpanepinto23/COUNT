@@ -61,13 +61,13 @@ function ResetPasswordForm() {
           {done ? (
             <div style={{ textAlign: 'center' }}>
               <p style={{ fontSize: 40, marginBottom: 16 }}>✅</p>
-              <h2 style={{ fontSize: 22, fontWeight: 900, marginBottom: 8, fontFamily: 'Archivo, sans-serif' }}>Password updated!</h2>
+              <h2 style={{ fontSize: 22, fontWeight: 900, marginBottom: 8, fontFamily: 'Archivo, sans-serif', color: '#111110' }}>Password updated!</h2>
               <p style={{ color: '#8A8478', fontSize: 14 }}>Taking you to the app...</p>
             </div>
           ) : error && !ready ? (
             <div style={{ textAlign: 'center' }}>
               <p style={{ fontSize: 40, marginBottom: 16 }}>⚠️</p>
-              <h2 style={{ fontSize: 20, fontWeight: 900, marginBottom: 8, fontFamily: 'Archivo, sans-serif' }}>Link expired</h2>
+              <h2 style={{ fontSize: 20, fontWeight: 900, marginBottom: 8, fontFamily: 'Archivo, sans-serif', color: '#111110' }}>Link expired</h2>
               <p style={{ color: '#8A8478', fontSize: 14, marginBottom: 24 }}>{error}</p>
               <a href="/auth/forgot-password" style={{ color: '#B5593C', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>Request a new link →</a>
             </div>

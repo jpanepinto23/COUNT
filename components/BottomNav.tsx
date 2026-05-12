@@ -39,7 +39,7 @@ const tabs = [
     center: true,
   },
   {
-    href: '/leaderboard',
+    href: '/invite',
     label: 'Friends',
     icon: (active: boolean) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#B5593C' : 'rgba(245,240,234,0.4)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
