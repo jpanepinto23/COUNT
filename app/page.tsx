@@ -209,13 +209,9 @@ export default function LandingPage() {
               position: 'absolute',
               top: '50%',
               left: '50%',
-              /* Oversize the iframe so YouTube's title (top-left) and "more videos" overlays
-                 are pushed outside the visible hero box. 125% scale + 12% off-center vertical
-                 nudge pulls the YT chrome out of the viewport. */
-              width: 'max(177.78vh, 125%)',
-              height: 'max(125%, 56.25vw)',
-              minWidth: '125%',
-              minHeight: '125%',
+              width: '177.78vh',
+              minWidth: '100%',
+              minHeight: '100%',
               transform: 'translate(-50%, -50%)',
               border: 'none',
               pointerEvents: 'none',
