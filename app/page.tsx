@@ -31,7 +31,7 @@ const REWARD_CATALOG = [
   { name: 'Thorne',            status: 'live',        note: 'Available now',  color: '#1A7A4C', logo: 'https://cdn.brandfetch.io/thorne.com/w/256/h/256' },
   { name: 'Momentous',         status: 'live',        note: 'Available now',  color: '#1E3A5F', logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
   { name: 'Vuori',             status: 'coming_soon', note: 'In talks',       color: '#4A7C59', logo: 'https://cdn.brandfetch.io/vuoriclothing.com/w/256/h/256' },
-  { name: 'NOBULL',            status: 'live',        note: 'Available now',  color: '#1A1A19', logo: '/nobull-logo-square.png' },
+  { name: 'NOBULL',            status: 'live',        note: 'Available now',  color: '#1A1A19', logo: 'https://cdn.brandfetch.io/nobullproject.com/w/256/h/256' },
   { name: 'Transparent Labs',  status: 'coming_soon', note: 'In talks',       color: '#3B82F6', logo: 'https://cdn.brandfetch.io/transparentlabs.com/w/256/h/256' },
   { name: 'AG1',               status: 'coming_soon', note: 'In talks',       color: '#1B5E20', logo: 'https://cdn.brandfetch.io/drinkag1.com/w/256/h/256' },
 ]
@@ -201,11 +201,51 @@ export default function LandingPage() {
       {/* Ã¢ÂÂÃ¢ÂÂ HERO Ã¢ÂÂÃ¢ÂÂ */}
       <div id="home" style={{ position: 'relative', overflow: 'hidden', background: '#0E0D0C', height: '60vw', minHeight: 340, maxHeight: 560 }}>
         {/* Video background */}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
           <iframe
             src="https://www.youtube-nocookie.com/embed/1tyX7qDArfA?autoplay=1&mute=1&loop=1&playlist=1tyX7qDArfA&controls=0&disablekb=1&playsinline=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&start=45"
             allow="autoplay; encrypted-media"
-            style={{ position: 'absolute', top: '50%', left: '50%', width: '177.78vh', minWidth: '100%', minHeight: '100%', transform: 'translate(-50%, -50%)', border: 'none', pointerEvents: 'none' }}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              /* Oversize the iframe so YouTube's title (top-left) and "more videos" overlays
+                 are pushed outside the visible hero box. 125% scale + 12% off-center vertical
+                 nudge pulls the YT chrome out of the viewport. */
+              width: 'max(177.78vh, 125%)',
+              height: 'max(125%, 56.25vw)',
+              minWidth: '125%',
+              minHeight: '125%',
+              transform: 'translate(-50%, -50%)',
+              border: 'none',
+              pointerEvents: 'none',
+            }}
+          />
+          {/* Top mask – hides YouTube's video-title overlay (top-left white text) */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 80,
+              background: 'linear-gradient(to bottom, rgba(10,8,7,0.95) 0%, rgba(10,8,7,0.6) 60%, transparent 100%)',
+              zIndex: 1,
+              pointerEvents: 'none',
+            }}
+          />
+          {/* Bottom mask – hides "More videos" / pause-state overlays */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: 90,
+              background: 'linear-gradient(to top, rgba(17,17,16,1) 0%, rgba(17,17,16,0.6) 60%, transparent 100%)',
+              zIndex: 1,
+              pointerEvents: 'none',
+            }}
           />
         </div>
         {/* Fallback rotating images behind video */}
