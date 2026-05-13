@@ -200,51 +200,24 @@ export default function LandingPage() {
 
       {/* Ã¢ÂÂÃ¢ÂÂ HERO Ã¢ÂÂÃ¢ÂÂ */}
       <div id="home" style={{ position: 'relative', overflow: 'hidden', background: '#0E0D0C', height: '60vw', minHeight: 340, maxHeight: 560 }}>
-        {/* Video background */}
+        {/* Self-hosted video background */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
-          <iframe
-            src="https://www.youtube-nocookie.com/embed/1tyX7qDArfA?autoplay=1&mute=1&loop=1&playlist=1tyX7qDArfA&controls=0&disablekb=1&playsinline=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&start=45"
-            allow="autoplay; encrypted-media"
+          <video
+            src="/hero.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
             style={{
               position: 'absolute',
-              top: '50%',
-              left: '50%',
-              width: '177.78vh',
-              minWidth: '100%',
-              minHeight: '100%',
-              transform: 'translate(-50%, -50%)',
-              border: 'none',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
               pointerEvents: 'none',
             }}
           />
-          {/* Top mask – hides YouTube's video-title overlay (top-left white text) */}
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 80,
-              background: 'linear-gradient(to bottom, rgba(10,8,7,0.95) 0%, rgba(10,8,7,0.6) 60%, transparent 100%)',
-              zIndex: 1,
-              pointerEvents: 'none',
-            }}
-          />
-          {/* Bottom mask – hides "More videos" / pause-state overlays */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: 90,
-              background: 'linear-gradient(to top, rgba(17,17,16,1) 0%, rgba(17,17,16,0.6) 60%, transparent 100%)',
-              zIndex: 1,
-              pointerEvents: 'none',
-            }}
-          />
-            {/* Mask YouTube title overlay top-left */}
-            <div style={{ position: 'absolute', top: 0, left: 0, width: 320, height: 80, background: 'linear-gradient(135deg, #0E0D0C 0%, #0E0D0C 35%, rgba(14,13,12,0.7) 65%, rgba(14,13,12,0) 100%)', pointerEvents: 'none' }} />
         </div>
         {/* Fallback rotating images behind video */}
         {HERO_IMAGES.map((img, i) => (
