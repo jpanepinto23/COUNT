@@ -23,7 +23,7 @@ const TIERS = [
 
 const HOW_IT_WORKS = [
   { step: '01', title: 'Log Your Workout', desc: 'Open COUNT after your session. Tap to confirm. Takes 30 seconds.' },
-  { step: '02', title: 'Earn Points',      desc: 'Every session earns 200 base points. Move up tiers for up to 3x and build streaks for up to 2x â they stack.' },
+  { step: '02', title: 'Earn Points',      desc: 'Every session earns 200 base points. Move up tiers for up to 3x and build streaks for up to 2x — they stack.' },
   { step: '03', title: 'Redeem Rewards',   desc: 'Real protein, pre-workout, and gear from brands you already buy. Free.' },
 ]
 
@@ -32,8 +32,7 @@ const REWARD_CATALOG = [
   { name: 'Momentous',         status: 'live',        note: 'Available now',  color: '#1E3A5F', logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
   { name: 'Vuori',             status: 'coming_soon', note: 'In talks',       color: '#4A7C59', logo: 'https://cdn.brandfetch.io/vuoriclothing.com/w/256/h/256' },
   { name: 'NOBULL',            status: 'live',        note: 'Available now',  color: '#1A1A19', logo: 'https://cdn.brandfetch.io/nobullproject.com/w/256/h/256' },
-  { name: 'Transparent Labs',  status: 'coming_soon', note: 'In talks',       color: '#3B82F6', logo: 'https://cdn.brandfetch.io/transparentlabs.com/w/256/h/256' },
-  { name: 'AG1',               status: 'coming_soon', note: 'In talks',       color: '#1B5E20', logo: 'https://cdn.brandfetch.io/drinkag1.com/w/256/h/256' },
+  { name: 'BPN',               status: 'coming_soon', note: 'In talks',       color: '#C13F26', logo: 'https://cdn.brandfetch.io/bareperformancenutrition.com/w/256/h/256' },
 ]
 
 const INTEGRATIONS = [
@@ -296,21 +295,6 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Ã¢ÂÂÃ¢ÂÂ SOCIAL PROOF Ã¢ÂÂÃ¢ÂÂ */}
-      <div style={{ padding: '32px 24px', background: '#0A0A09', borderTop: '1px solid #1C1C1B', borderBottom: '1px solid #1C1C1B' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, maxWidth: 420, margin: '0 auto' }}>
-          {[
-            { num: '1,200+', label: 'Workouts Logged' },
-            { num: '200+',   label: 'Active Members' },
-            { num: '6',      label: 'Brand Partners' },
-          ].map(({ num, label }) => (
-            <div key={label} style={{ textAlign: 'center', padding: '16px 8px', background: '#111110', borderRadius: 12, border: '1px solid #1E1E1D' }}>
-              <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, color: '#F5F0EA', marginBottom: 4, lineHeight: 1 }}>{num}</p>
-              <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#555', textTransform: 'uppercase', letterSpacing: 1.2, lineHeight: 1.3 }}>{label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* Ã¢ÂÂÃ¢ÂÂ HOW IT WORKS Ã¢ÂÂÃ¢ÂÂ */}
       <div id="how" style={{ padding: '40px 24px', borderTop: '1px solid #1C1C1B' }}>
@@ -369,7 +353,7 @@ export default function LandingPage() {
               </div>
             </div>
             <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 14, color: '#9A9087', lineHeight: 1.6, marginBottom: 16 }}>
-              Premium fitness essentials built for athletes who show up every day. COUNT members get exclusive access.
+              Premium fitness essentials for athletes who show up every day. Earn coins toward Kane purchases through COUNT.
             </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 13, fontWeight: 800, color: '#B5593C', letterSpacing: 0.3 }}>Shop Kane</span>
