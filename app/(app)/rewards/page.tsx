@@ -1214,7 +1214,7 @@ export default function RewardsPage() {
           count · earn more by training
         </div>
         <div style={{ fontFamily: 'var(--sans)', fontSize: 11, color: TOK.muted, marginTop: 6, lineHeight: 1.5, maxWidth: 260, margin: '6px auto 0' }}>
-          Each workout earns <span style={{ color: TOK.fg }}>50–80</span>, multiplied by your current streak.
+          Each workout earns <span style={{ color: TOK.fg }}>200</span> base coins, multiplied by your tier and streak (up to 6×).
         </div>
       </div>
 
