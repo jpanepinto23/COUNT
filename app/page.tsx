@@ -24,16 +24,14 @@ const TIERS = [
 const HOW_IT_WORKS = [
   { step: '01', title: 'Log Your Workout', desc: 'Open COUNT after your session. Tap to confirm. Takes 30 seconds.' },
   { step: '02', title: 'Earn Points',      desc: 'Every session earns 200 base points. Move up tiers for up to 3x and build streaks for up to 2x — they stack.' },
-  { step: '03', title: 'Redeem Rewards',   desc: 'Real protein, pre-workout, and gear from brands you already buy. Free.' },
+  { step: '03', title: 'Redeem Rewards',   desc: 'Cash in your points. Discount codes unlock in just 3 workouts (600 points) — and free product is the next tier up.' },
 ]
 
 const REWARD_CATALOG = [
   { name: 'Thorne',            status: 'live',        note: 'Available now',  color: '#1A7A4C', logo: 'https://cdn.brandfetch.io/thorne.com/w/256/h/256' },
   { name: 'Momentous',         status: 'live',        note: 'Available now',  color: '#1E3A5F', logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
-  { name: 'Vuori',             status: 'coming_soon', note: 'In talks',       color: '#4A7C59', logo: 'https://cdn.brandfetch.io/vuoriclothing.com/w/256/h/256' },
   { name: 'NOBULL',            status: 'live',        note: 'Available now',  color: '#1A1A19', logo: 'https://cdn.brandfetch.io/nobullproject.com/w/256/h/256' },
   { name: 'Trifecta',          status: 'live',        note: 'Available now',  color: '#0FBFC4', logo: 'https://cdn.brandfetch.io/trifectanutrition.com/w/256/h/256' },
-  { name: 'BPN',               status: 'coming_soon', note: 'In talks',       color: '#C13F26', logo: 'https://cdn.brandfetch.io/bareperformancenutrition.com/w/256/h/256' },
 ]
 
 const INTEGRATIONS = [
@@ -58,6 +56,7 @@ const COMPARISON = [
 const FAQ_ITEMS = [
   { q: 'Is COUNT really free?', a: 'Yes. No subscription, no hidden fees. Sign up, log workouts, and earn rewards — all completely free.' },
   { q: 'How do I earn points?', a: 'Every workout you log earns 200 base points. Move up tiers (Bronze to Platinum) for up to 3x and build streaks for up to 2x — meaning up to 1,200 points per session.' },
+  { q: 'How many points do rewards cost?', a: 'Discount codes unlock at 600 points — just 3 logged workouts. Free physical products start around 1,500 points. Your points never expire, so you can save toward bigger rewards.' },
   { q: 'What kind of rewards can I get?', a: 'Real products — protein, pre-workout, gear, and apparel from brands like Thorne, Momentous, and more. No gift cards or digital badges.' },
   { q: 'How does verification work?', a: 'You can sync with Strava, Apple Health, Garmin, or Google Fit for verified sessions. Unverified sessions still earn points — just at a reduced rate.' },
   { q: 'When do new brands get added?', a: 'We\'re onboarding new brands regularly. Drop your email in the waitlist to get notified when new rewards go live.' },
@@ -320,7 +319,7 @@ export default function LandingPage() {
         <p style={{ color: '#444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 6, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>Our Partners</p>
         <p style={{ color: '#3A3A38', fontSize: 12, textAlign: 'center', marginBottom: 28, fontFamily: 'JetBrains Mono, monospace' }}>Brands that believe in rewarding the grind</p>
 
-        <a
+        
           href="https://glnk.io/qv9ww/joseph-panepinto"
           target="_blank"
           rel="noopener noreferrer"
@@ -363,7 +362,7 @@ export default function LandingPage() {
           </div>
         </a>
 
-        <a
+        
           href="https://nobull.pxf.io/c/7109408/3869793/13069"
           target="_blank"
           rel="noopener noreferrer"
@@ -436,7 +435,7 @@ export default function LandingPage() {
       {/* —— REWARD CATALOG —— */}
       <div id="rewards" style={{ padding: '36px 24px 40px', background: '#0D0D0C', borderTop: '1px solid #1C1C1B' }}>
         <p style={{ color: '#444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 4, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>Reward catalog</p>
-        <p style={{ color: '#3A3A38', fontSize: 12, textAlign: 'center', marginBottom: 12, fontFamily: 'JetBrains Mono, monospace' }}>Live now + brands we&apos;re onboarding</p>
+        <p style={{ color: '#3A3A38', fontSize: 12, textAlign: 'center', marginBottom: 12, fontFamily: 'JetBrains Mono, monospace' }}>Discount rewards unlock in just 3 workouts (600 pts)</p>
 
         {/* Live brands - featured */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, maxWidth: 420, margin: '0 auto 16px' }}>
@@ -462,21 +461,6 @@ export default function LandingPage() {
             </div>
           ))}
         </div>
-
-        {/* In talks brands - grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, maxWidth: 420, margin: '0 auto' }}>
-          {REWARD_CATALOG.filter(b => b.status === 'coming_soon').map(({ name, logo, color }) => (
-            <div key={name} style={{ padding: '12px 14px', background: '#141413', borderRadius: 10, border: '1px solid #252523', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: `${color}18`, border: `1px solid ${color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <img src={logo} alt={name} style={{ width: '65%', height: '65%', objectFit: 'contain', borderRadius: 4 }} />
-              </div>
-              <div style={{ minWidth: 0 }}>
-                <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 13, fontWeight: 700, color: '#555', letterSpacing: 0.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>{name}</span>
-                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#B5593C', display: 'block', marginTop: 2, letterSpacing: 0.5 }}>In talks</span>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* —— COMPARISON TABLE —— */}
@@ -493,12 +477,12 @@ export default function LandingPage() {
             <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 60px 60px', gap: 8, alignItems: 'center', padding: '11px 12px', background: i % 2 === 0 ? '#141413' : '#111110', borderRadius: 8 }}>
               <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 13, color: '#B0A89E', lineHeight: 1.3 }}>{feature}</span>
               <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <span style={{ fontSize: 17, color: count ? '#5DBB63' : '#555' }}>{count ? '\u2713' : '\u2717'}</span>
+                <span style={{ fontSize: 17, color: count ? '#5DBB63' : '#555' }}>{count ? '✓' : '✗'}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 {others === true
                   ? <span style={{ fontSize: 14, color: '#555' }}>~</span>
-                  : <span style={{ fontSize: 14, color: '#3A3A38' }}>{'\u2717'}</span>
+                  : <span style={{ fontSize: 14, color: '#3A3A38' }}>{'✗'}</span>
                 }
               </div>
             </div>
