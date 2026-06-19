@@ -320,7 +320,7 @@ export default function LandingPage() {
         <p style={{ color: '#3A3A38', fontSize: 12, textAlign: 'center', marginBottom: 28, fontFamily: 'JetBrains Mono, monospace' }}>Brands that believe in rewarding the grind</p>
 
         
-          href="https://glnk.io/qv9ww/joseph-panepinto"
+          <a href="https://glnk.io/qv9ww/joseph-panepinto"
           target="_blank"
           rel="noopener noreferrer"
           style={{ display: 'block', textDecoration: 'none', maxWidth: 420, margin: '0 auto' }}
@@ -363,7 +363,7 @@ export default function LandingPage() {
         </a>
 
         
-          href="https://nobull.pxf.io/c/7109408/3869793/13069"
+         <a href="https://nobull.pxf.io/c/7109408/3869793/13069"
           target="_blank"
           rel="noopener noreferrer"
           style={{ display: 'block', textDecoration: 'none', maxWidth: 420, margin: '0 auto' }}
