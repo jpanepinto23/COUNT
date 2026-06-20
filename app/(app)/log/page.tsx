@@ -257,6 +257,8 @@ export default function LogPage() {
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [importing, setImporting] = useState(false)
+  const [importMsg, setImportMsg] = useState('')
   const [earnedPoints, setEarnedPoints] = useState(0)
   const [verificationSource, setVerificationSource] = useState<string | null>(null)
   const [newSessionCount, setNewSessionCount] = useState(0)
@@ -289,14 +291,20 @@ export default function LogPage() {
     setSheetOpen(true)
   }
 
-  async function handleLog() {
-    if (!user) return
-    if (workoutType === 'custom' && !customName.trim()) {
-      setError('Name your custom session first.')
-      return
-    }
-    setLoading(true)
-    setError('')
+  // Shared commit path \u2014 used by both manual log and Strava import so the coin,
+  // streak, mystery-bonus and referral logic lives in exactly one place.
+  async function commitWorkout(opts: {
+    type: WorkoutType
+    customName: string
+    duration: number
+    effortRating: number
+    notes: string
+    verified: boolean
+    verificationMethod: string
+    heartRateAvg: number | null
+    calories: number | null
+  }): Promise<{ ok: boolean; error?: string }> {
+    if (!user) return { ok: false, error: 'Not signed in' }
 
     const todayStart = new Date()
     todayStart.setHours(0, 0, 0, 0)
@@ -308,91 +316,33 @@ export default function LogPage() {
       .limit(1)
 
     if (todaySession && todaySession.length > 0) {
-      setError('You\u2019ve already logged a session today. One per day.')
-      setLoading(false)
-      return
-    }
-
-    let verified = false
-    let verificationMethod: string = 'unverified'
-    let heartRateAvg: number | null = null
-    let calories: number | null = null
-
-    const { data: terraActivity } = await supabase
-      .from('terra_activities')
-      .select('provider, heart_rate_avg, calories, duration_seconds, start_time')
-      .eq('user_id', user.id)
-      .gte('start_time', todayStart.toISOString())
-      .order('start_time', { ascending: false })
-      .limit(1)
-
-    if (terraActivity && terraActivity.length > 0) {
-      verified = true
-      const provider = terraActivity[0].provider?.toUpperCase()
-      verificationMethod =
-        provider === 'APPLE' ? 'apple_health' :
-        provider === 'GARMIN' ? 'garmin' :
-        provider === 'FITBIT' ? 'fitbit' :
-        provider === 'GOOGLE' ? 'google_fit' :
-        provider?.toLowerCase() ?? 'unverified'
-      heartRateAvg = terraActivity[0].heart_rate_avg
-      calories = terraActivity[0].calories
-    }
-
-    if (!verified) {
-      const { data: stravaConn } = await supabase
-        .from('strava_connections')
-        .select('access_token, token_expires_at')
-        .eq('user_id', user.id)
-        .single()
-
-      if (stravaConn && new Date(stravaConn.token_expires_at) > new Date()) {
-        try {
-          const _today = new Date()
-          const _after = Math.floor(new Date(_today.getFullYear(), _today.getMonth(), _today.getDate()).getTime() / 1000)
-          const _stravaRes = await fetch(
-            `https://www.strava.com/api/v3/athlete/activities?after=${_after}&before=${_after + 86400}&per_page=1`,
-            { headers: { Authorization: `Bearer ${stravaConn.access_token}` } }
-          )
-          if (_stravaRes.ok) {
-            const _acts = await _stravaRes.json()
-            if (Array.isArray(_acts) && _acts.length > 0) {
-              verified = true
-              verificationMethod = 'strava'
-            }
-          }
-        } catch {
-          /* strava check is best-effort */
-        }
-      }
+      return { ok: false, error: 'You\u2019ve already logged a session today. One per day.' }
     }
 
     const pts = calculatePoints({
-      verified,
+      verified: opts.verified,
       lifetimeSessions: user.lifetime_sessions,
       currentStreak: user.current_streak,
     })
 
     const { error: workoutError } = await supabase.from('workouts').insert({
       user_id: user.id,
-      type: workoutType,
-      custom_name: workoutType === 'custom' ? customName : null,
-      duration_minutes: duration,
-      verification_method: verificationMethod,
-      verified,
-      heart_rate_avg: heartRateAvg,
-      calories,
+      type: opts.type,
+      custom_name: opts.type === 'custom' ? (opts.customName || null) : null,
+      duration_minutes: opts.duration,
+      verification_method: opts.verificationMethod,
+      verified: opts.verified,
+      heart_rate_avg: opts.heartRateAvg,
+      calories: opts.calories,
       base_points: pts.base,
       multiplier_applied: pts.multiplier,
       total_points_earned: pts.total,
-      effort_rating: effortRating || null,
-      notes: notes.trim() || null,
+      effort_rating: opts.effortRating || null,
+      notes: opts.notes.trim() || null,
     })
 
     if (workoutError) {
-      setError(workoutError.message)
-      setLoading(false)
-      return
+      return { ok: false, error: workoutError.message }
     }
 
     const newSessions = user.lifetime_sessions + 1
@@ -451,16 +401,146 @@ export default function LogPage() {
       }
     }
 
+    setWorkoutType(opts.type)
+    setCustomName(opts.customName)
     setEarnedPoints(pts.total)
     setNewSessionCount(newSessions)
     setSharedStreak(newStreak)
-    setVerificationSource(verified ? verificationMethod : null)
+    setVerificationSource(opts.verified ? opts.verificationMethod : null)
     setMysteryBonus(bonus)
     setBonusRevealed(false)
     await refreshUser()
+    return { ok: true }
+  }
+
+  async function handleLog() {
+    if (!user) return
+    if (workoutType === 'custom' && !customName.trim()) {
+      setError('Name your custom session first.')
+      return
+    }
+    setLoading(true)
+    setError('')
+
+    let verified = false
+    let verificationMethod: string = 'unverified'
+    let heartRateAvg: number | null = null
+    let calories: number | null = null
+
+    const todayStart = new Date()
+    todayStart.setHours(0, 0, 0, 0)
+
+    const { data: terraActivity } = await supabase
+      .from('terra_activities')
+      .select('provider, heart_rate_avg, calories, duration_seconds, start_time')
+      .eq('user_id', user.id)
+      .gte('start_time', todayStart.toISOString())
+      .order('start_time', { ascending: false })
+      .limit(1)
+
+    if (terraActivity && terraActivity.length > 0) {
+      verified = true
+      const provider = terraActivity[0].provider?.toUpperCase()
+      verificationMethod =
+        provider === 'APPLE' ? 'apple_health' :
+        provider === 'GARMIN' ? 'garmin' :
+        provider === 'FITBIT' ? 'fitbit' :
+        provider === 'GOOGLE' ? 'google_fit' :
+        provider?.toLowerCase() ?? 'unverified'
+      heartRateAvg = terraActivity[0].heart_rate_avg
+      calories = terraActivity[0].calories
+    }
+
+    // Server-side Strava check (reliable token refresh, no browser CORS).
+    if (!verified) {
+      try {
+        const res = await fetch('/api/strava/today')
+        if (res.ok) {
+          const data = await res.json()
+          if (data.found && data.activity) {
+            verified = true
+            verificationMethod = 'strava'
+            heartRateAvg = data.activity.heart_rate_avg ?? heartRateAvg
+          }
+        }
+      } catch {
+        /* strava check is best-effort */
+      }
+    }
+
+    const result = await commitWorkout({
+      type: workoutType,
+      customName,
+      duration,
+      effortRating,
+      notes,
+      verified,
+      verificationMethod,
+      heartRateAvg,
+      calories,
+    })
+
     setLoading(false)
+    if (!result.ok) {
+      setError(result.error ?? 'Something went wrong.')
+      return
+    }
     setSheetOpen(false)
     setStep('success')
+  }
+
+  // One-tap: pull today's real Strava activity and log it \u2014 no manual entry.
+  async function handleImportStrava() {
+    if (!user) return
+    setImporting(true)
+    setImportMsg('')
+    try {
+      const res = await fetch('/api/strava/today')
+      const data = await res.json().catch(() => ({}))
+
+      if (res.status === 401) {
+        setImportMsg('Please sign in again.')
+        setImporting(false)
+        return
+      }
+      if (!data.connected) {
+        setImportMsg('Connect Strava first from your profile.')
+        setImporting(false)
+        return
+      }
+      if (!data.found || !data.activity) {
+        setImportMsg(
+          data.reason === 'Only manual entries found today'
+            ? 'Your Strava entry today was added manually \u2014 log it above instead.'
+            : 'No Strava workout found for today yet.'
+        )
+        setImporting(false)
+        return
+      }
+
+      const a = data.activity
+      const result = await commitWorkout({
+        type: a.type as WorkoutType,
+        customName: a.custom_name ?? '',
+        duration: a.duration_minutes ?? 60,
+        effortRating: 0,
+        notes: a.name ? `Imported from Strava: ${a.name}` : 'Imported from Strava',
+        verified: true,
+        verificationMethod: 'strava',
+        heartRateAvg: a.heart_rate_avg ?? null,
+        calories: null,
+      })
+
+      setImporting(false)
+      if (!result.ok) {
+        setImportMsg(result.error ?? 'Could not import this workout.')
+        return
+      }
+      setStep('success')
+    } catch {
+      setImporting(false)
+      setImportMsg('Could not reach Strava. Try again in a moment.')
+    }
   }
 
   async function handleShare() {
@@ -1227,6 +1307,53 @@ export default function LogPage() {
         <div style={{ fontFamily: 'var(--sans)', fontSize: 13, color: TOK.muted, marginTop: 8 }}>
           Tap one — log it in three seconds.
         </div>
+      </div>
+
+      {/* Import from Strava — log today's real activity with no manual entry */}
+      <div style={{ padding: '16px 16px 0' }}>
+        <button
+          onClick={handleImportStrava}
+          disabled={importing}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 9,
+            padding: '13px 16px',
+            background: 'rgba(252,76,2,0.10)',
+            color: '#FC4C02',
+            border: '1px solid rgba(252,76,2,0.38)',
+            borderRadius: 12,
+            fontFamily: 'var(--mono)',
+            fontSize: 11,
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            fontWeight: 700,
+            cursor: importing ? 'default' : 'pointer',
+            opacity: importing ? 0.6 : 1,
+          }}
+        >
+          <svg width={15} height={15} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
+          </svg>
+          {importing ? 'Checking Strava…' : 'Import today’s workout from Strava'}
+        </button>
+        {importMsg && (
+          <div
+            style={{
+              marginTop: 8,
+              fontFamily: 'var(--mono)',
+              fontSize: 10,
+              color: TOK.muted,
+              letterSpacing: '0.04em',
+              textAlign: 'center',
+              lineHeight: 1.5,
+            }}
+          >
+            {importMsg}
+          </div>
+        )}
       </div>
 
       {/* Featured 2x2 */}

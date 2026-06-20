@@ -141,7 +141,7 @@ export default function HistoryPage() {
       .gte('logged_at', since.toISOString())
       .order('logged_at', { ascending: false })
       .then(({ data }) => {
-        if (data) setWorkouts(data)
+        if (data) setWorkouts(data as Workout[])
         setLoading(false)
       })
   }, [user?.id]) // eslint-disable-line
