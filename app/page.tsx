@@ -35,11 +35,11 @@ const REWARD_CATALOG = [
 ]
 
 const INTEGRATIONS = [
-  { name: 'Strava',       color: '#FC4C02', logo: 'https://cdn.brandfetch.io/strava.com/w/256/h/256' },
-  { name: 'Apple Health', color: '#FF2D55', logo: 'https://cdn.brandfetch.io/apple.com/w/256/h/256' },
-  { name: 'Google Fit',   color: '#34A853', logo: 'https://cdn.brandfetch.io/google.com/w/256/h/256' },
-  { name: 'Garmin',       color: '#007CC3', logo: 'https://cdn.brandfetch.io/garmin.com/w/256/h/256' },
-  { name: 'MyFitnessPal', color: '#0066FF', logo: 'https://cdn.brandfetch.io/myfitnesspal.com/w/256/h/256' },
+  { name: 'Strava',       color: '#FC4C02', logo: 'https://cdn.brandfetch.io/strava.com/w/256/h/256', live: true },
+  { name: 'Apple Health', color: '#FF2D55', logo: 'https://cdn.brandfetch.io/apple.com/w/256/h/256', live: false },
+  { name: 'Google Fit',   color: '#34A853', logo: 'https://cdn.brandfetch.io/google.com/w/256/h/256', live: false },
+  { name: 'Garmin',       color: '#007CC3', logo: 'https://cdn.brandfetch.io/garmin.com/w/256/h/256', live: false },
+  { name: 'MyFitnessPal', color: '#0066FF', logo: 'https://cdn.brandfetch.io/myfitnesspal.com/w/256/h/256', live: false },
 ]
 
 const COMPARISON = [
@@ -58,7 +58,7 @@ const FAQ_ITEMS = [
   { q: 'How do I earn points?', a: 'Every workout you log earns 200 base points. Move up tiers (Bronze to Platinum) for up to 3x and build streaks for up to 2x — meaning up to 1,200 points per session.' },
   { q: 'How many points do rewards cost?', a: 'Discount codes unlock at 600 points — just 3 logged workouts. Free physical products start around 1,500 points. Your points never expire, so you can save toward bigger rewards.' },
   { q: 'What kind of rewards can I get?', a: 'Real products — protein, pre-workout, gear, and apparel from brands like Thorne, Momentous, and more. No gift cards or digital badges.' },
-  { q: 'How does verification work?', a: 'You can sync with Strava, Apple Health, Garmin, or Google Fit for verified sessions. Unverified sessions still earn points — just at a reduced rate.' },
+  { q: 'How does verification work?', a: 'Connect Strava and your workouts verify automatically — one tap, no double-logging. More trackers are on the way. Unverified sessions still earn points, just at a reduced rate.' },
   { q: 'When do new brands get added?', a: 'We\'re onboarding new brands regularly. Drop your email in the waitlist to get notified when new rewards go live.' },
 ]
 
@@ -409,15 +409,18 @@ export default function LandingPage() {
         <div style={{ marginTop: 32 }}>
           <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2.5, textTransform: 'uppercase', color: '#444', marginBottom: 8, textAlign: 'center', fontFamily: 'JetBrains Mono, monospace' }}>Already track your workouts?</p>
           <p style={{ fontSize: 14, color: '#9A938A', lineHeight: 1.6, textAlign: 'center', maxWidth: 360, margin: '0 auto 18px', fontFamily: 'Archivo, sans-serif' }}>
-            Connect Strava and your workouts earn Coins automatically — one tap, no logging twice. Seamless. Apple Health, Garmin &amp; more, too.
+            Connect Strava and your workouts earn Coins automatically — one tap, no logging twice. Seamless. More trackers on the way.
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', maxWidth: 420, margin: '0 auto' }}>
             {INTEGRATIONS.map(b => (
-              <div key={b.name} style={{ display: 'flex', alignItems: 'center', gap: 9, background: '#141413', borderRadius: 10, padding: '10px 16px', border: '1px solid #1E1E1D' }}>
+              <div key={b.name} style={{ display: 'flex', alignItems: 'center', gap: 9, background: '#141413', borderRadius: 10, padding: '10px 16px', border: '1px solid #1E1E1D', opacity: b.live ? 1 : 0.4 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 7, background: `${b.color}18`, border: `1px solid ${b.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <img src={b.logo} alt={b.name} style={{ width: '65%', height: '65%', objectFit: 'contain', borderRadius: 4 }} />
                 </div>
                 <span style={{ fontSize: 13, fontWeight: 600, color: '#B0A89E', fontFamily: 'Archivo, sans-serif' }}>{b.name}</span>
+                {b.live
+                  ? <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 8, fontWeight: 700, letterSpacing: 1, color: '#34D399', background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 5, padding: '2px 5px', textTransform: 'uppercase' }}>Live</span>
+                  : <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 8, fontWeight: 700, letterSpacing: 1, color: '#666', background: '#1A1A19', border: '1px solid #2A2A28', borderRadius: 5, padding: '2px 5px', textTransform: 'uppercase' }}>Soon</span>}
               </div>
             ))}
           </div>
