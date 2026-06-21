@@ -22,7 +22,7 @@ const TIERS = [
 ]
 
 const HOW_IT_WORKS = [
-  { step: '01', title: 'Log Your Workout', desc: 'Open COUNT after your session. Tap to confirm. Takes 30 seconds.' },
+  { step: '01', title: 'Log Your Workout', desc: 'Already on Strava? One tap pulls in your workout — verified, no double-logging. Or log any session in COUNT in seconds.' },
   { step: '02', title: 'Earn Points',      desc: 'Every session earns 200 base points. Move up tiers for up to 3x and build streaks for up to 2x — they stack.' },
   { step: '03', title: 'Redeem Rewards',   desc: 'Cash in your points. Discount codes unlock in just 3 workouts (600 points) — and free product is the next tier up.' },
 ]
@@ -407,7 +407,10 @@ export default function LandingPage() {
 
         {/* Integrations inline */}
         <div style={{ marginTop: 32 }}>
-          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2.5, textTransform: 'uppercase', color: '#444', marginBottom: 16, textAlign: 'center', fontFamily: 'JetBrains Mono, monospace' }}>Syncs with</p>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2.5, textTransform: 'uppercase', color: '#444', marginBottom: 8, textAlign: 'center', fontFamily: 'JetBrains Mono, monospace' }}>Already track your workouts?</p>
+          <p style={{ fontSize: 14, color: '#9A938A', lineHeight: 1.6, textAlign: 'center', maxWidth: 360, margin: '0 auto 18px', fontFamily: 'Archivo, sans-serif' }}>
+            Connect Strava and your workouts earn Coins automatically — one tap, no logging twice. Seamless. Apple Health, Garmin &amp; more, too.
+          </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', maxWidth: 420, margin: '0 auto' }}>
             {INTEGRATIONS.map(b => (
               <div key={b.name} style={{ display: 'flex', alignItems: 'center', gap: 9, background: '#141413', borderRadius: 10, padding: '10px 16px', border: '1px solid #1E1E1D' }}>
