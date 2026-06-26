@@ -579,7 +579,7 @@ export default function LandingPage() {
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
           <a href="https://instagram.com/make.it.count.app" target="_blank" rel="noopener" style={{ color: '#444', fontSize: 12, textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace' }}>Instagram</a>
           <span style={{ color: '#2A2A29' }}>&#183;</span>
-          <a href="mailto:jpanepinto23@gmail.com" style={{ color: '#444', fontSize: 12, textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace' }}>Contact</a>
+          <a href="mailto:joseph.s.panepinto@countfitness.app" style={{ color: '#444', fontSize: 12, textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace' }}>Contact</a>
           <span style={{ color: '#2A2A29' }}>&#183;</span>
           <a href="/terms" style={{ color: '#444', fontSize: 12, textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace' }}>Terms</a>
           <span style={{ color: '#2A2A29' }}>&#183;</span>
