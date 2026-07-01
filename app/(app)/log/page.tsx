@@ -489,46 +489,70 @@ export default function LogPage() {
     setStep('success')
   }
 
-  // One-tap: pull today's real Strava activity and log it \u2014 no manual entry.
-  async function handleImportStrava() {
+  // One-tap: pull today's real workout from any connected tracker (Strava or Garmin).
+  async function handleImportWorkout() {
     if (!user) return
     setImporting(true)
     setImportMsg('')
     try {
-      const res = await fetch('/api/strava/today')
-      const data = await res.json().catch(() => ({}))
+      const sources = [
+        { url: '/api/strava/today', method: 'strava', label: 'Strava' },
+        { url: '/api/terra/today', method: 'garmin', label: 'Garmin' },
+      ]
+      let picked: {
+        activity: {
+          type: string
+          custom_name?: string | null
+          name?: string | null
+          duration_minutes?: number
+          heart_rate_avg?: number | null
+          calories?: number | null
+        }
+        method: string
+        label: string
+      } | null = null
+      let anyConnected = false
+      let manualOnly = false
 
-      if (res.status === 401) {
-        setImportMsg('Please sign in again.')
-        setImporting(false)
-        return
+      for (const s of sources) {
+        const res = await fetch(s.url)
+        if (res.status === 401) {
+          setImportMsg('Please sign in again.')
+          setImporting(false)
+          return
+        }
+        const data = await res.json().catch(() => ({}))
+        if (data.connected) anyConnected = true
+        if (data.reason === 'Only manual entries found today') manualOnly = true
+        if (data.found && data.activity) {
+          picked = { activity: data.activity, method: s.method, label: s.label }
+          break
+        }
       }
-      if (!data.connected) {
-        setImportMsg('Connect Strava first from your profile.')
-        setImporting(false)
-        return
-      }
-      if (!data.found || !data.activity) {
+
+      if (!picked) {
         setImportMsg(
-          data.reason === 'Only manual entries found today'
-            ? 'Your Strava entry today was added manually \u2014 log it above instead.'
-            : 'No Strava workout found for today yet.'
+          !anyConnected
+            ? 'Connect Strava or Garmin first from your profile.'
+            : manualOnly
+              ? 'Your tracker entry today was added manually \u2014 log it above instead.'
+              : 'No recorded workout found for today yet.'
         )
         setImporting(false)
         return
       }
 
-      const a = data.activity
+      const a = picked.activity
       const result = await commitWorkout({
         type: a.type as WorkoutType,
         customName: a.custom_name ?? '',
         duration: a.duration_minutes ?? 60,
         effortRating: 0,
-        notes: a.name ? `Imported from Strava: ${a.name}` : 'Imported from Strava',
+        notes: a.name ? `Imported from ${picked.label}: ${a.name}` : `Imported from ${picked.label}`,
         verified: true,
-        verificationMethod: 'strava',
+        verificationMethod: picked.method,
         heartRateAvg: a.heart_rate_avg ?? null,
-        calories: null,
+        calories: a.calories ?? null,
       })
 
       setImporting(false)
@@ -539,7 +563,7 @@ export default function LogPage() {
       setStep('success')
     } catch {
       setImporting(false)
-      setImportMsg('Could not reach Strava. Try again in a moment.')
+      setImportMsg('Could not reach your tracker. Try again in a moment.')
     }
   }
 
@@ -1312,7 +1336,7 @@ export default function LogPage() {
       {/* Import from Strava — log today's real activity with no manual entry */}
       <div style={{ padding: '16px 16px 0' }}>
         <button
-          onClick={handleImportStrava}
+          onClick={handleImportWorkout}
           disabled={importing}
           style={{
             width: '100%',
@@ -1337,7 +1361,7 @@ export default function LogPage() {
           <svg width={15} height={15} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
           </svg>
-          {importing ? 'Checking Strava…' : 'Import today’s workout from Strava'}
+          {importing ? 'Checking your trackers…' : 'Import today’s workout'}
         </button>
         {importMsg && (
           <div

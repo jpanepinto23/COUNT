@@ -1259,43 +1259,6 @@ export default function ProfilePage() {
               )
             })}
           </div>
-          <div
-            style={{
-              marginTop: 10,
-              padding: '12px 14px',
-              borderRadius: 12,
-              background: 'rgba(22,163,74,0.08)',
-              border: '1px solid rgba(34,197,94,0.22)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-            }}
-          >
-            <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 10,
-                background: TOK.card,
-                border: `1px solid ${TOK.hairline}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#86efac',
-              }}
-            >
-              <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
-            </div>
-            <div>
-              <div style={{ fontFamily: 'var(--sans)', fontSize: 13, color: TOK.fg, fontWeight: 600 }}>GPS Check-in</div>
-              <div style={{ fontFamily: 'var(--mono)', fontSize: 10, color: TOK.muted, letterSpacing: '0.02em', marginTop: 2 }}>
-                Always active · auto-used when logging
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
