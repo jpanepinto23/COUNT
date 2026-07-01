@@ -56,6 +56,23 @@ export async function GET(req: NextRequest) {
     )
   }
 
+  // Historical-by-default: right after connecting, ask Terra to push the last
+  // 2 days of activity to our webhook. This backfills a workout the user did
+  // earlier today (before connecting) so it still gets credited. Best-effort —
+  // depends on the user granting historical scope on the provider's consent screen.
+  const terraDevId = process.env.TERRA_DEV_ID
+  const terraApiKey = process.env.TERRA_API_KEY
+  if (terraDevId && terraApiKey) {
+    const end = new Date()
+    const start = new Date(end.getTime() - 2 * 24 * 60 * 60 * 1000)
+    fetch(
+      `https://api.tryterra.co/v2/activity?user_id=${terraUserId}` +
+        `&start_date=${encodeURIComponent(start.toISOString())}` +
+        `&end_date=${encodeURIComponent(end.toISOString())}&to_webhook=true`,
+      { headers: { 'dev-id': terraDevId, 'x-api-key': terraApiKey } }
+    ).catch(() => {})
+  }
+
   return NextResponse.redirect(
     new URL('/profile?connected=true', process.env.NEXT_PUBLIC_APP_URL!)
   )

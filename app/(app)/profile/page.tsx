@@ -612,7 +612,7 @@ export default function ProfilePage() {
       if (!session) throw new Error('No session')
       const endpoint = deviceType === 'strava'
         ? '/api/strava/disconnect'
-        : `/api/terra/disconnect?provider=${DEVICE_INFO[deviceType]?.provider ?? ''}`
+        : `/api/terra/disconnect?type=${deviceType}`
       const res = await fetch(endpoint, { method: 'DELETE', headers: { Authorization: `Bearer ${session.access_token}` } })
       if (!res.ok) throw new Error('Disconnect failed')
       setDevices((prev) => prev.filter((d) => d.type !== deviceType))
