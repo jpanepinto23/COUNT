@@ -43,20 +43,28 @@ export async function GET() {
     return NextResponse.json({ found: false, connected: true, reason: 'Terra not configured' })
   }
 
-  // Look back a rolling ~36h window (robust to the user's timezone vs the
+  // Look back a rolling ~2-day window (robust to the user's timezone vs the
   // server's UTC clock, and to Garmin's sync lag) and take the most recent
-  // workout. The one-per-day guard lives in commitWorkout on the client.
+  // workout. Terra's /v2/activity expects plain YYYY-MM-DD dates, not full
+  // ISO timestamps. The one-per-day guard lives in commitWorkout on the client.
   const now = new Date()
-  const start = new Date(now.getTime() - 36 * 60 * 60 * 1000).toISOString()
-  const end = now.toISOString()
+  const startDate = new Date(now.getTime() - 36 * 60 * 60 * 1000).toISOString().slice(0, 10)
+  const endDate = now.toISOString().slice(0, 10)
 
   const res = await fetch(
     `https://api.tryterra.co/v2/activity?user_id=${dev.terra_user_id}` +
-      `&start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}&to_webhook=false`,
+      `&start_date=${startDate}&end_date=${endDate}&to_webhook=false`,
     { headers: { 'dev-id': devId, 'x-api-key': apiKey } }
   )
   if (!res.ok) {
-    return NextResponse.json({ found: false, connected: true, reason: 'Failed to fetch activity' })
+    const errBody = await res.text().catch(() => '')
+    return NextResponse.json({
+      found: false,
+      connected: true,
+      reason: 'Failed to fetch activity',
+      terraStatus: res.status,
+      terraBody: errBody.slice(0, 300),
+    })
   }
 
   const json: any = await res.json().catch(() => ({}))
