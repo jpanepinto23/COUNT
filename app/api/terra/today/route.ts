@@ -43,8 +43,11 @@ export async function GET() {
     return NextResponse.json({ found: false, connected: true, reason: 'Terra not configured' })
   }
 
+  // Look back a rolling ~36h window (robust to the user's timezone vs the
+  // server's UTC clock, and to Garmin's sync lag) and take the most recent
+  // workout. The one-per-day guard lives in commitWorkout on the client.
   const now = new Date()
-  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString()
+  const start = new Date(now.getTime() - 36 * 60 * 60 * 1000).toISOString()
   const end = now.toISOString()
 
   const res = await fetch(
@@ -58,9 +61,15 @@ export async function GET() {
 
   const json: any = await res.json().catch(() => ({}))
   const activities: any[] = Array.isArray(json?.data) ? json.data : []
-  const activity = activities[activities.length - 1] // most recent today
+  // Most recent by start_time (Terra doesn't guarantee ordering).
+  activities.sort((a, b) => {
+    const ta = new Date(a?.metadata?.start_time ?? 0).getTime()
+    const tb = new Date(b?.metadata?.start_time ?? 0).getTime()
+    return ta - tb
+  })
+  const activity = activities[activities.length - 1]
   if (!activity) {
-    return NextResponse.json({ found: false, connected: true, reason: 'No activity today yet' })
+    return NextResponse.json({ found: false, connected: true, reason: 'No recent activity found' })
   }
 
   const metadata = activity.metadata ?? {}
