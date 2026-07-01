@@ -33,6 +33,7 @@ const TIER_COLORS: Record<string, string> = {
 
 const DEVICE_INFO: Record<string, { label: string; provider: string }> = {
   strava: { label: 'Strava', provider: 'STRAVA' },
+  garmin: { label: 'Garmin', provider: 'GARMIN' },
   google_fit: { label: 'Google Fit', provider: 'GOOGLE' },
   gps: { label: 'GPS Check-in', provider: '' },
   photo: { label: 'Photo Verification', provider: '' },
@@ -579,6 +580,28 @@ export default function ProfilePage() {
     }
   }
 
+  // Connect a wearable through Terra (Garmin, and later Fitbit/Whoop/Oura).
+  async function handleConnectTerra(type: string, provider: string) {
+    if (!user) return
+    setConnecting(type)
+    setConnectMessage(null)
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (!session) throw new Error('No session')
+      const res = await fetch(`/api/terra/connect?provider=${provider}`, {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      })
+      const json = await res.json()
+      if (!res.ok || !json.url) throw new Error(json.error ?? 'Failed to get connection URL')
+      window.location.href = json.url
+    } catch (err: any) {
+      setConnectMessage({ text: err.message ?? 'Connection failed', ok: false })
+      setConnecting(null)
+    }
+  }
+
   async function handleDisconnect(deviceType: string) {
     if (!user) return
     setDisconnecting(deviceType)
@@ -587,7 +610,10 @@ export default function ProfilePage() {
         data: { session },
       } = await supabase.auth.getSession()
       if (!session) throw new Error('No session')
-      const res = await fetch('/api/strava/disconnect', { method: 'DELETE', headers: { Authorization: `Bearer ${session.access_token}` } })
+      const endpoint = deviceType === 'strava'
+        ? '/api/strava/disconnect'
+        : `/api/terra/disconnect?provider=${DEVICE_INFO[deviceType]?.provider ?? ''}`
+      const res = await fetch(endpoint, { method: 'DELETE', headers: { Authorization: `Bearer ${session.access_token}` } })
       if (!res.ok) throw new Error('Disconnect failed')
       setDevices((prev) => prev.filter((d) => d.type !== deviceType))
       setConnectMessage({ text: `${DEVICE_INFO[deviceType]?.label ?? deviceType} disconnected.`, ok: true })
@@ -636,7 +662,10 @@ export default function ProfilePage() {
   const multiplier =
     streakDays >= 30 ? 1.5 : streakDays >= 14 ? 1.3 : streakDays >= 7 ? 1.2 : streakDays >= 3 ? 1.1 : 1.0
   const connectedTypes = new Set(devices.filter((d) => d.status === 'active').map((d) => d.type))
-  const CONNECTABLE_TRACKERS = [{ type: 'strava', provider: 'STRAVA' }]
+  const CONNECTABLE_TRACKERS = [
+    { type: 'strava', provider: 'STRAVA' },
+    { type: 'garmin', provider: 'GARMIN' },
+  ]
 
   // Derive handle from email local-part, with fallback to name
   const handleBase = (user.email?.split('@')[0] || user.name || 'athlete').replace(/[^a-zA-Z0-9_.-]/g, '').toLowerCase()
@@ -1206,7 +1235,7 @@ export default function ProfilePage() {
                     </button>
                   ) : (
                     <button
-                      onClick={() => handleConnectStrava()}
+                      onClick={() => (type === 'strava' ? handleConnectStrava() : handleConnectTerra(type, info.provider))}
                       disabled={isLoading || connecting !== null}
                       style={{
                         padding: '6px 14px',
