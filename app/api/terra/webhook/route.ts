@@ -11,16 +11,34 @@ function createServiceClient() {
   )
 }
 
-function verifySignature(body: string, signature: string | null, secret: string): boolean {
-  if (!signature || !secret) return false
-  const hmac = crypto.createHmac('sha256', secret)
-  hmac.update(body)
-  const expected = hmac.digest('hex')
-  try {
-    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))
-  } catch {
-    return false
-  }
+function verifySignature(body: string, header: string | null, secret: string): boolean {
+    if (!header || !secret) return false
+    // Terra signs Stripe-style: the header is "t=<timestamp>,v1=<hex>" and the
+    // signature is HMAC-SHA256 over `${timestamp}.${rawBody}` — not the body alone.
+    let timestamp = ''
+    const signatures: string[] = []
+    for (const element of header.split(',')) {
+          const idx = element.indexOf('=')
+          if (idx === -1) continue
+          const prefix = element.slice(0, idx).trim()
+          const value = element.slice(idx + 1).trim()
+          if (prefix === 't') timestamp = value
+          else if (prefix === 'v1') signatures.push(value)
+    }
+    if (!timestamp || signatures.length === 0) {
+          console.warn('Terra webhook: malformed terra-signature header')
+          return false
+    }
+    const expected = crypto.createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex')
+    const valid = signatures.some((sig) => {
+          try {
+                  return sig.length === expected.length && crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))
+          } catch {
+                  return false
+          }
+    })
+    if (!valid) console.warn('Terra webhook: signature mismatch')
+    return valid
 }
 
 const TIER_MULTIPLIERS: Record<string, number> = { bronze: 1.0, silver: 1.5, gold: 2.0, platinum: 3.0 }
