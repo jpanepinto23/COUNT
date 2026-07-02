@@ -18,23 +18,21 @@ function Stepper({ value, onChange, min, max, format, label }: {
 }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1 }}>
-      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: '#8A8478', fontFamily: 'Archivo, sans-serif' }}>
+      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: '#8A8680', fontFamily: 'Archivo, sans-serif' }}>
         {label}
       </span>
-      <div style={{ display: 'flex', alignItems: 'center', border: '1.5px solid #E0D9CE', borderRadius: 12, overflow: 'hidden', width: '100%', background: '#FDFAF6' }}>
+      <div style={{ display: 'flex', alignItems: 'center', border: '1.5px solid #2E2C29', borderRadius: 12, overflow: 'hidden', width: '100%', background: '#181714' }}>
         <button type="button" onClick={() => onChange(Math.max(min, value - 1))}
-          style={{ width: 48, height: 54, border: 'none', background: 'transparent', fontSize: 22, color: '#5C5346', borderRight: '1.5px solid #E0D9CE', cursor: 'pointer', flexShrink: 0 }}>&#8722;</button>
-        <div style={{ flex: 1, textAlign: 'center', fontSize: 20, fontWeight: 800, color: '#2D2926', fontFamily: 'Archivo, sans-serif', padding: '0 4px' }}>
+          style={{ width: 48, height: 54, border: 'none', background: 'transparent', fontSize: 22, color: '#B0A89E', borderRight: '1.5px solid #2E2C29', cursor: 'pointer', flexShrink: 0 }}>&#8722;</button>
+        <div style={{ flex: 1, textAlign: 'center', fontSize: 20, fontWeight: 800, color: '#F5F0EA', fontFamily: 'Archivo, sans-serif', padding: '0 4px' }}>
           {format(value)}
         </div>
         <button type="button" onClick={() => onChange(Math.min(max, value + 1))}
-          style={{ width: 48, height: 54, border: 'none', background: 'transparent', fontSize: 22, color: '#5C5346', borderLeft: '1.5px solid #E0D9CE', cursor: 'pointer', flexShrink: 0 }}>+</button>
+          style={{ width: 48, height: 54, border: 'none', background: 'transparent', fontSize: 22, color: '#B0A89E', borderLeft: '1.5px solid #2E2C29', cursor: 'pointer', flexShrink: 0 }}>+</button>
       </div>
     </div>
   )
 }
-
-
 function SignupContent() {
   const [step, setStep] = useState(1)
   const [name, setName] = useState('')
@@ -118,9 +116,8 @@ function SignupContent() {
 
     router.replace('/connect')
   }
-
   return (
-    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', background: '#FAF8F4' }}>
+    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', background: '#0E0E0D' }}>
       <div style={{ marginBottom: 36 }}>
         <TallyLogo />
       </div>
@@ -129,14 +126,14 @@ function SignupContent() {
         {/* Step indicator */}
         <div style={{ display: 'flex', gap: 6, marginBottom: 28 }}>
           {[1, 2].map(s => (
-            <div key={s} style={{ flex: 1, height: 3, borderRadius: 2, background: s <= step ? '#B5593C' : '#E0D9CE' }} />
+            <div key={s} style={{ flex: 1, height: 3, borderRadius: 2, background: s <= step ? '#B5593C' : '#2E2C29' }} />
           ))}
         </div>
 
         {step === 1 && (
           <>
-            <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#111110' }}>Create account</h1>
-            <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>Every rep counts. Start earning today.</p>
+            <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#F5F0EA' }}>Create account</h1>
+            <p style={{ color: '#8A8680', fontSize: 15, marginBottom: 28 }}>Every rep counts. Start earning today.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <input type="text" placeholder="Full name" value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
               <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
@@ -176,15 +173,15 @@ function SignupContent() {
 
         {step === 2 && (
           <form onSubmit={handleSignup}>
-            <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#111110' }}>One last thing</h1>
-            <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>We just need your age to confirm you&apos;re 13+.</p>
+            <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#F5F0EA' }}>One last thing</h1>
+            <p style={{ color: '#8A8680', fontSize: 15, marginBottom: 28 }}>We just need your age to confirm you&apos;re 13+.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <Stepper value={age} onChange={setAge} min={13} max={100} format={v => `${v} yr`} label="Age" />
               {error && <p style={{ color: '#ef4444', fontSize: 13 }}>{error}</p>}
               <button type="submit" disabled={loading} style={btnStyle}>
                 {loading ? 'Creating account...' : 'Start Counting →'}
               </button>
-              <button type="button" onClick={() => setStep(1)} style={{ ...btnStyle, background: 'transparent', color: '#8A8478', border: '1.5px solid #E0D9CE' }}>
+              <button type="button" onClick={() => setStep(1)} style={{ ...btnStyle, background: 'transparent', color: '#8A8680', border: '1.5px solid #2E2C29' }}>
                 Back
               </button>
             </div>
@@ -192,14 +189,13 @@ function SignupContent() {
         )}
 
         <div style={{ marginTop: 20, textAlign: 'center' }}>
-          <span style={{ color: '#8A8478', fontSize: 13 }}>Already have an account? </span>
+          <span style={{ color: '#8A8680', fontSize: 13 }}>Already have an account? </span>
           <Link href="/auth/login" style={{ color: '#B5593C', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>Sign in →</Link>
         </div>
       </div>
     </div>
   )
 }
-
 export default function SignupPage() {
   return (
     <Suspense>
@@ -213,30 +209,30 @@ function TallyLogo() {
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
       <div style={{ position: 'relative', width: 44, height: 36 }}>
         {[6, 14, 22, 30].map((left, i) => (
-          <div key={i} style={{ position: 'absolute', left, top: 4, width: 4, height: 28, background: '#111110', borderRadius: 2 }} />
+          <div key={i} style={{ position: 'absolute', left, top: 4, width: 4, height: 28, background: '#F5F0EA', borderRadius: 2 }} />
         ))}
         <div style={{ position: 'absolute', top: 16, left: -2, width: 48, height: 3.5, background: '#B5593C', borderRadius: 2, transform: 'rotate(-30deg)' }} />
       </div>
-      <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, letterSpacing: 6, textTransform: 'uppercase', color: '#111110' }}>COUNT</span>
+      <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, letterSpacing: 6, textTransform: 'uppercase', color: '#F5F0EA' }}>COUNT</span>
     </div>
   )
 }
 
 const inputStyle: React.CSSProperties = {
   padding: '14px 16px',
-  border: '1.5px solid #E0D9CE',
+  border: '1.5px solid #2E2C29',
   borderRadius: 10,
   fontSize: 15,
   fontFamily: 'Archivo, sans-serif',
-  background: '#fff',
-  color: '#111110',
+  background: '#181714',
+  color: '#F5F0EA',
   outline: 'none',
   width: '100%',
 }
 
 const btnStyle: React.CSSProperties = {
   padding: '15px',
-  background: '#111110',
+  background: '#B5593C',
   color: '#F5F0EA',
   fontFamily: 'Archivo, sans-serif',
   fontSize: 15,
