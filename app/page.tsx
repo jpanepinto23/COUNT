@@ -260,10 +260,16 @@ export default function LandingPage() {
           <Link href="/auth/signup" style={{ display: 'inline-block', padding: '16px 36px', background: '#B5593C', color: '#F5F0EA', textDecoration: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800, fontFamily: 'Archivo, sans-serif', letterSpacing: 0.3, textShadow: 'none', boxShadow: '0 4px 20px rgba(181,89,60,0.45)' }}>
             Start earning &rarr;
           </Link>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 18 }}>
-            <img src="https://cdn.brandfetch.io/garmin.com/w/256/h/256" alt="Garmin" style={{ width: 18, height: 18, borderRadius: 4, objectFit: 'contain' }} />
-            <img src="https://cdn.brandfetch.io/strava.com/w/256/h/256" alt="Strava" style={{ width: 18, height: 18, borderRadius: 4, objectFit: 'contain' }} />
-            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'rgba(245,240,234,0.65)', letterSpacing: 0.5 }}>Syncs with Garmin &amp; Strava &mdash; auto-verified</span>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 22, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 10, padding: '9px 14px' }}>
+              <img src="https://cdn.brandfetch.io/garmin.com/w/256/h/256" alt="Garmin" style={{ width: 22, height: 22, borderRadius: 5, objectFit: 'contain' }} />
+              <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 14, fontWeight: 700, color: '#F5F0EA' }}>Garmin</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 10, padding: '9px 14px' }}>
+              <img src="https://cdn.brandfetch.io/strava.com/w/256/h/256" alt="Strava" style={{ width: 22, height: 22, borderRadius: 5, objectFit: 'contain' }} />
+              <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 14, fontWeight: 700, color: '#F5F0EA' }}>Strava</span>
+            </div>
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: 'rgba(245,240,234,0.8)', letterSpacing: 0.5 }}>syncs &amp; auto-verifies</span>
           </div>
 </div>
       </div>
