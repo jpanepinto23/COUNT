@@ -22,7 +22,7 @@ const TIERS = [
 ]
 
 const HOW_IT_WORKS = [
-  { step: '01', title: 'Log Your Workout', desc: 'Already on Strava? One tap pulls in your workout — verified, no double-logging. Or log any session in COUNT in seconds.' },
+    { step: '01', title: 'Connect Your Tracker', desc: 'Link Garmin or Strava once — workouts sync and verify automatically, no double-logging. No tracker? Tap to log in 30 seconds.' },
   { step: '02', title: 'Earn Points',      desc: 'Every session earns 200 base points. Move up tiers for up to 3x and build streaks for up to 2x — they stack.' },
   { step: '03', title: 'Redeem Rewards',   desc: 'Cash in your points. Discount codes unlock in just 3 workouts (600 points) — and free product is the next tier up.' },
 ]
@@ -35,10 +35,10 @@ const REWARD_CATALOG = [
 ]
 
 const INTEGRATIONS = [
-  { name: 'Strava',       color: '#FC4C02', logo: 'https://cdn.brandfetch.io/strava.com/w/256/h/256', live: true },
+    { name: 'Strava',       color: '#FC4C02', logo: 'https://cdn.brandfetch.io/strava.com/w/256/h/256', live: true },
+  { name: 'Garmin',       color: '#007CC3', logo: 'https://cdn.brandfetch.io/garmin.com/w/256/h/256', live: true },
   { name: 'Apple Health', color: '#FF2D55', logo: 'https://cdn.brandfetch.io/apple.com/w/256/h/256', live: false },
   { name: 'Google Fit',   color: '#34A853', logo: 'https://cdn.brandfetch.io/google.com/w/256/h/256', live: false },
-  { name: 'Garmin',       color: '#007CC3', logo: 'https://cdn.brandfetch.io/garmin.com/w/256/h/256', live: false },
   { name: 'MyFitnessPal', color: '#0066FF', logo: 'https://cdn.brandfetch.io/myfitnesspal.com/w/256/h/256', live: false },
 ]
 
@@ -58,7 +58,7 @@ const FAQ_ITEMS = [
   { q: 'How do I earn points?', a: 'Every workout you log earns 200 base points. Move up tiers (Bronze to Platinum) for up to 3x and build streaks for up to 2x — meaning up to 1,200 points per session.' },
   { q: 'How many points do rewards cost?', a: 'Discount codes unlock at 600 points — just 3 logged workouts. Free physical products start around 1,500 points. Your points never expire, so you can save toward bigger rewards.' },
   { q: 'What kind of rewards can I get?', a: 'Real products — protein, pre-workout, gear, and apparel from brands like Thorne, Momentous, and more. No gift cards or digital badges.' },
-  { q: 'How does verification work?', a: 'Connect Strava and your workouts verify automatically — one tap, no double-logging. More trackers are on the way. Unverified sessions still earn points, just at a reduced rate.' },
+    { q: 'How does verification work?', a: 'Connect Garmin or Strava and your workouts sync and verify automatically — no double-logging, and verified sessions earn a 25% bonus. More trackers coming soon. Manual logs still earn points, just at a reduced rate.' },
   { q: 'When do new brands get added?', a: 'We\'re onboarding new brands regularly. Drop your email in the waitlist to get notified when new rewards go live.' },
 ]
 
@@ -260,7 +260,12 @@ export default function LandingPage() {
           <Link href="/auth/signup" style={{ display: 'inline-block', padding: '16px 36px', background: '#B5593C', color: '#F5F0EA', textDecoration: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800, fontFamily: 'Archivo, sans-serif', letterSpacing: 0.3, textShadow: 'none', boxShadow: '0 4px 20px rgba(181,89,60,0.45)' }}>
             Start earning &rarr;
           </Link>
-        </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 18 }}>
+            <img src="https://cdn.brandfetch.io/garmin.com/w/256/h/256" alt="Garmin" style={{ width: 18, height: 18, borderRadius: 4, objectFit: 'contain' }} />
+            <img src="https://cdn.brandfetch.io/strava.com/w/256/h/256" alt="Strava" style={{ width: 18, height: 18, borderRadius: 4, objectFit: 'contain' }} />
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'rgba(245,240,234,0.65)', letterSpacing: 0.5 }}>Syncs with Garmin &amp; Strava &mdash; auto-verified</span>
+          </div>
+</div>
       </div>
 
       {/* —— VALUE PROP —— */}
@@ -564,7 +569,17 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* —— FOOTER —— */}
+            {/* —— FINAL CTA —— */}
+      <div style={{ padding: '44px 24px', borderTop: '1px solid #1C1C1B', background: '#0D0D0C', textAlign: 'center' }}>
+        <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 24, fontWeight: 900, color: '#F5F0EA', lineHeight: 1.2, marginBottom: 18 }}>
+          Ready to get paid<br />for showing up?
+        </p>
+        <Link href="/auth/signup" style={{ display: 'inline-block', padding: '16px 36px', background: '#B5593C', color: '#F5F0EA', textDecoration: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800, fontFamily: 'Archivo, sans-serif', letterSpacing: 0.3 }}>
+          Start earning &rarr;
+        </Link>
+      </div>
+
+{/* —— FOOTER —— */}
       <div style={{ padding: '32px 24px 44px', borderTop: '1px solid #1A1A19', background: '#0A0A09' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 16 }}>
           <div style={{ position: 'relative', width: 20, height: 17 }}>
