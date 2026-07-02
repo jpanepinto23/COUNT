@@ -157,11 +157,11 @@ export default function LandingPage() {
             {/* Menu header */}
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #1E1E1D', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ position: 'relative', width: 20, height: 17 }}>
-                  {[0, 5, 10].map(left => (
+                                <div style={{ position: 'relative', width: 22, height: 17 }}>
+                  {[0, 5, 10, 15].map(left => (
                     <div key={left} style={{ position: 'absolute', top: 0, width: 2, height: 17, background: '#F5F0EA', borderRadius: 1, left }} />
                   ))}
-                  <div style={{ position: 'absolute', top: 5, left: 1.5, width: 13, height: 1.5, background: '#B5593C', borderRadius: 1, transform: 'rotate(-30deg)' }} />
+                  <div style={{ position: 'absolute', top: 6, left: 0, width: 19, height: 1.5, background: '#B5593C', borderRadius: 1, transform: 'rotate(-30deg)' }} />
                 </div>
                 <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 14, fontWeight: 900, color: '#F5F0EA', letterSpacing: '0.15em', textTransform: 'uppercase' }}>COUNT</span>
               </div>
@@ -245,11 +245,11 @@ export default function LandingPage() {
           </Link>
         </div>
         <div style={{ position: 'absolute', inset: 0, zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 0, padding: '0 24px' }}>
-          <div style={{ position: 'relative', width: 52, height: 44, marginBottom: 14 }}>
-            {[0, 13, 26].map(left => (
+                    <div style={{ position: 'relative', width: 57, height: 44, marginBottom: 14 }}>
+            {[0, 13, 26, 39].map(left => (
               <div key={left} style={{ position: 'absolute', top: 0, width: 5, height: 44, background: '#F5F0EA', borderRadius: 3, left }} />
             ))}
-            <div style={{ position: 'absolute', top: 12, left: 4, width: 34, height: 4, background: '#B5593C', borderRadius: 2, transform: 'rotate(-30deg)' }} />
+            <div style={{ position: 'absolute', top: 14, left: -2, width: 52, height: 4, background: '#B5593C', borderRadius: 2, transform: 'rotate(-30deg)' }} />
           </div>
           <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 'clamp(52px, 12vw, 96px)', fontWeight: 900, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#F5F0EA', lineHeight: 1, textShadow: '0 2px 24px rgba(0,0,0,0.6)', marginBottom: 10 }}>
             COUNT
@@ -588,11 +588,11 @@ export default function LandingPage() {
 {/* —— FOOTER —— */}
       <div style={{ padding: '32px 24px 44px', borderTop: '1px solid #1A1A19', background: '#0A0A09' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 16 }}>
-          <div style={{ position: 'relative', width: 20, height: 17 }}>
-            {[0, 5, 10].map(left => (
+                    <div style={{ position: 'relative', width: 22, height: 17 }}>
+            {[0, 5, 10, 15].map(left => (
               <div key={left} style={{ position: 'absolute', top: 0, width: 2, height: 17, background: '#444', borderRadius: 1, left }} />
             ))}
-            <div style={{ position: 'absolute', top: 5, left: 1.5, width: 13, height: 1.5, background: '#B5593C', borderRadius: 1, transform: 'rotate(-30deg)' }} />
+            <div style={{ position: 'absolute', top: 6, left: 0, width: 19, height: 1.5, background: '#B5593C', borderRadius: 1, transform: 'rotate(-30deg)' }} />
           </div>
           <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 14, fontWeight: 900, color: '#444', letterSpacing: '0.15em', textTransform: 'uppercase' }}>COUNT</span>
         </div>
