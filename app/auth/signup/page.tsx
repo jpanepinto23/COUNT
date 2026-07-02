@@ -116,7 +116,7 @@ function SignupContent() {
       })
     }
 
-    router.replace('/home')
+    router.replace('/connect')
   }
 
   return (
