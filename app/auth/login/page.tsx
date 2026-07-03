@@ -27,15 +27,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', background: '#FAF8F4' }}>
+    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', background: '#0E0E0D' }}>
       {/* Logo */}
       <div style={{ marginBottom: 40 }}>
         <TallyLogo />
       </div>
 
       <div style={{ width: '100%', maxWidth: 380 }}>
-        <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#111110' }}>Welcome back</h1>
-        <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>Sign in to keep your streak alive.</p>
+        <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#F5F0EA' }}>Welcome back</h1>
+        <p style={{ color: '#8A8680', fontSize: 15, marginBottom: 28 }}>Sign in to keep your streak alive.</p>
 
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <input
@@ -61,10 +61,10 @@ export default function LoginPage() {
         </form>
 
         <div style={{ marginTop: 20, textAlign: 'center' }}>
-          <Link href="/auth/forgot-password" style={{ color: '#8A8478', fontSize: 13, textDecoration: 'none' }}>Forgot password?</Link>
+          <Link href="/auth/forgot-password" style={{ color: '#8A8680', fontSize: 13, textDecoration: 'none' }}>Forgot password?</Link>
         </div>
         <div style={{ marginTop: 12, textAlign: 'center' }}>
-          <span style={{ color: '#8A8478', fontSize: 13 }}>No account? </span>
+          <span style={{ color: '#8A8680', fontSize: 13 }}>No account? </span>
           <Link href="/auth/signup" style={{ color: '#B5593C', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>Create one →</Link>
         </div>
       </div>
@@ -77,30 +77,30 @@ function TallyLogo() {
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
       <div style={{ position: 'relative', width: 44, height: 36 }}>
         {[6, 14, 22, 30].map((left, i) => (
-          <div key={i} style={{ position: 'absolute', left, top: 4, width: 4, height: 28, background: '#111110', borderRadius: 2 }} />
+          <div key={i} style={{ position: 'absolute', left, top: 4, width: 4, height: 28, background: '#F5F0EA', borderRadius: 2 }} />
         ))}
         <div style={{ position: 'absolute', top: 16, left: -2, width: 48, height: 3.5, background: '#B5593C', borderRadius: 2, transform: 'rotate(-30deg)' }} />
       </div>
-      <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, letterSpacing: 6, textTransform: 'uppercase', color: '#111110' }}>COUNT</span>
+      <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, letterSpacing: 6, textTransform: 'uppercase', color: '#F5F0EA' }}>COUNT</span>
     </div>
   )
 }
 
 const inputStyle: React.CSSProperties = {
   padding: '14px 16px',
-  border: '1.5px solid #E0D9CE',
+  border: '1.5px solid #2E2C29',
   borderRadius: 10,
   fontSize: 15,
   fontFamily: 'Archivo, sans-serif',
-  background: '#fff',
-  color: '#111110',
+  background: '#181714',
+  color: '#F5F0EA',
   outline: 'none',
   width: '100%',
 }
 
 const btnStyle: React.CSSProperties = {
   padding: '15px',
-  background: '#111110',
+  background: '#B5593C',
   color: '#F5F0EA',
   fontFamily: 'Archivo, sans-serif',
   fontSize: 15,
