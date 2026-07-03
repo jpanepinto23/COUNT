@@ -54,31 +54,31 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#FAF8F4' }}>
+    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#0E0E0D' }}>
       <div style={{ width: '100%', maxWidth: 380 }}>
         <TallyLogo />
         <div style={{ marginTop: 36 }}>
           {done ? (
             <div style={{ textAlign: 'center' }}>
               <p style={{ fontSize: 40, marginBottom: 16 }}>✅</p>
-              <h2 style={{ fontSize: 22, fontWeight: 900, marginBottom: 8, fontFamily: 'Archivo, sans-serif', color: '#111110' }}>Password updated!</h2>
-              <p style={{ color: '#8A8478', fontSize: 14 }}>Taking you to the app...</p>
+              <h2 style={{ fontSize: 22, fontWeight: 900, marginBottom: 8, fontFamily: 'Archivo, sans-serif', color: '#F5F0EA' }}>Password updated!</h2>
+              <p style={{ color: '#8A8680', fontSize: 14 }}>Taking you to the app...</p>
             </div>
           ) : error && !ready ? (
             <div style={{ textAlign: 'center' }}>
               <p style={{ fontSize: 40, marginBottom: 16 }}>⚠️</p>
-              <h2 style={{ fontSize: 20, fontWeight: 900, marginBottom: 8, fontFamily: 'Archivo, sans-serif', color: '#111110' }}>Link expired</h2>
-              <p style={{ color: '#8A8478', fontSize: 14, marginBottom: 24 }}>{error}</p>
+              <h2 style={{ fontSize: 20, fontWeight: 900, marginBottom: 8, fontFamily: 'Archivo, sans-serif', color: '#F5F0EA' }}>Link expired</h2>
+              <p style={{ color: '#8A8680', fontSize: 14, marginBottom: 24 }}>{error}</p>
               <a href="/auth/forgot-password" style={{ color: '#B5593C', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>Request a new link →</a>
             </div>
           ) : !ready ? (
             <div style={{ textAlign: 'center' }}>
-              <p style={{ color: '#8A8478', fontSize: 15 }}>Verifying reset link…</p>
+              <p style={{ color: '#8A8680', fontSize: 15 }}>Verifying reset link…</p>
             </div>
           ) : (
             <>
-              <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#111110' }}>New Password</h1>
-              <p style={{ color: '#8A8478', fontSize: 15, marginBottom: 28 }}>Choose a new password for your account.</p>
+              <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#F5F0EA' }}>New Password</h1>
+              <p style={{ color: '#8A8680', fontSize: 15, marginBottom: 28 }}>Choose a new password for your account.</p>
               <form onSubmit={handleReset} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 <input type="password" placeholder="New password (min 6 chars)" value={password} onChange={e => setPassword(e.target.value)} required style={inputStyle} />
                 <input type="password" placeholder="Confirm new password"        value={confirm}  onChange={e => setConfirm(e.target.value)}  required style={inputStyle} />
@@ -97,7 +97,7 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100dvh', background: '#FAF8F4' }} />}>
+    <Suspense fallback={<div style={{ minHeight: '100dvh', background: '#0E0E0D' }} />}>
       <ResetPasswordForm />
     </Suspense>
   )
@@ -108,22 +108,22 @@ function TallyLogo() {
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
       <div style={{ position: 'relative', width: 44, height: 36 }}>
         {[6, 14, 22, 30].map((left, i) => (
-          <div key={i} style={{ position: 'absolute', left, top: 4, width: 4, height: 28, background: '#111110', borderRadius: 2 }} />
+          <div key={i} style={{ position: 'absolute', left, top: 4, width: 4, height: 28, background: '#F5F0EA', borderRadius: 2 }} />
         ))}
         <div style={{ position: 'absolute', top: 16, left: -2, width: 48, height: 3.5, background: '#B5593C', borderRadius: 2, transform: 'rotate(-30deg)' }} />
       </div>
-      <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, letterSpacing: 6, textTransform: 'uppercase', color: '#111110' }}>COUNT</span>
+      <span style={{ fontFamily: 'Archivo, sans-serif', fontSize: 22, fontWeight: 900, letterSpacing: 6, textTransform: 'uppercase', color: '#F5F0EA' }}>COUNT</span>
     </div>
   )
 }
 
 const inputStyle: React.CSSProperties = {
-  padding: '14px 16px', border: '1.5px solid #E0D9CE', borderRadius: 10,
-  fontSize: 15, fontFamily: 'Archivo, sans-serif', background: '#fff',
-  color: '#111110', outline: 'none', width: '100%',
+  padding: '14px 16px', border: '1.5px solid #2E2C29', borderRadius: 10,
+  fontSize: 15, fontFamily: 'Archivo, sans-serif', background: '#181714',
+  color: '#F5F0EA', outline: 'none', width: '100%',
 }
 const btnStyle: React.CSSProperties = {
-  padding: '15px', background: '#111110', color: '#F5F0EA',
+  padding: '15px', background: '#B5593C', color: '#F5F0EA',
   fontFamily: 'Archivo, sans-serif', fontSize: 15, fontWeight: 800,
   border: 'none', borderRadius: 10, cursor: 'pointer',
 }
