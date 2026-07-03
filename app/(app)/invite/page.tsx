@@ -31,14 +31,28 @@ export default function InvitePage() {
 
   useEffect(() => {
     if (!user?.id) return
-    supabase
-      .from('referrals')
-      .select('id, bonus_awarded, created_at, referred:referred_id(name)')
-      .eq('referrer_id', user.id)
-      .order('created_at', { ascending: false })
-      .then(({ data }) => {
-        if (data) setReferrals(data as unknown as ReferralRow[])
-      })
+    async function loadReferrals() {
+      const { data } = await supabase
+        .from('referrals')
+        .select('id, bonus_awarded, created_at, referred_id')
+        .eq('referrer_id', user!.id)
+        .order('created_at', { ascending: false })
+      if (!data) return
+      // Names come from the public_profiles view — the users table itself is
+      // no longer publicly readable (it holds emails).
+      const ids = data.map((r: any) => r.referred_id).filter(Boolean)
+      const { data: profiles } = ids.length
+        ? await supabase.from('public_profiles').select('id, name').in('id', ids)
+        : { data: [] }
+      const byId = new Map((profiles ?? []).map((p: any) => [p.id, p.name]))
+      setReferrals(
+        data.map((r: any) => ({
+          ...r,
+          referred: { name: byId.get(r.referred_id) ?? null },
+        })) as unknown as ReferralRow[]
+      )
+    }
+    loadReferrals()
   }, [user?.id]) // eslint-disable-line
 
   if (!user) return null

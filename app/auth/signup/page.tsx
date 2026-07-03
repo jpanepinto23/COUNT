@@ -5,13 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 
-// Generates a unique 6-char referral code (e.g. "JOE3X7")
-function generateReferralCode(name: string): string {
-  const prefix = name.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 3).padEnd(3, 'X')
-  const suffix = Math.random().toString(36).toUpperCase().slice(2, 5)
-  return prefix + suffix
-}
-
 function Stepper({ value, onChange, min, max, format, label }: {
   value: number; onChange: (v: number) => void; min: number; max: number;
   format: (v: number) => string; label: string
@@ -57,61 +50,24 @@ function SignupContent() {
     setLoading(true)
     setError('')
 
-    const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
+    // The profile row, referral code, and referral link-up are all created
+    // server-side by the on_auth_user_created trigger — the client just passes
+    // signup details along as auth metadata.
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+          age,
+          referred_by_code: refCode.trim().toUpperCase() || null,
+        },
+      },
+    })
     if (signUpError || !data.user) {
       setError(signUpError?.message ?? 'Signup failed')
       setLoading(false)
       return
-    }
-
-    const userId = data.user.id
-    const myReferralCode = generateReferralCode(name)
-
-    // Look up referrer by code (if provided)
-    let referrerId: string | null = null
-    if (refCode.trim()) {
-      const { data: referrer } = await supabase
-        .from('users')
-        .select('id')
-        .eq('referral_code', refCode.trim().toUpperCase())
-        .single()
-      if (referrer) referrerId = referrer.id
-    }
-
-    const { error: profileError } = await supabase.from('users').insert({
-      id: userId,
-      email,
-      name,
-      age: age,
-      height: null,
-      weight: null,
-      current_streak: 0,
-      longest_streak: 0,
-      lifetime_sessions: 0,
-      tier: 'bronze',
-      multiplier: 1.0,
-      points_balance: 0,
-      points_lifetime_earned: 0,
-      free_unverified_remaining: 5,
-      referral_code: myReferralCode,
-      referred_by: referrerId,
-      referral_bonus_claimed: false,
-    })
-
-    if (profileError) {
-      setError(profileError.message)
-      setLoading(false)
-      return
-    }
-
-    // Log the referral relationship so the referrer can track it
-    if (referrerId) {
-      await supabase.from('referrals').insert({
-        referrer_id: referrerId,
-        referred_id: userId,
-        bonus_points: 300, // bronze default
-        bonus_awarded: false,
-      })
     }
 
     router.replace('/connect')

@@ -28,19 +28,26 @@ export default function LeaderboardPage() {
     async function load() {
       const { data } = await supabase
         .from('leaderboard')
-        .select('user_id, month, points_earned_this_month, rank, users (name, current_streak, tier)')
+        .select('user_id, month, points_earned_this_month, rank')
         .eq('month', currentMonth)
         .order('points_earned_this_month', { ascending: false })
         .limit(50)
       if (data) {
+        // Display fields come from the public_profiles view — the users table
+        // itself is no longer publicly readable (it holds emails).
+        const ids = data.map((row: any) => row.user_id)
+        const { data: profiles } = ids.length
+          ? await supabase.from('public_profiles').select('id, name, current_streak, tier').in('id', ids)
+          : { data: [] }
+        const byId = new Map((profiles ?? []).map((p: any) => [p.id, p]))
         const enriched = data.map((row: any, i: number) => ({
           user_id: row.user_id,
           month: row.month,
           points_earned_this_month: row.points_earned_this_month,
           rank: i + 1,
-          name: row.users?.name ?? 'Anonymous',
-          current_streak: row.users?.current_streak ?? 0,
-          tier: row.users?.tier ?? 'bronze',
+          name: byId.get(row.user_id)?.name ?? 'Anonymous',
+          current_streak: byId.get(row.user_id)?.current_streak ?? 0,
+          tier: byId.get(row.user_id)?.tier ?? 'bronze',
         }))
         setEntries(enriched)
       }

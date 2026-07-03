@@ -924,18 +924,7 @@ export default function RewardsPage() {
       const resp = await fetch('/api/redeem', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          reward_id: reward.id,
-          user_id: user.id,
-          points_spent: reward.point_cost,
-          product_name: reward.product_name,
-          brand_name: reward.brand_name,
-          user_email: user.email,
-          user_name: user.name,
-          reward_type: reward.reward_type ?? 'gift_card',
-          fulfillment_value: reward.fulfillment_value,
-          affiliate_url: reward.affiliate_url,
-        }),
+        body: JSON.stringify({ reward_id: reward.id }),
       })
       if (resp.ok) {
         const data = await resp.json()

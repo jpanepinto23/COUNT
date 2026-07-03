@@ -3,9 +3,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
-import { createClient } from '@/lib/supabase'
-import { calculatePoints, getTier, getTierLabel, getReferralPoints, generateMysteryBonus } from '@/lib/points'
-import type { WorkoutType, Tier } from '@/lib/types'
+import { calculatePoints, getTier, getTierLabel } from '@/lib/points'
+import type { WorkoutType } from '@/lib/types'
 
 // ===== Design tokens (per Claude Design handoff) =====
 const TOK = {
@@ -246,7 +245,6 @@ function PhotoTile({
 export default function LogPage() {
   const { user, refreshUser } = useAuth()
   const router = useRouter()
-  const supabase = createClient()
 
   const [step, setStep] = useState<'select' | 'success'>('select')
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -291,123 +289,47 @@ export default function LogPage() {
     setSheetOpen(true)
   }
 
-  // Shared commit path \u2014 used by both manual log and Strava import so the coin,
-  // streak, mystery-bonus and referral logic lives in exactly one place.
+  // Shared commit path \u2014 used by both manual log and tracker import. All point,
+  // streak, verification and referral logic now runs server-side in
+  // /api/workouts/log; the client only says what the workout was.
   async function commitWorkout(opts: {
     type: WorkoutType
     customName: string
     duration: number
     effortRating: number
     notes: string
-    verified: boolean
-    verificationMethod: string
-    heartRateAvg: number | null
-    calories: number | null
   }): Promise<{ ok: boolean; error?: string }> {
     if (!user) return { ok: false, error: 'Not signed in' }
 
-    const todayStart = new Date()
-    todayStart.setHours(0, 0, 0, 0)
-    const { data: todaySession } = await supabase
-      .from('workouts')
-      .select('id')
-      .eq('user_id', user.id)
-      .gte('logged_at', todayStart.toISOString())
-      .limit(1)
-
-    if (todaySession && todaySession.length > 0) {
-      return { ok: false, error: 'You\u2019ve already logged a session today. One per day.' }
-    }
-
-    const pts = calculatePoints({
-      verified: opts.verified,
-      lifetimeSessions: user.lifetime_sessions,
-      currentStreak: user.current_streak,
-    })
-
-    const { error: workoutError } = await supabase.from('workouts').insert({
-      user_id: user.id,
-      type: opts.type,
-      custom_name: opts.type === 'custom' ? (opts.customName || null) : null,
-      duration_minutes: opts.duration,
-      verification_method: opts.verificationMethod,
-      verified: opts.verified,
-      heart_rate_avg: opts.heartRateAvg,
-      calories: opts.calories,
-      base_points: pts.base,
-      multiplier_applied: pts.multiplier,
-      total_points_earned: pts.total,
-      effort_rating: opts.effortRating || null,
-      notes: opts.notes.trim() || null,
-    })
-
-    if (workoutError) {
-      return { ok: false, error: workoutError.message }
-    }
-
-    const newSessions = user.lifetime_sessions + 1
-    const newTier = getTier(newSessions)
-    const tierMultipliers: Record<string, number> = { bronze: 1.0, silver: 1.5, gold: 2.0, platinum: 3.0 }
-
-    const yesterday = new Date()
-    yesterday.setDate(yesterday.getDate() - 1)
-    yesterday.setHours(0, 0, 0, 0)
-    const { data: yesterdaySession } = await supabase
-      .from('workouts')
-      .select('id')
-      .eq('user_id', user.id)
-      .gte('logged_at', yesterday.toISOString())
-      .lt('logged_at', new Date(new Date().setHours(0, 0, 0, 0)).toISOString())
-      .limit(1)
-
-    const newStreak = yesterdaySession && yesterdaySession.length > 0 ? user.current_streak + 1 : 1
-    const newLongest = Math.max(user.longest_streak, newStreak)
-
-    const bonus = generateMysteryBonus(newStreak)
-    const totalWithBonus = pts.total + bonus.amount
-
-    await supabase
-      .from('users')
-      .update({
-        lifetime_sessions: newSessions,
-        tier: newTier,
-        multiplier: tierMultipliers[newTier],
-        points_balance: user.points_balance + totalWithBonus,
-        points_lifetime_earned: user.points_lifetime_earned + totalWithBonus,
-        current_streak: newStreak,
-        longest_streak: newLongest,
+    let res: Response
+    try {
+      res = await fetch('/api/workouts/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: opts.type,
+          customName: opts.customName,
+          duration: opts.duration,
+          effortRating: opts.effortRating,
+          notes: opts.notes,
+        }),
       })
-      .eq('id', user.id)
+    } catch {
+      return { ok: false, error: 'Could not reach the server. Try again in a moment.' }
+    }
 
-    if (user.lifetime_sessions === 0 && user.referred_by && !user.referral_bonus_claimed) {
-      const { data: referrer } = await supabase
-        .from('users')
-        .select('id, points_balance, points_lifetime_earned, tier')
-        .eq('id', user.referred_by)
-        .single()
-      if (referrer) {
-        await supabase
-          .from('users')
-          .update({
-            points_balance: referrer.points_balance + getReferralPoints(referrer.tier as Tier),
-            points_lifetime_earned: referrer.points_lifetime_earned + getReferralPoints(referrer.tier as Tier),
-          })
-          .eq('id', referrer.id)
-        await supabase.from('users').update({ referral_bonus_claimed: true }).eq('id', user.id)
-        await supabase
-          .from('referrals')
-          .update({ bonus_awarded: true, bonus_awarded_at: new Date().toISOString() })
-          .eq('referred_id', user.id)
-      }
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok || !data.ok) {
+      return { ok: false, error: data.error ?? 'Something went wrong.' }
     }
 
     setWorkoutType(opts.type)
     setCustomName(opts.customName)
-    setEarnedPoints(pts.total)
-    setNewSessionCount(newSessions)
-    setSharedStreak(newStreak)
-    setVerificationSource(opts.verified ? opts.verificationMethod : null)
-    setMysteryBonus(bonus)
+    setEarnedPoints(data.points)
+    setNewSessionCount(data.newSessions)
+    setSharedStreak(data.newStreak)
+    setVerificationSource(data.verified ? data.verificationMethod : null)
+    setMysteryBonus(data.bonus)
     setBonusRevealed(false)
     await refreshUser()
     return { ok: true }
@@ -422,62 +344,13 @@ export default function LogPage() {
     setLoading(true)
     setError('')
 
-    let verified = false
-    let verificationMethod: string = 'unverified'
-    let heartRateAvg: number | null = null
-    let calories: number | null = null
-
-    const todayStart = new Date()
-    todayStart.setHours(0, 0, 0, 0)
-
-    const { data: terraActivity } = await supabase
-      .from('terra_activities')
-      .select('provider, heart_rate_avg, calories, duration_seconds, start_time')
-      .eq('user_id', user.id)
-      .gte('start_time', todayStart.toISOString())
-      .order('start_time', { ascending: false })
-      .limit(1)
-
-    if (terraActivity && terraActivity.length > 0) {
-      verified = true
-      const provider = terraActivity[0].provider?.toUpperCase()
-      verificationMethod =
-        provider === 'APPLE' ? 'apple_health' :
-        provider === 'GARMIN' ? 'garmin' :
-        provider === 'FITBIT' ? 'fitbit' :
-        provider === 'GOOGLE' ? 'google_fit' :
-        provider?.toLowerCase() ?? 'unverified'
-      heartRateAvg = terraActivity[0].heart_rate_avg
-      calories = terraActivity[0].calories
-    }
-
-    // Server-side Strava check (reliable token refresh, no browser CORS).
-    if (!verified) {
-      try {
-        const res = await fetch('/api/strava/today')
-        if (res.ok) {
-          const data = await res.json()
-          if (data.found && data.activity) {
-            verified = true
-            verificationMethod = 'strava'
-            heartRateAvg = data.activity.heart_rate_avg ?? heartRateAvg
-          }
-        }
-      } catch {
-        /* strava check is best-effort */
-      }
-    }
-
+    // Verification (Terra/Strava) is checked authoritatively by the server.
     const result = await commitWorkout({
       type: workoutType,
       customName,
       duration,
       effortRating,
       notes,
-      verified,
-      verificationMethod,
-      heartRateAvg,
-      calories,
     })
 
     setLoading(false)
@@ -549,10 +422,6 @@ export default function LogPage() {
         duration: a.duration_minutes ?? 60,
         effortRating: 0,
         notes: a.name ? `Imported from ${picked.label}: ${a.name}` : `Imported from ${picked.label}`,
-        verified: true,
-        verificationMethod: picked.method,
-        heartRateAvg: a.heart_rate_avg ?? null,
-        calories: a.calories ?? null,
       })
 
       setImporting(false)

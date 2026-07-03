@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
+import { cookies } from 'next/headers'
+
+// Redemption is fully server-trusted: the client sends ONLY reward_id.
+// Cost, reward type, fulfillment value, and the user's identity all come from
+// the database — never from the request body.
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
 async function sendEmail(to: string, subject: string, html: string) {
@@ -18,79 +24,115 @@ async function sendEmail(to: string, subject: string, html: string) {
 
 export async function POST(req: NextRequest) {
   try {
-    const {
-      reward_id, user_id, points_spent, product_name, brand_name,
-      user_email, user_name,
-      reward_type = 'gift_card',
-      fulfillment_value,
-      affiliate_url,
-    } = await req.json()
-
-    if (!reward_id || !user_id || !points_spent || !user_email) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    // 1. Authenticate the caller.
+    const cookieStore = await cookies()
+    const authClient = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { get: (name: string) => cookieStore.get(name)?.value } }
+    )
+    const { data: { user: authUser } } = await authClient.auth.getUser()
+    if (!authUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // 1. Insert redemption record
+    const { reward_id } = await req.json()
+    if (!reward_id) {
+      return NextResponse.json({ error: 'Missing reward_id' }, { status: 400 })
+    }
+
+    // 2. Load the reward and the user's profile from the database.
+    const [{ data: reward }, { data: profile }] = await Promise.all([
+      supabaseAdmin.from('rewards').select('*').eq('id', reward_id).single(),
+      supabaseAdmin.from('users').select('id, email, name, points_balance').eq('id', authUser.id).single(),
+    ])
+
+    if (!reward || reward.is_active === false) {
+      return NextResponse.json({ error: 'Reward not available' }, { status: 404 })
+    }
+    if (!profile) {
+      return NextResponse.json({ error: 'Profile not found' }, { status: 400 })
+    }
+
+    const pointCost: number = reward.point_cost
+    if ((profile.points_balance ?? 0) < pointCost) {
+      return NextResponse.json({ error: 'Not enough coins for this reward' }, { status: 400 })
+    }
+
+    // 3. Deduct points FIRST (atomic, guarded so balance can't go negative),
+    //    then record the redemption.
+    const { data: deducted, error: deductErr } = await supabaseAdmin
+      .from('users')
+      .update({ points_balance: profile.points_balance - pointCost })
+      .eq('id', profile.id)
+      .gte('points_balance', pointCost)
+      .select('id')
+    if (deductErr || !deducted || deducted.length === 0) {
+      return NextResponse.json({ error: 'Not enough coins for this reward' }, { status: 400 })
+    }
+
     const { error: insertError } = await supabaseAdmin.from('redemptions').insert({
-      user_id, reward_id, points_spent,
+      user_id: profile.id,
+      reward_id: reward.id,
+      points_spent: pointCost,
     })
     if (insertError) {
+      // Refund the deduction if the record failed to write.
+      await supabaseAdmin
+        .from('users')
+        .update({ points_balance: profile.points_balance })
+        .eq('id', profile.id)
       console.error('Redemption insert error:', insertError)
       return NextResponse.json({ error: 'Failed to record redemption' }, { status: 500 })
     }
 
-    // 2. Deduct points
-    const { error: pointsError } = await supabaseAdmin.rpc('deduct_points', {
-      p_user_id: user_id, p_amount: points_spent,
-    })
-    if (pointsError) {
-      const { data: userData } = await supabaseAdmin.from('users').select('points_balance').eq('id', user_id).single()
-      if (userData) {
-        await supabaseAdmin.from('users').update({
-          points_balance: Math.max(0, (userData.points_balance ?? 0) - points_spent),
-        }).eq('id', user_id)
-      }
-    }
+    // 4. Build fulfillment content from DB values only.
+    const rewardType: string = reward.reward_type ?? 'gift_card'
+    const fulfillmentValue: string | null = reward.fulfillment_value ?? null
+    const affiliateUrl: string | null = reward.affiliate_url ?? null
+    const brandName: string = reward.brand_name
+    const productName: string = reward.product_name
+    const userEmail: string = profile.email
+    const userName: string = profile.name ?? 'there'
 
-    // 3. Build fulfillment content
-    const isAutoFulfilled = reward_type === 'discount_code' || reward_type === 'affiliate_link'
+    const isAutoFulfilled = rewardType === 'discount_code' || rewardType === 'affiliate_link'
 
     let adminFulfillmentHtml = ''
     let userFulfillmentHtml = ''
 
-    if (reward_type === 'discount_code' && fulfillment_value) {
+    if (rewardType === 'discount_code' && fulfillmentValue) {
       adminFulfillmentHtml = `
         <p style="font-family:sans-serif;color:#16a34a;font-weight:bold">
-          Auto-fulfilled \u2014 promo code sent to user automatically.
+          Auto-fulfilled — promo code sent to user automatically.
         </p>
-        <p style="font-family:sans-serif">Code: <strong>${fulfillment_value}</strong></p>
+        <p style="font-family:sans-serif">Code: <strong>${fulfillmentValue}</strong></p>
       `
       userFulfillmentHtml = `
         <div style="background:#F0FAF0;border:1.5px solid #B2DFB2;border-radius:12px;padding:20px;margin:20px 0;text-align:center">
           <p style="margin:0 0 8px;color:#166534;font-size:13px;font-weight:600;letter-spacing:1px">YOUR PROMO CODE</p>
           <p style="margin:0;font-size:26px;font-weight:900;letter-spacing:4px;color:#111110;font-family:monospace">
-            ${fulfillment_value}
+            ${fulfillmentValue}
           </p>
         </div>
         <p style="font-family:sans-serif;color:#666;font-size:13px;text-align:center">
-          Apply this code at checkout on ${brand_name}'s website.
+          Apply this code at checkout on ${brandName}'s website.
         </p>
       `
-    } else if (reward_type === 'affiliate_link' && affiliate_url) {
+    } else if (rewardType === 'affiliate_link' && affiliateUrl) {
       adminFulfillmentHtml = `
         <p style="font-family:sans-serif;color:#16a34a;font-weight:bold">
-          Auto-fulfilled \u2014 affiliate link sent to user automatically.
+          Auto-fulfilled — affiliate link sent to user automatically.
         </p>
       `
       userFulfillmentHtml = `
         <div style="margin:24px 0;text-align:center">
-          <a href="${affiliate_url}" target="_blank"
+          <a href="${affiliateUrl}" target="_blank"
             style="background:#111110;color:white;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:bold;font-size:15px;display:inline-block">
-            Claim Your ${brand_name} Reward \u2192
+            Claim Your ${brandName} Reward →
           </a>
         </div>
         <p style="font-family:sans-serif;color:#666;font-size:13px;text-align:center">
-          This is your exclusive link \u2014 use it to access your reward on ${brand_name}'s site.
+          This is your exclusive link — use it to access your reward on ${brandName}'s site.
         </p>
       `
     } else {
@@ -102,7 +144,7 @@ export async function POST(req: NextRequest) {
           </a>
         </p>
         <p style="font-family:sans-serif;margin-top:16px;font-size:13px;color:#666">
-          Then email the code to <a href="mailto:${user_email}">${user_email}</a>
+          Then email the code to <a href="mailto:${userEmail}">${userEmail}</a>
         </p>
       `
       userFulfillmentHtml = `
@@ -114,20 +156,20 @@ export async function POST(req: NextRequest) {
       `
     }
 
-    // 4. Admin notification
+    // 5. Admin notification
     await sendEmail(
       'jpanepinto23@gmail.com',
-      `${isAutoFulfilled ? 'Auto-fulfilled' : 'Action needed'}: ${product_name} for ${user_name}`,
+      `${isAutoFulfilled ? 'Auto-fulfilled' : 'Action needed'}: ${productName} for ${userName}`,
       `
         <h2 style="font-family:sans-serif">${isAutoFulfilled ? 'Auto-Fulfilled Redemption' : 'New Gift Card Redemption'}</h2>
         <p style="font-family:sans-serif">
-          <strong>User:</strong> ${user_name}<br>
-          <strong>Email:</strong> <a href="mailto:${user_email}">${user_email}</a>
+          <strong>User:</strong> ${userName}<br>
+          <strong>Email:</strong> <a href="mailto:${userEmail}">${userEmail}</a>
         </p>
         <p style="font-family:sans-serif">
-          <strong>Reward:</strong> ${product_name} from ${brand_name}<br>
-          <strong>Type:</strong> ${reward_type.replace(/_/g, ' ')}<br>
-          <strong>Points spent:</strong> ${points_spent}
+          <strong>Reward:</strong> ${productName} from ${brandName}<br>
+          <strong>Type:</strong> ${rewardType.replace(/_/g, ' ')}<br>
+          <strong>Points spent:</strong> ${pointCost}
         </p>
         ${adminFulfillmentHtml}
         <p style="font-family:sans-serif;margin-top:24px;font-size:13px">
@@ -136,23 +178,23 @@ export async function POST(req: NextRequest) {
       `
     )
 
-    // 5. User confirmation
-    const userSubject = reward_type === 'discount_code'
-      ? `Your ${brand_name} promo code is here!`
-      : reward_type === 'affiliate_link'
-      ? `Your ${brand_name} reward is ready!`
-      : `Your ${product_name} gift card is on its way!`
+    // 6. User confirmation
+    const userSubject = rewardType === 'discount_code'
+      ? `Your ${brandName} promo code is here!`
+      : rewardType === 'affiliate_link'
+      ? `Your ${brandName} reward is ready!`
+      : `Your ${productName} gift card is on its way!`
 
     await sendEmail(
-      user_email,
+      userEmail,
       userSubject,
       `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
           <h2 style="color:#B5593C">
-            ${reward_type === 'gift_card' ? 'Your gift card is coming' : 'Your reward is ready'}, ${user_name}!
+            ${rewardType === 'gift_card' ? 'Your gift card is coming' : 'Your reward is ready'}, ${userName}!
           </h2>
-          <p>You redeemed <strong>${points_spent.toLocaleString()} pts</strong> for
-          <strong>${product_name}</strong> from <strong>${brand_name}</strong>.</p>
+          <p>You redeemed <strong>${pointCost.toLocaleString()} pts</strong> for
+          <strong>${productName}</strong> from <strong>${brandName}</strong>.</p>
           ${userFulfillmentHtml}
           <p style="color:#8A8478;font-size:12px">Questions? Reply to this email and we'll help you out.</p>
           <p style="color:#8A8478;font-size:12px">- The COUNT team</p>
@@ -160,7 +202,12 @@ export async function POST(req: NextRequest) {
       `
     )
 
-    return NextResponse.json({ success: true, reward_type, fulfillment_value, affiliate_url })
+    return NextResponse.json({
+      success: true,
+      reward_type: rewardType,
+      fulfillment_value: isAutoFulfilled ? fulfillmentValue : null,
+      affiliate_url: rewardType === 'affiliate_link' ? affiliateUrl : null,
+    })
   } catch (err) {
     console.error('Redeem route error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
