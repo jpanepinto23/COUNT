@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
@@ -15,10 +15,23 @@ export default function ConnectPage() {
   const [connecting, setConnecting] = useState<string | null>(null)
   const [error, setError] = useState('')
 
+  // Fire-and-forget funnel event (connect_viewed / connect_clicked_* / connect_skipped)
+  function track(event: string) {
+    if (!user) return
+    supabase.from('funnel_events').insert({ user_id: user.id, event }).then(() => {}, () => {})
+  }
+
+  useEffect(() => {
+    if (user) {
+      supabase.from('funnel_events').insert({ user_id: user.id, event: 'connect_viewed' }).then(() => {}, () => {})
+    }
+  }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
+
   async function connect(kind: 'garmin' | 'strava') {
     if (!user || connecting) return
     setConnecting(kind)
     setError('')
+    track('connect_clicked_' + kind)
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('No session')
@@ -59,11 +72,10 @@ export default function ConnectPage() {
           ))}
         </div>
         {error && <p style={{ color: '#ef4444', fontSize: 13, textAlign: 'center', marginBottom: 16 }}>{error}</p>}
-        <Link href="/home" style={{ display: 'block', textAlign: 'center', color: '#8A8680', fontSize: 13, textDecoration: 'none', fontFamily: 'Archivo, sans-serif', padding: 12 }}>
+        <Link href="/home" onClick={() => track('connect_skipped')} style={{ display: 'block', textAlign: 'center', color: '#8A8680', fontSize: 13, textDecoration: 'none', fontFamily: 'Archivo, sans-serif', padding: 12 }}>
           Skip for now — you can connect anytime from Profile
         </Link>
       </div>
     </div>
   )
 }
-
