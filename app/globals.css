@@ -50,3 +50,12 @@ body {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+/* Dark-theme autofill: stop Chrome forcing black-on-blue in filled inputs */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #181714 inset;
+  -webkit-text-fill-color: #F5F0EA;
+  caret-color: #F5F0EA;
+  transition: background-color 9999s ease-in-out 0s;
+}
