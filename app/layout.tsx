@@ -4,8 +4,23 @@ import ServiceWorkerRegistrar from '@/components/ServiceWorkerRegistrar'
 import { AuthProvider } from '@/lib/auth-context'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://countfitness.app'),
   title: 'COUNT — Make It Count',
   description: 'Get rewarded for showing up. COUNT turns your gym sessions into real rewards.',
+  openGraph: {
+    title: 'COUNT — Make It Count',
+    description: 'Get rewarded for showing up. COUNT turns your gym sessions into real rewards.',
+    url: 'https://countfitness.app',
+    siteName: 'COUNT',
+    images: [{ url: '/og.png', width: 1200, height: 630 }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'COUNT — Make It Count',
+    description: 'Get rewarded for showing up. COUNT turns your gym sessions into real rewards.',
+    images: ['/og.png'],
+  },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,

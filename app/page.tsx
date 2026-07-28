@@ -197,6 +197,13 @@ export default function LandingPage() {
         </div>
       )}
 
+      {/* —— TRIFECTA CHALLENGE STRIP —— */}
+      <Link href="/trifecta" style={{ display: 'block', background: 'linear-gradient(90deg, #1a2408, #23300b)', borderBottom: '1px solid rgba(157,230,80,0.35)', padding: '10px 16px', textAlign: 'center', textDecoration: 'none' }}>
+        <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#9DE650', letterSpacing: 1 }}>
+          THE TRIFECTA CHALLENGE · Aug 1–31 — 12 workouts unlock 50% off clean meals <span style={{ color: '#F5F0EA' }}>→</span>
+        </span>
+      </Link>
+
       {/* —— HERO —— */}
       <div id="home" style={{ position: 'relative', overflow: 'hidden', background: '#0E0D0C', height: '60vw', minHeight: 340, maxHeight: 560 }}>
         {/* Self-hosted video background */}
