@@ -5,8 +5,8 @@ import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 
 const TRACKERS = [
-  { kind: 'garmin', label: 'Garmin', logo: 'https://cdn.brandfetch.io/garmin.com/w/256/h/256', color: '#007CC3', desc: 'Watches & bike computers' },
-  { kind: 'strava', label: 'Strava', logo: 'https://cdn.brandfetch.io/strava.com/w/256/h/256', color: '#FC4C02', desc: 'Runs, rides & more' },
+  { kind: 'strava', label: 'Strava', logo: 'https://cdn.brandfetch.io/strava.com/w/256/h/256', color: '#FC4C02', desc: 'Runs, rides & more', disabled: false, note: '' },
+  { kind: 'garmin', label: 'Garmin', logo: 'https://cdn.brandfetch.io/garmin.com/w/256/h/256', color: '#007CC3', desc: 'Watches & bike computers', disabled: true, note: 'Back Aug 20 — use Strava meanwhile' },
 ] as const
 
 export default function ConnectPage() {
@@ -56,8 +56,8 @@ export default function ConnectPage() {
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
           {TRACKERS.map(t => (
-            <button key={t.kind} onClick={() => connect(t.kind)} disabled={connecting !== null}
-              style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 18px', background: '#181714', border: '1.5px solid rgba(245,240,234,0.14)', borderRadius: 14, cursor: connecting ? 'default' : 'pointer', opacity: connecting && connecting !== t.kind ? 0.5 : 1, textAlign: 'left', width: '100%' }}>
+            <button key={t.kind} onClick={() => !t.disabled && connect(t.kind)} disabled={connecting !== null || t.disabled}
+              style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 18px', background: '#181714', border: '1.5px solid rgba(245,240,234,0.14)', borderRadius: 14, cursor: connecting || t.disabled ? 'default' : 'pointer', opacity: t.disabled ? 0.45 : connecting && connecting !== t.kind ? 0.5 : 1, textAlign: 'left', width: '100%' }}>
               <div style={{ width: 44, height: 44, borderRadius: 10, background: t.color + '18', border: '1px solid ' + t.color + '30', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <img src={t.logo} alt={t.label} style={{ width: '65%', height: '65%', objectFit: 'contain', borderRadius: 4 }} />
               </div>
@@ -65,7 +65,7 @@ export default function ConnectPage() {
                 <p style={{ fontFamily: 'Archivo, sans-serif', fontSize: 16, fontWeight: 800, color: '#F5F0EA', marginBottom: 2 }}>
                   {connecting === t.kind ? 'Connecting…' : 'Connect ' + t.label}
                 </p>
-                <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#8A8680' }}>{t.desc}</p>
+                <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: t.disabled ? '#B5593C' : '#8A8680' }}>{t.disabled ? t.note : t.desc}</p>
               </div>
               <span style={{ color: '#B5593C', fontSize: 18 }}>&rarr;</span>
             </button>
