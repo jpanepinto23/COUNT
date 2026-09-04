@@ -5,8 +5,23 @@ import VisitTracker from '@/components/VisitTracker'
 import { AuthProvider } from '@/lib/auth-context'
 
 export const metadata: Metadata = {
-  title: 'COUNT — Make It Count',
-  description: 'Get rewarded for showing up. COUNT turns your gym sessions into real rewards.',
+  title: 'COUNT: workouts that pay you back',
+  description: 'Log a workout or sync from Strava or Garmin, earn coins, redeem them for discounts and free product from NOBULL, Momentous, Thorne, and Trifecta. Free, no card.',
+  metadataBase: new URL('https://www.countfitness.app'),
+  openGraph: {
+    title: 'COUNT: workouts that pay you back',
+    description: 'Three workouts gets you a discount code from NOBULL, Momentous, or Thorne. Keep going and the creatine is free.',
+    url: 'https://www.countfitness.app',
+    siteName: 'COUNT',
+    images: [{ url: '/og.png', width: 1200, height: 630 }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'COUNT: workouts that pay you back',
+    description: 'Three workouts gets you a discount code from NOBULL, Momentous, or Thorne. Keep going and the creatine is free.',
+    images: ['/og.png'],
+  },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
