@@ -6,7 +6,7 @@ import { AuthProvider } from '@/lib/auth-context'
 
 export const metadata: Metadata = {
   title: 'COUNT: workouts that pay you back',
-  description: 'Log a workout or sync from Strava or Garmin, earn coins, redeem them for discounts and free product from NOBULL, Momentous, Thorne, and Trifecta. Free, no card.',
+  description: 'Log a workout or sync from Strava, earn coins, redeem them for discounts and free product from NOBULL, Momentous, Thorne, and Trifecta. Free, no card.',
   metadataBase: new URL('https://www.countfitness.app'),
   openGraph: {
     title: 'COUNT: workouts that pay you back',

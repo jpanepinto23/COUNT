@@ -80,7 +80,7 @@ export default function LandingPage() {
           </p>
           {cta}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 22, flexWrap: 'wrap', justifyContent: 'center' }}>
-            {[['Garmin', 'https://cdn.brandfetch.io/garmin.com/w/256/h/256'], ['Strava', 'https://cdn.brandfetch.io/strava.com/w/256/h/256']].map(([name, logo]) => (
+            {[['Strava', 'https://cdn.brandfetch.io/strava.com/w/256/h/256']].map(([name, logo]) => (
               <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 10, padding: '8px 14px' }}>
                 <img src={logo} alt={name} style={{ width: 20, height: 20, borderRadius: 5, objectFit: 'contain' }} />
                 <span style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700 }}>{name}</span>
@@ -99,7 +99,7 @@ export default function LandingPage() {
             Your workouts should pay you back.
           </h1>
           <p style={{ color: MUTED, fontSize: 17, lineHeight: 1.6, maxWidth: 480 }}>
-            Log a workout or sync one from Strava or Garmin. Every session earns coins. Three sessions gets you 30% off at NOBULL. Six gets you a tub of Momentous creatine, shipped, free. No card. No subscription. The brands pay, not you.
+            Log a workout or sync one from Strava. Every session earns coins. Three sessions gets you 30% off at NOBULL. Six gets you a tub of Momentous creatine, shipped, free. No card. No subscription. The brands pay, not you.
           </p>
         </div>
 
@@ -123,7 +123,7 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-          <p style={{ fontFamily: MONO, fontSize: 12, color: MUTED, marginTop: 14 }}>Prices in coins. A logged workout is 200, a synced one is 250. Streaks and tiers multiply from there.</p>
+          <p style={{ fontFamily: MONO, fontSize: 12, color: MUTED, marginTop: 14 }}>Prices in coins. A logged workout is 200, a Strava-synced one is 250. Streaks and tiers multiply from there.</p>
         </div>
 
         {/* Final CTA */}
