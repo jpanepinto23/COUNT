@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
+import { getStreakMultiplier } from '@/lib/points'
 
 // ===== Design tokens (per Claude Design handoff) =====
 const TOK = {
@@ -441,7 +442,7 @@ export default function HomePage() {
   const coins = user?.points_balance ?? 0
   const streakDays = (user as any)?.current_streak ?? 0
   const longestStreak = (user as any)?.longest_streak ?? streakDays
-  const multiplier = streakDays >= 30 ? 1.5 : streakDays >= 14 ? 1.3 : streakDays >= 7 ? 1.2 : streakDays >= 3 ? 1.1 : 1.0
+  const multiplier = getStreakMultiplier(streakDays)
   const weeklyPct = Math.min(1, weeklyCount / WEEKLY_GOAL)
   const monthlyPct = Math.min(1, monthlyCount / MONTHLY_GOAL)
   const isFrozen = (user as any)?.streak_frozen_until
@@ -569,7 +570,7 @@ export default function HomePage() {
               Strength &mdash; 50 min
             </div>
             <div style={{ fontFamily: 'var(--sans)', fontSize: 12, marginTop: 6, color: 'rgba(245,240,234,0.75)' }}>
-              Tap to log a workout. +50–80 coins, multiplied by your streak.
+              Tap to log a workout. 200 coins, multiplied by your tier and streak.
             </div>
             <div
               style={{
@@ -864,7 +865,7 @@ export default function HomePage() {
             {coins.toLocaleString()} coins ready to redeem
           </div>
           <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: TOK.muted, marginTop: 4, letterSpacing: '0.04em' }}>
-            Browse Thorne, NOBULL, Momentous, Kane and more →
+            Browse NOBULL, Momentous, Thorne and more →
           </div>
         </Link>
       </div>
