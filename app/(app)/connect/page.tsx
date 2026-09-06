@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase'
 
 const TRACKERS = [
   { kind: 'strava', label: 'Strava', logo: 'https://cdn.brandfetch.io/strava.com/w/256/h/256', color: '#FC4C02', desc: 'Runs, rides & more', disabled: false, note: '' },
-  { kind: 'garmin', label: 'Garmin', logo: 'https://cdn.brandfetch.io/garmin.com/w/256/h/256', color: '#007CC3', desc: 'Watches & bike computers', disabled: true, note: 'Back Aug 20 — use Strava meanwhile' },
+  { kind: 'garmin', label: 'Garmin', logo: 'https://cdn.brandfetch.io/garmin.com/w/256/h/256', color: '#007CC3', desc: 'Watches & bike computers', disabled: true, note: 'Coming soon. Use Strava for now' },
 ] as const
 
 export default function ConnectPage() {
