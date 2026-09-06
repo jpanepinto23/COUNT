@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
-import { getTierLabel, getTierMultiplier } from '@/lib/points'
+import { getTierLabel, getTierMultiplier, getStreakMultiplier } from '@/lib/points'
 import type { Redemption } from '@/lib/types'
 
 // ===== Design tokens (per Claude Design handoff) =====
@@ -659,8 +659,7 @@ export default function ProfilePage() {
   const streakDays = user.current_streak ?? 0
   const longestStreak = user.longest_streak ?? streakDays
   const lifetimeSessions = user.lifetime_sessions ?? 0
-  const multiplier =
-    streakDays >= 30 ? 1.5 : streakDays >= 14 ? 1.3 : streakDays >= 7 ? 1.2 : streakDays >= 3 ? 1.1 : 1.0
+  const multiplier = getStreakMultiplier(streakDays)
   const connectedTypes = new Set(devices.filter((d) => d.status === 'active').map((d) => d.type))
   const CONNECTABLE_TRACKERS = [
     { type: 'strava', provider: 'STRAVA' },
