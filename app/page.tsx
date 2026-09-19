@@ -76,7 +76,7 @@ export default function LandingPage() {
             COUNT
           </span>
           <p style={{ fontFamily: SANS, fontSize: 'clamp(17px, 3.2vw, 22px)', fontWeight: 600, color: INK, opacity: 0.9, marginBottom: 26, textShadow: '0 1px 12px rgba(0,0,0,0.6)' }}>
-            Strava claps for you. COUNT pays you.
+            COUNT turns workouts into rewards.
           </p>
           {cta}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 22, flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -97,7 +97,7 @@ export default function LandingPage() {
         <div style={{ padding: '28px 0 36px', display: 'flex', gap: 28, alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 260px', minWidth: 0 }}>
             <h1 style={{ fontFamily: SANS, fontSize: 'clamp(30px, 7vw, 40px)', fontWeight: 900, lineHeight: 1.05, letterSpacing: -0.5, marginBottom: 16 }}>
-              Your workouts should pay you back.
+              Cashing in sweaty equity.
             </h1>
             <p style={{ color: MUTED, fontSize: 17, lineHeight: 1.6, maxWidth: 480 }}>
               Log a workout or sync one from Strava. Every session earns coins. Three sessions gets you 30% off at NOBULL. Six gets you a tub of Momentous creatine, shipped, free. No card. No subscription. The brands pay, not you.
