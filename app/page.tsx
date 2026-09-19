@@ -97,7 +97,7 @@ export default function LandingPage() {
         <div style={{ padding: '28px 0 36px', display: 'flex', gap: 28, alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 260px', minWidth: 0 }}>
             <h1 style={{ fontFamily: SANS, fontSize: 'clamp(30px, 7vw, 40px)', fontWeight: 900, lineHeight: 1.05, letterSpacing: -0.5, marginBottom: 16 }}>
-              Cashing in sweaty equity.
+              Cashing in sweat equity.
             </h1>
             <p style={{ color: MUTED, fontSize: 17, lineHeight: 1.6, maxWidth: 480 }}>
               Log a workout or sync one from Strava. Every session earns coins. Three sessions gets you 30% off at NOBULL. Six gets you a tub of Momentous creatine, shipped, free. No card. No subscription. The brands pay, not you.
