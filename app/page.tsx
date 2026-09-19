@@ -93,33 +93,48 @@ export default function LandingPage() {
 
       <div style={{ maxWidth: 600, margin: '0 auto', padding: '8px 24px 56px' }}>
 
-        {/* Pitch */}
-        <div style={{ padding: '28px 0 36px' }}>
-          <h1 style={{ fontFamily: SANS, fontSize: 'clamp(30px, 7vw, 40px)', fontWeight: 900, lineHeight: 1.05, letterSpacing: -0.5, marginBottom: 16 }}>
-            Your workouts should pay you back.
-          </h1>
-          <p style={{ color: MUTED, fontSize: 17, lineHeight: 1.6, maxWidth: 480 }}>
-            Log a workout or sync one from Strava. Every session earns coins. Three sessions gets you 30% off at NOBULL. Six gets you a tub of Momentous creatine, shipped, free. No card. No subscription. The brands pay, not you.
-          </p>
+        {/* Pitch, with the balance screen beside it */}
+        <div style={{ padding: '28px 0 36px', display: 'flex', gap: 28, alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 260px', minWidth: 0 }}>
+            <h1 style={{ fontFamily: SANS, fontSize: 'clamp(30px, 7vw, 40px)', fontWeight: 900, lineHeight: 1.05, letterSpacing: -0.5, marginBottom: 16 }}>
+              Your workouts should pay you back.
+            </h1>
+            <p style={{ color: MUTED, fontSize: 17, lineHeight: 1.6, maxWidth: 480 }}>
+              Log a workout or sync one from Strava. Every session earns coins. Three sessions gets you 30% off at NOBULL. Six gets you a tub of Momentous creatine, shipped, free. No card. No subscription. The brands pay, not you.
+            </p>
+          </div>
+          <img src="/shots/balance.jpg" alt="COUNT balance screen showing coins earned" width={640} height={1169} style={{ flex: '0 0 auto', width: 180, height: 'auto', margin: '0 auto', boxShadow: '0 18px 50px rgba(0,0,0,0.55)', borderRadius: 22 }} />
+        </div>
+
+        {/* The app */}
+        <div style={{ borderTop: `1px solid ${LINE}`, padding: '32px 0 8px' }}>
+          <h2 style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, marginBottom: 6 }}>This is the app</h2>
+          <p style={{ color: MUTED, fontSize: 15, lineHeight: 1.5, marginBottom: 20 }}>Runs in your browser. Add it to your home screen and it works like any other app.</p>
+          <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 12, scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}>
+            {[
+              ['/shots/home.jpg', 'Today screen: coins, streak, log a workout'],
+              ['/shots/store.jpg', 'Rewards store: NOBULL, Momentous, Thorne, Trifecta'],
+              ['/shots/nobull.jpg', 'Redeeming 30% off at NOBULL'],
+            ].map(([src, alt]) => (
+              <img key={src} src={src} alt={alt} width={640} height={1169} style={{ flex: '0 0 auto', width: 'calc(50% - 6px)', maxWidth: 220, height: 'auto', borderRadius: 22, boxShadow: '0 12px 36px rgba(0,0,0,0.5)', scrollSnapAlign: 'start' }} />
+            ))}
+          </div>
         </div>
 
         {/* Store */}
         <div style={{ borderTop: `1px solid ${LINE}`, padding: '32px 0' }}>
-          <h2 style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, marginBottom: 18 }}>What&rsquo;s in the store</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <h2 style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, marginBottom: 14 }}>What&rsquo;s in the store</h2>
+          <div>
             {REWARDS.map((r, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', background: '#171716', border: `1px solid ${LINE}`, borderRadius: 14 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 11, background: '#0E0E0D', border: `1px solid ${LINE}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <img src={r.logo} alt={r.brand} style={{ width: '62%', height: '62%', objectFit: 'contain', borderRadius: 4 }} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontFamily: SANS, fontSize: 15, fontWeight: 800, marginBottom: 2 }}>{r.brand}</p>
-                  <p style={{ color: MUTED, fontSize: 13, lineHeight: 1.4 }}>{r.what}</p>
-                </div>
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <p style={{ fontFamily: MONO, fontSize: 14, fontWeight: 700, color: COPPER }}>{r.coins.toLocaleString()}</p>
-                  <p style={{ fontFamily: MONO, fontSize: 11, color: MUTED }}>{r.note}</p>
-                </div>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderTop: i === 0 ? 'none' : `1px solid ${LINE}` }}>
+                <img src={r.logo} alt={r.brand} style={{ width: 28, height: 28, objectFit: 'contain', borderRadius: 6, flexShrink: 0 }} />
+                <p style={{ flex: 1, minWidth: 0, fontSize: 15, lineHeight: 1.4 }}>
+                  <span style={{ fontFamily: SANS, fontWeight: 800 }}>{r.brand}</span>
+                  <span style={{ color: MUTED }}> {r.what}</span>
+                </p>
+                <p style={{ fontFamily: MONO, fontSize: 13, color: COPPER, flexShrink: 0, textAlign: 'right' }}>
+                  {r.coins.toLocaleString()}<span style={{ color: MUTED }}> / {r.note}</span>
+                </p>
               </div>
             ))}
           </div>
