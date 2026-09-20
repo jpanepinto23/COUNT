@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 
@@ -35,6 +35,7 @@ function Tally({ size = 1 }: { size?: number }) {
 export default function LandingPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     if (!loading && user) router.replace('/home')
@@ -58,13 +59,40 @@ export default function LandingPage() {
   return (
     <div style={{ minHeight: '100dvh', background: '#111110', color: INK }}>
 
-      {/* Full-bleed video hero */}
+      {/* Menu */}
+      {menuOpen && (
+        <div onClick={() => setMenuOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50 }}>
+          <nav onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: 280, maxWidth: '85vw', background: '#171716', borderRight: `1px solid ${LINE}`, padding: '20px 24px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><Tally size={0.5} /><span style={{ fontFamily: SANS, fontWeight: 900, letterSpacing: '0.18em', fontSize: 14 }}>COUNT</span></div>
+              <button aria-label="Close" onClick={() => setMenuOpen(false)} style={{ background: 'none', border: 'none', color: MUTED, fontSize: 22, cursor: 'pointer', lineHeight: 1 }}>&times;</button>
+            </div>
+            {[
+              ['How it works', '#how'],
+              ['What\u2019s in the store', '#store'],
+              ['About', '#about'],
+              ['Request a brand', 'mailto:joe@countfitness.app?subject=Brand%20request%20for%20COUNT'],
+            ].map(([label, href]) => (
+              <a key={href} href={href} onClick={() => setMenuOpen(false)} style={{ color: INK, textDecoration: 'none', fontFamily: SANS, fontSize: 18, fontWeight: 700, padding: '14px 0', borderBottom: `1px solid ${LINE}` }}>{label}</a>
+            ))}
+            <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <Link href="/auth/signup" style={{ textAlign: 'center', padding: '14px', background: COPPER, color: INK, textDecoration: 'none', borderRadius: 10, fontFamily: SANS, fontWeight: 800 }}>Sign up</Link>
+              <Link href="/auth/login" style={{ textAlign: 'center', padding: '14px', background: 'transparent', color: INK, textDecoration: 'none', borderRadius: 10, fontFamily: SANS, fontWeight: 700, border: `1px solid ${LINE}` }}>Log in</Link>
+            </div>
+          </nav>
+        </div>
+      )}
+
+      {/* Full-bleed photo hero */}
       <div style={{ position: 'relative', overflow: 'hidden', background: '#0E0D0C', height: '72vw', minHeight: 420, maxHeight: 620 }}>
-        <video src="/hero.mp4" autoPlay muted loop playsInline preload="auto" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,8,7,0.5)' }} />
+        <img src="/photos/hero.jpg" alt="" width={1374} height={768} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 60%' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,8,7,0.55)' }} />
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 120, background: 'linear-gradient(to bottom, transparent, #111110)' }} />
 
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, padding: '16px 20px', display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 2 }}>
+          <button aria-label="Menu" onClick={() => setMenuOpen(true)} style={{ background: 'rgba(0,0,0,0.45)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 8, padding: '9px 10px', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {[0, 1, 2].map(i => <span key={i} style={{ display: 'block', width: 18, height: 2, background: INK, borderRadius: 1 }} />)}
+          </button>
           <Link href="/auth/login" style={{ color: INK, fontSize: 13, fontWeight: 700, textDecoration: 'none', fontFamily: SANS, background: 'rgba(0,0,0,0.45)', padding: '8px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.14)' }}>
             Log in
           </Link>
@@ -106,6 +134,24 @@ export default function LandingPage() {
           <img src="/shots/balance.jpg" alt="COUNT balance screen showing coins earned" width={640} height={1169} style={{ flex: '0 0 auto', width: 180, height: 'auto', margin: '0 auto', boxShadow: '0 18px 50px rgba(0,0,0,0.55)', borderRadius: 22 }} />
         </div>
 
+        {/* How it works */}
+        <div id="how" style={{ borderTop: `1px solid ${LINE}`, padding: '32px 0' }}>
+          <h2 style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, marginBottom: 18 }}>How it works</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 14 }}>
+            {[
+              ['1', 'Log or sync a workout', 'Tap it in, or connect Strava and it verifies itself.'],
+              ['2', 'Earn coins', '200 a session. Streaks and tiers multiply it.'],
+              ['3', 'Redeem with the brands', 'Discount codes after three workouts. Free product after more.'],
+            ].map(([n, t, d]) => (
+              <div key={n} style={{ padding: '16px', background: '#171716', border: `1px solid ${LINE}`, borderRadius: 14 }}>
+                <p style={{ fontFamily: MONO, fontSize: 12, color: COPPER, marginBottom: 8 }}>{n}</p>
+                <p style={{ fontFamily: SANS, fontSize: 16, fontWeight: 800, marginBottom: 6 }}>{t}</p>
+                <p style={{ color: MUTED, fontSize: 14, lineHeight: 1.5 }}>{d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* The app */}
         <div style={{ borderTop: `1px solid ${LINE}`, padding: '32px 0 8px' }}>
           <h2 style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, marginBottom: 6 }}>This is the app</h2>
@@ -122,7 +168,7 @@ export default function LandingPage() {
         </div>
 
         {/* Store */}
-        <div style={{ borderTop: `1px solid ${LINE}`, padding: '32px 0' }}>
+        <div id="store" style={{ borderTop: `1px solid ${LINE}`, padding: '32px 0' }}>
           <h2 style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, marginBottom: 14 }}>What&rsquo;s in the store</h2>
           <div>
             {REWARDS.map((r, i) => (
@@ -139,6 +185,34 @@ export default function LandingPage() {
             ))}
           </div>
           <p style={{ fontFamily: MONO, fontSize: 12, color: MUTED, marginTop: 14 }}>Prices in coins. A logged workout is 200, a Strava-synced one is 250. Streaks and tiers multiply from there.</p>
+        </div>
+
+        {/* Reviews */}
+        <div style={{ borderTop: `1px solid ${LINE}`, padding: '32px 0 8px' }}>
+          <h2 style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, marginBottom: 18 }}>From people using it</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {[
+              ['Erin', 'Trifecta', 'As a mom on the go, it\u2019s easy for workouts to get pushed down the list. I used COUNT for the Trifecta rewards and liked having an extra reason to stay consistent. I was already working out, so being able to earn rewards for it was a nice bonus.'],
+              ['Lisa', 'NOBULL', 'I\u2019m a coach, so I\u2019m pretty particular about the workout apparel I buy. NOBULL is a brand I trust, and earning high value workout apparel through COUNT made it even better. I like that I can earn rewards for workouts I\u2019m already doing.'],
+              ['Joe, founder', 'Thorne', 'I\u2019ve been using COUNT for the Thorne rewards. I like that I can earn rewards just by doing the workouts I\u2019m already doing. It gives me a little extra motivation to stay consistent, and getting something in the mail after earning enough coins is pretty cool.'],
+            ].map(([who, brand, quote]) => (
+              <div key={who} style={{ padding: '18px', background: '#171716', border: `1px solid ${LINE}`, borderRadius: 14 }}>
+                <p style={{ fontSize: 15, lineHeight: 1.6, color: INK, marginBottom: 12 }}>{quote}</p>
+                <p style={{ fontFamily: MONO, fontSize: 12, color: MUTED }}><span style={{ color: COPPER }}>{who}</span> &middot; redeemed {brand}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* About */}
+        <div id="about" style={{ padding: '36px 0 8px' }}>
+          <h2 style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, marginBottom: 14 }}>About COUNT</h2>
+          <div style={{ color: MUTED, fontSize: 16, lineHeight: 1.65, display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <p>I&rsquo;ve trained consistently for over fifteen years. Somewhere in year twelve I started wondering why the only thing my workouts earned me was the workout.</p>
+            <p>The real reward is the obvious one: a healthier life, the body you&rsquo;re working toward. But along the way, why not cash in sweat equity for the supplements, the shoes and the food you were going to buy anyway?</p>
+            <p>COUNT was officially established in early 2026. The dedication behind it goes back almost two decades.</p>
+            <p style={{ color: INK, fontWeight: 700 }}>Wherever you are on your fitness journey, join today and make it count.</p>
+          </div>
         </div>
 
         {/* Final CTA */}
