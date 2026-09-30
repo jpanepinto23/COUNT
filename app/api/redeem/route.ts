@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { isPlaceholderEmail } from '@/lib/strava-auth'
 import { createServerClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
@@ -52,6 +53,14 @@ export async function POST(req: NextRequest) {
     }
     if (!profile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 400 })
+    }
+
+    // Accounts created from Strava have no real email until the user adds one.
+    if (isPlaceholderEmail(profile.email)) {
+      return NextResponse.json(
+        { error: 'Add your email on the Home screen first so we can send your reward.', code: 'email_required' },
+        { status: 400 }
+      )
     }
 
     const pointCost: number = reward.point_cost

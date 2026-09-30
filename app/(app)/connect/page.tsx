@@ -5,8 +5,7 @@ import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 
 const TRACKERS = [
-  { kind: 'strava', label: 'Strava', logo: 'https://cdn.brandfetch.io/strava.com/w/256/h/256', color: '#FC4C02', desc: 'Runs, rides & more', disabled: false, note: '' },
-  { kind: 'garmin', label: 'Garmin', logo: 'https://cdn.brandfetch.io/garmin.com/w/256/h/256', color: '#007CC3', desc: 'Watches & bike computers', disabled: true, note: 'Coming soon. Use Strava for now' },
+  { kind: 'strava', label: 'Strava', logo: 'https://cdn.brandfetch.io/strava.com/w/256/h/256', color: '#FC4C02', desc: 'Runs, rides, lifts and more', disabled: false, note: '' },
 ] as const
 
 export default function ConnectPage() {
@@ -50,9 +49,9 @@ export default function ConnectPage() {
     <div style={{ minHeight: '100dvh', background: '#0E0E0D', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
       <div style={{ width: '100%', maxWidth: 400 }}>
         <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#B5593C', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12, textAlign: 'center' }}>Last step</p>
-        <h1 style={{ fontFamily: 'Archivo, sans-serif', fontSize: 28, fontWeight: 900, color: '#F5F0EA', textAlign: 'center', marginBottom: 10, lineHeight: 1.15 }}>Connect your tracker</h1>
+        <h1 style={{ fontFamily: 'Archivo, sans-serif', fontSize: 28, fontWeight: 900, color: '#F5F0EA', textAlign: 'center', marginBottom: 10, lineHeight: 1.15 }}>Connect Strava</h1>
         <p style={{ color: '#8A8680', fontSize: 14, lineHeight: 1.6, textAlign: 'center', marginBottom: 28 }}>
-          Workouts sync and verify automatically — and verified sessions earn a 25% bonus. No double-logging.
+          Your workouts verify automatically and verified sessions earn 50 extra coins each. No double logging.
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
           {TRACKERS.map(t => (
@@ -73,7 +72,7 @@ export default function ConnectPage() {
         </div>
         {error && <p style={{ color: '#ef4444', fontSize: 13, textAlign: 'center', marginBottom: 16 }}>{error}</p>}
         <Link href="/home" onClick={() => track('connect_skipped')} style={{ display: 'block', textAlign: 'center', color: '#8A8680', fontSize: 13, textDecoration: 'none', fontFamily: 'Archivo, sans-serif', padding: 12 }}>
-          Skip for now — you can connect anytime from Profile
+          Skip for now. You can connect anytime from Profile
         </Link>
       </div>
     </div>
