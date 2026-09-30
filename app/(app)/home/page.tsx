@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import { getStreakMultiplier } from '@/lib/points'
+import FirstRewardProgress from '@/components/FirstRewardProgress'
 
 // ===== Design tokens (per Claude Design handoff) =====
 const TOK = {
@@ -520,6 +521,9 @@ export default function HomePage() {
         weeklyDone={weeklyCount}
         weeklyGoal={WEEKLY_GOAL}
       />
+
+      {/* Progress toward the first reward (hidden after first redemption) */}
+      {user && <FirstRewardProgress user={user} onUserChanged={refreshUser} />}
 
       {/* Today's pick — gradient card linking to log */}
       <div style={{ padding: '20px 16px 0' }}>
