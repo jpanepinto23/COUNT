@@ -60,6 +60,18 @@ export default function LoginPage() {
           </button>
         </form>
 
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '18px 0' }}>
+          <div style={{ flex: 1, height: 1, background: '#2E2C29' }} />
+          <span style={{ color: '#8A8680', fontSize: 12 }}>or</span>
+          <div style={{ flex: 1, height: 1, background: '#2E2C29' }} />
+        </div>
+        <a
+          href="/api/strava/start"
+          style={{ ...btnStyle, display: 'block', textAlign: 'center', background: '#FC4C02', color: '#fff', textDecoration: 'none' }}
+        >
+          Continue with Strava
+        </a>
+
         <div style={{ marginTop: 20, textAlign: 'center' }}>
           <Link href="/auth/forgot-password" style={{ color: '#8A8680', fontSize: 13, textDecoration: 'none' }}>Forgot password?</Link>
         </div>
