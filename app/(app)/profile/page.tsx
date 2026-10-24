@@ -490,6 +490,7 @@ export default function ProfilePage() {
   const [devices, setDevices] = useState<{ type: string; connected_at: string; status: string }[]>([])
   const [signingOut, setSigningOut] = useState(false)
   const [connecting, setConnecting] = useState<string | null>(null)
+  const [garminOverride, setGarminOverride] = useState(false)
   const [disconnecting, setDisconnecting] = useState<string | null>(null)
   const [connectMessage, setConnectMessage] = useState<{ text: string; ok: boolean } | null>(null)
   const [editingStats, setEditingStats] = useState(false)
@@ -527,6 +528,7 @@ export default function ProfilePage() {
       })
 
     const params = new URLSearchParams(window.location.search)
+    if (params.get('garmin') === '1') setGarminOverride(true)
     if (params.get('connected') === 'true') {
       setConnectMessage({ text: 'Fitness tracker connected. Workouts will now auto-verify.', ok: true })
       window.history.replaceState({}, '', '/profile')
@@ -539,7 +541,15 @@ export default function ProfilePage() {
         })
     }
     if (params.get('error')) {
-      setConnectMessage({ text: 'Connection failed — please try again.', ok: false })
+      const e = params.get('error') ?? ''
+      const GARMIN_ERRORS: Record<string, string> = {
+        garmin_denied: 'Garmin connection was cancelled.',
+        garmin_state: 'Garmin session expired — please try again.',
+        garmin_token: 'Garmin rejected the connection. Please try again.',
+        garmin_userid: 'Could not read your Garmin account. Please try again.',
+        garmin_save: 'Connected to Garmin but could not save it. Please try again.',
+      }
+      setConnectMessage({ text: GARMIN_ERRORS[e] ?? 'Connection failed — please try again.', ok: false })
       window.history.replaceState({}, '', '/profile')
     }
   }, [user?.id]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -580,7 +590,27 @@ export default function ProfilePage() {
     }
   }
 
-  // Connect a wearable through Terra (Garmin, and later Fitbit/Whoop/Oura).
+  // Connect Garmin directly (Garmin Health API, OAuth2).
+  async function handleConnectGarmin() {
+    if (!user) return
+    setConnecting('garmin')
+    setConnectMessage(null)
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (!session) throw new Error('No session')
+      const res = await fetch('/api/garmin/connect', { headers: { Authorization: `Bearer ${session.access_token}` } })
+      const json = await res.json()
+      if (!res.ok || !json.url) throw new Error(json.error ?? 'Failed to get Garmin URL')
+      window.location.href = json.url
+    } catch (err) {
+      setConnectMessage({ text: err instanceof Error ? err.message : 'Connection failed', ok: false })
+      setConnecting(null)
+    }
+  }
+
+  // Connect a wearable through Terra (later Fitbit/Whoop/Oura).
   async function handleConnectTerra(type: string, provider: string) {
     if (!user) return
     setConnecting(type)
@@ -612,7 +642,9 @@ export default function ProfilePage() {
       if (!session) throw new Error('No session')
       const endpoint = deviceType === 'strava'
         ? '/api/strava/disconnect'
-        : `/api/terra/disconnect?type=${deviceType}`
+        : deviceType === 'garmin'
+          ? '/api/garmin/disconnect'
+          : `/api/terra/disconnect?type=${deviceType}`
       const res = await fetch(endpoint, { method: 'DELETE', headers: { Authorization: `Bearer ${session.access_token}` } })
       if (!res.ok) throw new Error('Disconnect failed')
       setDevices((prev) => prev.filter((d) => d.type !== deviceType))
@@ -661,9 +693,15 @@ export default function ProfilePage() {
   const lifetimeSessions = user.lifetime_sessions ?? 0
   const multiplier = getStreakMultiplier(streakDays)
   const connectedTypes = new Set(devices.filter((d) => d.status === 'active').map((d) => d.type))
+  // Garmin is hidden until NEXT_PUBLIC_GARMIN_ENABLED=true. For testing before
+  // the flag is flipped, /profile?garmin=1 shows it for this page load.
+  const garminVisible =
+    process.env.NEXT_PUBLIC_GARMIN_ENABLED === 'true' ||
+    connectedTypes.has('garmin') ||
+    garminOverride
   const CONNECTABLE_TRACKERS = [
     { type: 'strava', provider: 'STRAVA' },
-    { type: 'garmin', provider: 'GARMIN' },
+    ...(garminVisible ? [{ type: 'garmin', provider: 'GARMIN' }] : []),
   ]
 
   // Derive handle from email local-part, with fallback to name
@@ -1234,7 +1272,7 @@ export default function ProfilePage() {
                     </button>
                   ) : (
                     <button
-                      onClick={() => (type === 'strava' ? handleConnectStrava() : handleConnectTerra(type, info.provider))}
+                      onClick={() => (type === 'strava' ? handleConnectStrava() : type === 'garmin' ? handleConnectGarmin() : handleConnectTerra(type, info.provider))}
                       disabled={isLoading || connecting !== null}
                       style={{
                         padding: '6px 14px',
