@@ -4,9 +4,18 @@ import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 
-const TRACKERS = [
+// Garmin stays hidden until NEXT_PUBLIC_GARMIN_ENABLED=true (set in Vercel once
+// the direct Garmin integration is verified end-to-end).
+const GARMIN_ENABLED = process.env.NEXT_PUBLIC_GARMIN_ENABLED === 'true'
+
+type Tracker = { kind: 'strava' | 'garmin'; label: string; logo: string; color: string; desc: string; disabled: boolean; note: string }
+
+const TRACKERS: Tracker[] = [
   { kind: 'strava', label: 'Strava', logo: 'https://cdn.brandfetch.io/strava.com/w/256/h/256', color: '#FC4C02', desc: 'Runs, rides, lifts and more', disabled: false, note: '' },
-] as const
+  ...(GARMIN_ENABLED
+    ? [{ kind: 'garmin' as const, label: 'Garmin', logo: 'https://cdn.brandfetch.io/garmin.com/w/256/h/256', color: '#007CC3', desc: 'Watch activities sync automatically', disabled: false, note: '' }]
+    : []),
+]
 
 export default function ConnectPage() {
   const { user } = useAuth()
@@ -34,7 +43,7 @@ export default function ConnectPage() {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('No session')
-      const endpoint = kind === 'strava' ? '/api/strava/connect' : '/api/terra/connect?provider=GARMIN'
+      const endpoint = kind === 'strava' ? '/api/strava/connect' : '/api/garmin/connect'
       const res = await fetch(endpoint, { headers: { Authorization: 'Bearer ' + session.access_token } })
       const json = await res.json()
       if (!res.ok || !json.url) throw new Error(json.error ?? 'Failed to get connection URL')
@@ -49,7 +58,7 @@ export default function ConnectPage() {
     <div style={{ minHeight: '100dvh', background: '#0E0E0D', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
       <div style={{ width: '100%', maxWidth: 400 }}>
         <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#B5593C', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12, textAlign: 'center' }}>Last step</p>
-        <h1 style={{ fontFamily: 'Archivo, sans-serif', fontSize: 28, fontWeight: 900, color: '#F5F0EA', textAlign: 'center', marginBottom: 10, lineHeight: 1.15 }}>Connect Strava</h1>
+        <h1 style={{ fontFamily: 'Archivo, sans-serif', fontSize: 28, fontWeight: 900, color: '#F5F0EA', textAlign: 'center', marginBottom: 10, lineHeight: 1.15 }}>{GARMIN_ENABLED ? 'Connect your tracker' : 'Connect Strava'}</h1>
         <p style={{ color: '#8A8680', fontSize: 14, lineHeight: 1.6, textAlign: 'center', marginBottom: 28 }}>
           Your workouts verify automatically and verified sessions earn 50 extra coins each. No double logging.
         </p>
