@@ -66,6 +66,12 @@ export default function LoginPage() {
           <div style={{ flex: 1, height: 1, background: '#2E2C29' }} />
         </div>
         <a
+          href="/api/garmin/start"
+          style={{ ...btnStyle, display: 'block', textAlign: 'center', background: '#007CC3', color: '#fff', textDecoration: 'none', marginBottom: 10 }}
+        >
+          Continue with Garmin
+        </a>
+        <a
           href="/api/strava/start"
           style={{ ...btnStyle, display: 'block', textAlign: 'center', background: '#FC4C02', color: '#fff', textDecoration: 'none' }}
         >

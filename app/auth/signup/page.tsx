@@ -16,6 +16,16 @@ const STRAVA_ERRORS: Record<string, string> = {
   failed: 'Something went wrong connecting Strava. Try again, or sign up with email below.',
 }
 
+const GARMIN_ERRORS: Record<string, string> = {
+  denied: 'Garmin was not connected. Try again, or sign up with email below.',
+  state: 'That took too long and the link expired. Try again.',
+  config: 'Garmin sign up is not available right now. Sign up with email below.',
+  token: 'Garmin rejected the connection. Try again, or sign up with email below.',
+  userid: 'Could not read your Garmin account. Try again, or sign up with email below.',
+  save: 'Connected to Garmin but could not save it. Try again.',
+  failed: 'Something went wrong connecting Garmin. Try again, or sign up with email below.',
+}
+
 function SignupContent() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -23,15 +33,20 @@ function SignupContent() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [goingToStrava, setGoingToStrava] = useState(false)
+  const [goingToGarmin, setGoingToGarmin] = useState(false)
   const [firstReward, setFirstReward] = useState<{ brand_name: string; point_cost: number } | null>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
   const supabase = createClient()
 
   const stravaError = searchParams.get('strava_error')
-  // Pre-fill referral code from URL ?ref=CODE. Open the email form when Strava is the thing that failed.
+  const garminError = searchParams.get('garmin_error')
+  // Pre-fill referral code from URL ?ref=CODE. Open the email form when a tracker is the thing that failed.
   const [refCode, setRefCode] = useState(() => (searchParams.get('ref') ?? '').toUpperCase())
-  const [showEmail, setShowEmail] = useState(() => Boolean(stravaError && stravaError !== 'denied' && stravaError !== 'state'))
+  const [showEmail, setShowEmail] = useState(() => {
+    const e = stravaError ?? garminError
+    return Boolean(e && e !== 'denied' && e !== 'state')
+  })
 
   // Cheapest live reward, so the page can say exactly what the first win is.
   useEffect(() => {
@@ -79,10 +94,11 @@ function SignupContent() {
 
   const cleanRef = refCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '')
   const stravaHref = '/api/strava/start' + (cleanRef ? `?ref=${cleanRef}` : '')
+  const garminHref = '/api/garmin/start' + (cleanRef ? `?ref=${cleanRef}` : '')
   const cost = firstReward?.point_cost ?? 600
   const workoutsNeeded = Math.max(1, Math.ceil(cost / VERIFIED_WORKOUT_COINS))
   const steps = [
-    'Connect Strava',
+    'Connect tracker',
     ...Array.from({ length: workoutsNeeded }, (_, i) => `Workout ${i + 1}`),
   ]
 
@@ -95,7 +111,7 @@ function SignupContent() {
       <div style={{ width: '100%', maxWidth: 380 }}>
         <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#F5F0EA' }}>Get paid for your workouts</h1>
         <p style={{ color: '#8A8680', fontSize: 15, marginBottom: 22, lineHeight: 1.5 }}>
-          One tap. Your Strava activities earn coins, and coins buy rewards. No forms, no password.
+          One tap. Your Garmin or Strava activities earn coins, and coins buy rewards. No forms, no password.
         </p>
 
         {/* Path to the first reward */}
@@ -120,6 +136,18 @@ function SignupContent() {
         {stravaError && (
           <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12, lineHeight: 1.45 }}>{STRAVA_ERRORS[stravaError] ?? STRAVA_ERRORS.failed}</p>
         )}
+        {garminError && (
+          <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12, lineHeight: 1.45 }}>{GARMIN_ERRORS[garminError] ?? GARMIN_ERRORS.failed}</p>
+        )}
+
+        <a
+          href={garminHref}
+          onClick={() => setGoingToGarmin(true)}
+          style={{ ...btnStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: '#007CC3', color: '#fff', textDecoration: 'none', fontSize: 16, padding: '17px', marginBottom: 10, opacity: goingToGarmin ? 0.7 : 1 }}
+        >
+          <img src="https://cdn.brandfetch.io/garmin.com/w/256/h/256" alt="" width={18} height={18} style={{ borderRadius: 4 }} />
+          {goingToGarmin ? 'Opening Garmin...' : 'Continue with Garmin'}
+        </a>
 
         <a
           href={stravaHref}
@@ -132,7 +160,7 @@ function SignupContent() {
           {goingToStrava ? 'Opening Strava...' : 'Connect with Strava'}
         </a>
         <p style={{ color: '#8A8680', fontSize: 12, textAlign: 'center', marginTop: 10, lineHeight: 1.5 }}>
-          We only read your activities. We never post. You must be 13 or older.
+          We only read your activities. We never post. You must be 13 or older. Compatible with Garmin.
         </p>
 
         {!showEmail ? (
@@ -141,7 +169,7 @@ function SignupContent() {
             onClick={() => setShowEmail(true)}
             style={{ display: 'block', width: '100%', marginTop: 14, padding: 10, background: 'transparent', border: 'none', color: '#8A8680', fontSize: 13, fontFamily: 'Archivo, sans-serif', cursor: 'pointer', textDecoration: 'underline' }}
           >
-            No Strava? Sign up with email
+            No tracker? Sign up with email
           </button>
         ) : (
           <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 22, paddingTop: 22, borderTop: '1.5px solid #2E2C29' }}>
