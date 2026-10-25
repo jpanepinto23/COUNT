@@ -1,5 +1,22 @@
 // Points calculation logic — COUNT
+//
+// The whole earning rule in one sentence:
+//   Verified workout = 500 coins. Unverified = 200. 7-day streak = +50%.
+//
+// Tiers are status (badges, referral payout), not a payout multiplier.
+// There is no random/mystery bonus. A user should be able to do the math in their head.
+
 export type Tier = 'bronze' | 'silver' | 'gold' | 'platinum'
+
+// Flat payouts
+export const VERIFIED_POINTS = 500
+export const UNVERIFIED_POINTS = 200
+// Kept for callers that still read it; equals the unverified payout.
+export const BASE_POINTS = UNVERIFIED_POINTS
+
+// Single bonus: 7+ day streak
+export const STREAK_BONUS_DAYS = 7
+export const STREAK_BONUS_MULTIPLIER = 1.5
 
 export function getTier(lifetimeSessions: number): Tier {
   if (lifetimeSessions >= 120) return 'platinum'
@@ -8,29 +25,21 @@ export function getTier(lifetimeSessions: number): Tier {
   return 'bronze'
 }
 
-export function getTierMultiplier(tier: Tier): number {
-  const multipliers: Record<Tier, number> = {
-    bronze: 1.0,
-    silver: 1.5,
-    gold: 2.0,
-    platinum: 3.0,
-  }
-  return multipliers[tier]
+// Tier no longer affects payout. Always 1 — kept so existing display code compiles.
+export function getTierMultiplier(_tier: Tier): number {
+  return 1
 }
 
-// Returns numeric streak multiplier — used in actual point calculation
+// Streak multiplier — the only bonus in the system.
 export function getStreakMultiplier(streak: number): number {
-  if (streak >= 14) return 2.0
-  if (streak >= 7) return 1.5
-  if (streak >= 3) return 1.2
-  return 1.0
+  return streak >= STREAK_BONUS_DAYS ? STREAK_BONUS_MULTIPLIER : 1
 }
 
-// Returns display label for streak multiplier
 export function getStreakMultiplierLabel(streak: number): string {
   return getStreakMultiplier(streak) + 'x'
 }
 
+// Referral payout to the referrer — this is the tier perk.
 export function getReferralPoints(tier: Tier): number {
   const points: Record<Tier, number> = {
     bronze: 300,
@@ -56,58 +65,12 @@ export function getNextTierSessions(lifetimeSessions: number): {
   return { next: null, sessionsNeeded: 0, threshold: 120 }
 }
 
-// Base points per session — flat 200, duration does not affect earnings
-export const BASE_POINTS = 200
-
-// Verification bonus — verified sessions earn extra points on top of base
-// Everyone gets full base points; connecting Strava/Apple Health earns a bonus
-export const VERIFIED_BONUS = 50
-
-// Mystery bonus — weighted random coins after each workout
-// Streak holders get better odds for higher tiers
-export function generateMysteryBonus(currentStreak: number): {
-  amount: number
-  rarity: 'common' | 'uncommon' | 'rare' | 'epic'
-} {
-  const roll = Math.random() * 100
-
-  // Streak >=7 shifts 5% from common -> uncommon and 2% from uncommon -> rare
-  const hasStreak = currentStreak >= 7
-  const epicThreshold = hasStreak ? 7 : 5       // top slice
-  const rareThreshold = epicThreshold + (hasStreak ? 17 : 15)
-  // uncommon fills the next band, common is the remainder
-
-  let amount: number
-  let rarity: 'common' | 'uncommon' | 'rare' | 'epic'
-
-  if (roll < epicThreshold) {
-    // Epic: 75-200 coins
-    amount = Math.floor(Math.random() * 126) + 75
-    rarity = 'epic'
-  } else if (roll < rareThreshold) {
-    // Rare: 25-75 coins
-    amount = Math.floor(Math.random() * 51) + 25
-    rarity = 'rare'
-  } else if (roll < rareThreshold + 20) {
-    // Uncommon: 10-25 coins
-    amount = Math.floor(Math.random() * 16) + 10
-    rarity = 'uncommon'
-  } else {
-    // Common: 5-10 coins
-    amount = Math.floor(Math.random() * 6) + 5
-    rarity = 'common'
-  }
-
-  return { amount, rarity }
-}
-
 export function calculatePoints({
   verified,
-  lifetimeSessions,
   currentStreak = 0,
 }: {
   verified: boolean
-  lifetimeSessions: number
+  lifetimeSessions?: number // ignored; accepted so existing call sites don't change
   currentStreak?: number
 }): {
   base: number
@@ -116,19 +79,16 @@ export function calculatePoints({
   total: number
   verifiedBonus: number
 } {
-  const tier = getTier(lifetimeSessions)
-  const tierMultiplier = getTierMultiplier(tier)
+  const base = verified ? VERIFIED_POINTS : UNVERIFIED_POINTS
   const streakMult = getStreakMultiplier(currentStreak)
-  const verifiedBonus = verified ? VERIFIED_BONUS : 0
-
-  // Everyone gets full base x tier x streak. Verified users earn a flat bonus on top.
-  const total = Math.round((BASE_POINTS + verifiedBonus) * streakMult * tierMultiplier)
+  const total = Math.round(base * streakMult)
 
   return {
-    base: BASE_POINTS,
-    multiplier: tierMultiplier,
+    base,
+    // The multiplier recorded on the workout row is now just the streak multiplier.
+    multiplier: streakMult,
     streakMultiplier: streakMult,
     total,
-    verifiedBonus,
+    verifiedBonus: verified ? VERIFIED_POINTS - UNVERIFIED_POINTS : 0,
   }
 }

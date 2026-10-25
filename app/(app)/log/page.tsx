@@ -262,8 +262,6 @@ export default function LogPage() {
   const [newSessionCount, setNewSessionCount] = useState(0)
   const [sharedStreak, setSharedStreak] = useState(0)
   const [shareCopied, setShareCopied] = useState(false)
-  const [mysteryBonus, setMysteryBonus] = useState<{ amount: number; rarity: 'common' | 'uncommon' | 'rare' | 'epic' } | null>(null)
-  const [bonusRevealed, setBonusRevealed] = useState(false)
 
   if (!user) return null
 
@@ -329,8 +327,6 @@ export default function LogPage() {
     setNewSessionCount(data.newSessions)
     setSharedStreak(data.newStreak)
     setVerificationSource(data.verified ? data.verificationMethod : null)
-    setMysteryBonus(data.bonus)
-    setBonusRevealed(false)
     await refreshUser()
     return { ok: true }
   }
@@ -552,10 +548,6 @@ export default function LogPage() {
     const wt = WORKOUT_TYPES.find((t) => t.value === workoutType)!
     const MilestoneIcon = milestone?.Icon
     const isStreakMilestone = [3, 7, 14, 21, 30].includes(sharedStreak)
-    const bonusColor =
-      mysteryBonus?.rarity === 'epic' ? '#A855F7' :
-      mysteryBonus?.rarity === 'rare' ? '#EAB308' :
-      TOK.copper
     return (
       <div
         style={{
@@ -739,7 +731,7 @@ export default function LogPage() {
               </span>
             </div>
             <div style={{ fontFamily: 'var(--sans)', fontSize: 12, color: TOK.muted, marginTop: 6 }}>
-              {getTierLabel(tier)} tier · {multiplier}× multiplier
+              {getTierLabel(tier)} tier{multiplier > 1 ? ` · ${multiplier}× streak bonus` : ''}
             </div>
             {verificationSource && (
               <div
@@ -765,107 +757,6 @@ export default function LogPage() {
             )}
           </div>
         </div>
-
-        {/* Mystery bonus */}
-        {mysteryBonus && (
-          <div style={{ padding: '14px 16px 0' }}>
-            <button
-              onClick={() => setBonusRevealed(true)}
-              disabled={bonusRevealed}
-              style={{
-                width: '100%',
-                position: 'relative',
-                overflow: 'hidden',
-                background: bonusRevealed
-                  ? `linear-gradient(135deg, ${bonusColor}22 0%, ${bonusColor}11 100%)`
-                  : TOK.card,
-                border: `1px solid ${bonusRevealed ? `${bonusColor}66` : TOK.hairline2}`,
-                borderRadius: 16,
-                padding: '18px 20px',
-                textAlign: 'left',
-                cursor: bonusRevealed ? 'default' : 'pointer',
-                transition: 'all 0.4s ease',
-                color: TOK.fg,
-              }}
-            >
-              {!bonusRevealed ? (
-                <>
-                  <div
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      backgroundImage:
-                        'linear-gradient(90deg, transparent 0%, rgba(181,89,60,0.10) 50%, transparent 100%)',
-                      backgroundSize: '200% 100%',
-                      animation: 'shimmer 2.2s infinite linear',
-                    }}
-                  />
-                  <div
-                    style={{
-                      position: 'relative',
-                      fontFamily: 'var(--mono)',
-                      fontSize: 10,
-                      letterSpacing: '0.22em',
-                      textTransform: 'uppercase',
-                      color: TOK.copper,
-                    }}
-                  >
-                    Mystery bonus
-                  </div>
-                  <div
-                    style={{
-                      position: 'relative',
-                      fontFamily: 'var(--serif)',
-                      fontSize: 20,
-                      letterSpacing: '-0.015em',
-                      lineHeight: 1.1,
-                      marginTop: 4,
-                    }}
-                  >
-                    Tap to reveal your bonus coins
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div
-                    style={{
-                      fontFamily: 'var(--mono)',
-                      fontSize: 10,
-                      letterSpacing: '0.22em',
-                      textTransform: 'uppercase',
-                      color: bonusColor,
-                      fontWeight: 600,
-                    }}
-                  >
-                    {mysteryBonus.rarity === 'epic'
-                      ? 'Epic bonus!'
-                      : mysteryBonus.rarity === 'rare'
-                        ? 'Rare bonus!'
-                        : mysteryBonus.rarity === 'uncommon'
-                          ? 'Nice bonus!'
-                          : 'Bonus coins'}
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: 'var(--serif)',
-                      fontSize: 44,
-                      color: bonusColor,
-                      letterSpacing: '-0.04em',
-                      lineHeight: 1,
-                      marginTop: 4,
-                      fontFeatureSettings: '"tnum"',
-                    }}
-                  >
-                    +{mysteryBonus.amount}
-                  </div>
-                  <div style={{ fontFamily: 'var(--sans)', fontSize: 12, color: TOK.muted, marginTop: 6 }}>
-                    bonus coins added to your balance
-                  </div>
-                </>
-              )}
-            </button>
-          </div>
-        )}
 
         {/* Share card */}
         <div style={{ padding: '14px 16px 0' }}>
@@ -951,11 +842,6 @@ export default function LogPage() {
                   }}
                 >
                   +{earnedPoints}
-                  {bonusRevealed && mysteryBonus ? (
-                    <span style={{ fontSize: 14, color: bonusColor, marginLeft: 6 }}>
-                      +{mysteryBonus.amount}
-                    </span>
-                  ) : null}
                 </div>
               </div>
               {sharedStreak > 0 && (
@@ -1629,7 +1515,7 @@ export default function LogPage() {
                   }}
                 >
                   <span>
-                    {getTierLabel(tier)} tier · {multiplier}×
+                    {getTierLabel(tier)} tier{multiplier > 1 ? ` · ${multiplier}× streak` : ''}
                   </span>
                   <span style={{ color: '#86efac' }}>
                     +{verifiedPoints.total - total} if verified

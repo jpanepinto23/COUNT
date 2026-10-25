@@ -4,9 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import {
   calculatePoints,
-  generateMysteryBonus,
   getTier,
-  getTierMultiplier,
   getReferralPoints,
   type Tier,
 } from '@/lib/points'
@@ -178,15 +176,14 @@ export async function POST(req: NextRequest) {
   const newStreak = yesterdaySession && yesterdaySession.length > 0 ? profile.current_streak + 1 : 1
   const newLongest = Math.max(profile.longest_streak, newStreak)
 
-  const bonus = generateMysteryBonus(newStreak)
-  const totalWithBonus = pts.total + bonus.amount
+  const totalWithBonus = pts.total
 
   const { error: updateError } = await admin
     .from('users')
     .update({
       lifetime_sessions: newSessions,
       tier: newTier,
-      multiplier: getTierMultiplier(newTier),
+      multiplier: 1,
       points_balance: profile.points_balance + totalWithBonus,
       points_lifetime_earned: profile.points_lifetime_earned + totalWithBonus,
       current_streak: newStreak,
@@ -222,7 +219,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     ok: true,
     points: pts.total,
-    bonus,
+    bonus: null,
     newSessions,
     newStreak,
     newTier,

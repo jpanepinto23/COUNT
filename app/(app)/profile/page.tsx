@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
-import { getTierLabel, getTierMultiplier, getStreakMultiplier } from '@/lib/points'
+import { getTierLabel, getStreakMultiplier } from '@/lib/points'
 import type { Redemption } from '@/lib/types'
 
 // ===== Design tokens (per Claude Design handoff) =====
@@ -971,16 +971,6 @@ export default function ProfilePage() {
                 }}
               >
                 {getTierLabel(tier)}
-              </span>
-              <span
-                style={{
-                  fontFamily: 'var(--mono)',
-                  fontSize: 9,
-                  color: TOK.muted,
-                  letterSpacing: '0.08em',
-                }}
-              >
-                · {getTierMultiplier(tier)}×
               </span>
             </div>
           </div>

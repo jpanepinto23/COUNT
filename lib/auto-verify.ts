@@ -115,7 +115,7 @@ async function mintFromActivity(
   const { error: insErr } = await supabase.from('workouts').insert({
     user_id: userId,
     type: opts.type,
-    custom_name: null,
+    custom_name: opts.activityName || null,
     duration_minutes: opts.durationMinutes,
     verification_method: opts.deviceType,
     verified: true,

@@ -1,14 +1,14 @@
 'use client'
 
 import { useAuth } from '@/lib/auth-context'
-import { getTier, getTierLabel, getTierMultiplier, getNextTierSessions } from '@/lib/points'
+import { getTier, getTierLabel, getReferralPoints, getNextTierSessions, VERIFIED_POINTS, UNVERIFIED_POINTS } from '@/lib/points'
 import Icon from '@/components/Icon'
 
 const TIERS = [
-  { key: 'bronze',   label: 'Bronze',   range: '0–29 sessions',   multiplier: '1.0x', color: '#B5593C', perks: ['Base points', '1x multiplier', 'Access to all rewards'] },
-  { key: 'silver',   label: 'Silver',   range: '30–59 sessions',  multiplier: '1.5x', color: '#6B7280', perks: ['1.5x point multiplier', 'Priority reward access', 'Streak badges'] },
-  { key: 'gold',     label: 'Gold',     range: '60–119 sessions', multiplier: '2.0x', color: '#D97706', perks: ['2.0x point multiplier', 'Exclusive gold rewards', 'Monthly bonus points'] },
-  { key: 'platinum', label: 'Platinum', range: '120+ sessions',   multiplier: '3.0x', color: '#7C3AED', perks: ['3.0x point multiplier', 'Platinum-only rewards', 'Top 3 leaderboard bonus'] },
+  { key: 'bronze',   label: 'Bronze',   range: '0–29 sessions',   multiplier: '300 / referral', color: '#B5593C', perks: ['300 coins per referral', 'Access to all rewards'] },
+  { key: 'silver',   label: 'Silver',   range: '30–59 sessions',  multiplier: '500 / referral', color: '#6B7280', perks: ['500 coins per referral', 'Priority reward access', 'Streak badges'] },
+  { key: 'gold',     label: 'Gold',     range: '60–119 sessions', multiplier: '750 / referral', color: '#D97706', perks: ['750 coins per referral', 'Exclusive gold rewards', 'Monthly bonus points'] },
+  { key: 'platinum', label: 'Platinum', range: '120+ sessions',   multiplier: '1000 / referral', color: '#7C3AED', perks: ['1000 coins per referral', 'Platinum-only rewards', 'Top 3 leaderboard bonus'] },
 ]
 
 const MILESTONES = [
@@ -26,7 +26,7 @@ export default function RankPage() {
   if (!user) return null
 
   const tier = getTier(user.lifetime_sessions)
-  const tierMultiplier = getTierMultiplier(tier)
+  const referralPts = getReferralPoints(tier)
   const { next, sessionsNeeded, threshold } = getNextTierSessions(user.lifetime_sessions)
 
   const tierStart: Record<string, number> = { bronze: 0, silver: 30, gold: 60, platinum: 120 }
@@ -100,18 +100,18 @@ export default function RankPage() {
         </div>
       </div>
 
-      {/* Multiplier badge */}
+      {/* Earning rate */}
       <div className="mx-5 mb-5">
         <div className="bg-[#1A1A18] border border-white/[0.08] rounded-2xl p-4 flex items-center justify-between">
           <div>
-            <div className="text-xs text-white/50 uppercase tracking-widest font-semibold mb-1">Point Multiplier</div>
-            <div className="text-2xl font-black" style={{ color: currentTierData.color }}>{tierMultiplier}x</div>
+            <div className="text-xs text-white/50 uppercase tracking-widest font-semibold mb-1">Referral bonus</div>
+            <div className="text-2xl font-black" style={{ color: currentTierData.color }}>{referralPts}</div>
           </div>
           <div className="text-right">
             <div className="text-xs text-white/50 mb-1">Earning rate</div>
             <div className="text-sm text-white/80">
-              Every session earns<br />
-              <span className="font-bold text-white">{tierMultiplier}x base points</span>
+              Verified <span className="font-bold text-white">{VERIFIED_POINTS}</span> · Unverified <span className="font-bold text-white">{UNVERIFIED_POINTS}</span><br />
+              7-day streak <span className="font-bold text-white">+50%</span>
             </div>
           </div>
         </div>
