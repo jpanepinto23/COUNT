@@ -1,6 +1,6 @@
-// Shared bits for "sign up with Strava".
+// Shared bits for "sign up with Strava" / "continue with Garmin".
 //
-// Strava does not share an athlete's email, so accounts created from Strava
+// Strava and Garmin do not share the user's email, so accounts created from Strava
 // get a placeholder address on this domain. It is never emailed. The user is
 // asked for a real address before their first redemption.
 export const STRAVA_STATE_COOKIE = 'count_strava_state'
@@ -10,6 +10,15 @@ export function stravaPlaceholderEmail(athleteId: number | string): string {
   return `athlete-${athleteId}@${STRAVA_PLACEHOLDER_DOMAIN}`
 }
 
+export const GARMIN_PLACEHOLDER_DOMAIN = 'garmin.countfitness.app'
+
+export function garminPlaceholderEmail(garminUserId: string): string {
+  return `garmin-${garminUserId.toLowerCase()}@${GARMIN_PLACEHOLDER_DOMAIN}`
+}
+
+// True for any provider-created account that has not given us a real email yet.
 export function isPlaceholderEmail(email: string | null | undefined): boolean {
-  return !email || email.toLowerCase().endsWith('@' + STRAVA_PLACEHOLDER_DOMAIN)
+  if (!email) return true
+  const e = email.toLowerCase()
+  return e.endsWith('@' + STRAVA_PLACEHOLDER_DOMAIN) || e.endsWith('@' + GARMIN_PLACEHOLDER_DOMAIN)
 }
