@@ -3,7 +3,6 @@
 // Env vars (Vercel → count-fitness-app → Environment Variables):
 //   GARMIN_CLIENT_ID       Consumer Key / Client ID from the Garmin Developer Portal
 //   GARMIN_CLIENT_SECRET   Consumer Secret / Client Secret (shown once)
-//   NEXT_PUBLIC_GARMIN_ENABLED   "true" to show the Garmin button in the app
 //
 // Garmin pushes activity summaries to /api/garmin/webhooks (configure in the
 // Developer Portal → API Tools → Endpoint Configuration → "Activities").

@@ -490,7 +490,6 @@ export default function ProfilePage() {
   const [devices, setDevices] = useState<{ type: string; connected_at: string; status: string }[]>([])
   const [signingOut, setSigningOut] = useState(false)
   const [connecting, setConnecting] = useState<string | null>(null)
-  const [garminOverride, setGarminOverride] = useState(false)
   const [disconnecting, setDisconnecting] = useState<string | null>(null)
   const [connectMessage, setConnectMessage] = useState<{ text: string; ok: boolean } | null>(null)
   const [editingStats, setEditingStats] = useState(false)
@@ -528,7 +527,6 @@ export default function ProfilePage() {
       })
 
     const params = new URLSearchParams(window.location.search)
-    if (params.get('garmin') === '1') setGarminOverride(true)
     if (params.get('connected') === 'true') {
       setConnectMessage({ text: 'Fitness tracker connected. Workouts will now auto-verify.', ok: true })
       window.history.replaceState({}, '', '/profile')
@@ -693,15 +691,9 @@ export default function ProfilePage() {
   const lifetimeSessions = user.lifetime_sessions ?? 0
   const multiplier = getStreakMultiplier(streakDays)
   const connectedTypes = new Set(devices.filter((d) => d.status === 'active').map((d) => d.type))
-  // Garmin is hidden until NEXT_PUBLIC_GARMIN_ENABLED=true. For testing before
-  // the flag is flipped, /profile?garmin=1 shows it for this page load.
-  const garminVisible =
-    process.env.NEXT_PUBLIC_GARMIN_ENABLED === 'true' ||
-    connectedTypes.has('garmin') ||
-    garminOverride
   const CONNECTABLE_TRACKERS = [
+    { type: 'garmin', provider: 'GARMIN' },
     { type: 'strava', provider: 'STRAVA' },
-    ...(garminVisible ? [{ type: 'garmin', provider: 'GARMIN' }] : []),
   ]
 
   // Derive handle from email local-part, with fallback to name

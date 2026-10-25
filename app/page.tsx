@@ -108,7 +108,7 @@ export default function LandingPage() {
           </p>
           {cta}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 22, flexWrap: 'wrap', justifyContent: 'center' }}>
-            {[['Strava', 'https://cdn.brandfetch.io/strava.com/w/256/h/256']].map(([name, logo]) => (
+            {[['Garmin', 'https://cdn.brandfetch.io/garmin.com/w/256/h/256'], ['Strava', 'https://cdn.brandfetch.io/strava.com/w/256/h/256']].map(([name, logo]) => (
               <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 10, padding: '8px 14px' }}>
                 <img src={logo} alt={name} style={{ width: 20, height: 20, borderRadius: 5, objectFit: 'contain' }} />
                 <span style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700 }}>{name}</span>
@@ -169,7 +169,10 @@ export default function LandingPage() {
 
         {/* Store */}
         <div id="store" style={{ borderTop: `1px solid ${LINE}`, padding: '32px 0' }}>
-          <h2 style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, marginBottom: 14 }}>What&rsquo;s in the store</h2>
+          <h2 style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, marginBottom: 10 }}>What&rsquo;s in the store</h2>
+          <p style={{ color: MUTED, fontSize: 15, lineHeight: 1.5, marginBottom: 14 }}>
+            Now compatible with Garmin &mdash; connect your watch and earn rewards for every workout.
+          </p>
           <div>
             {REWARDS.map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderTop: i === 0 ? 'none' : `1px solid ${LINE}` }}>
@@ -230,6 +233,9 @@ export default function LandingPage() {
           <a href="/privacy" style={{ color: MUTED, fontSize: 12, textDecoration: 'none', fontFamily: MONO }}>Privacy</a>
           <span style={{ fontSize: 12, color: '#3A3A38', fontFamily: MONO }}>&copy; {new Date().getFullYear()} COUNT</span>
         </div>
+        <p style={{ fontFamily: MONO, fontSize: 11, color: '#3A3A38', textAlign: 'center', lineHeight: 1.5, marginTop: 14 }}>
+          Garmin is a registered trademark of Garmin Ltd. or its subsidiaries. COUNT is an independent app and is not affiliated with or endorsed by Garmin.
+        </p>
 
       </div>
     </div>
