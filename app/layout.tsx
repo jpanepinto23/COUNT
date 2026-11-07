@@ -6,11 +6,11 @@ import { AuthProvider } from '@/lib/auth-context'
 
 export const metadata: Metadata = {
   title: 'COUNT: workouts that pay you back',
-  description: 'Log a workout or sync from Strava, earn coins, redeem them for discounts and free product from NOBULL, Momentous, Thorne, and Trifecta. Free, no card.',
+  description: 'Log a workout or sync from Strava, earn coins, redeem them for real discounts at NOBULL, Momentous, Thorne, and Trifecta. Free, no card.',
   metadataBase: new URL('https://www.countfitness.app'),
   openGraph: {
     title: 'COUNT: workouts that pay you back',
-    description: 'Three workouts gets you a discount code from NOBULL, Momentous, or Thorne. Keep going and the creatine is free.',
+    description: 'Three workouts gets you a discount code from NOBULL, Momentous, or Thorne. Keep going and the coins keep stacking.',
     url: 'https://www.countfitness.app',
     siteName: 'COUNT',
     images: [{ url: '/og.png', width: 1200, height: 630 }],
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'COUNT: workouts that pay you back',
-    description: 'Three workouts gets you a discount code from NOBULL, Momentous, or Thorne. Keep going and the creatine is free.',
+    description: 'Three workouts gets you a discount code from NOBULL, Momentous, or Thorne. Keep going and the coins keep stacking.',
     images: ['/og.png'],
   },
   manifest: '/manifest.json',

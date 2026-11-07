@@ -14,10 +14,8 @@ const LINE = '#222220'
 /* Live rewards. Keep in sync with the rewards table. */
 const REWARDS = [
   { brand: 'NOBULL',    what: '30% off shoes and gear',           coins: 600,  note: '3 workouts',  logo: 'https://cdn.brandfetch.io/nobullproject.com/w/256/h/256' },
-  { brand: 'Momentous', what: 'Creatine, free, shipped to you',   coins: 1500, note: '6 workouts',  logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
-  { brand: 'Momentous', what: 'Essential Protein, free, shipped', coins: 2500, note: '10 workouts', logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
   { brand: 'Trifecta',  what: '50% off first meal order',         coins: 500,  note: '2 workouts',  logo: 'https://cdn.brandfetch.io/trifectanutrition.com/w/256/h/256' },
-  { brand: 'Momentous', what: '20% off supplements',              coins: 600,  note: '3 workouts',  logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
+  { brand: 'Momentous', what: 'Up to 35% off your first subscription, 14% off one-time', coins: 600, note: '3 workouts', logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
   { brand: 'Thorne',    what: '15% off supplements',              coins: 600,  note: '3 workouts',  logo: 'https://cdn.brandfetch.io/thorne.com/w/256/h/256' },
 ]
 
@@ -128,7 +126,7 @@ export default function LandingPage() {
               Cashing in sweat equity.
             </h1>
             <p style={{ color: MUTED, fontSize: 17, lineHeight: 1.6, maxWidth: 480 }}>
-              Log a workout or sync one from Strava. Every session earns coins. Three sessions gets you 30% off at NOBULL. Six gets you a tub of Momentous creatine, shipped, free. No card. No subscription. The brands pay, not you.
+              Log a workout or sync one from Strava. Every session earns coins. Three sessions gets you 30% off at NOBULL. Every session after that stacks coins toward real discounts at Momentous, Thorne, and Trifecta. No card. No subscription. The brands pay, not you.
             </p>
           </div>
           <img src="/shots/balance.jpg" alt="COUNT balance screen showing coins earned" width={640} height={1169} style={{ flex: '0 0 auto', width: 180, height: 'auto', margin: '0 auto', boxShadow: '0 18px 50px rgba(0,0,0,0.55)', borderRadius: 22 }} />
@@ -141,7 +139,7 @@ export default function LandingPage() {
             {[
               ['1', 'Log or sync a workout', 'Tap it in, or connect Strava and it verifies itself.'],
               ['2', 'Earn coins', '200 a session. Streaks and tiers multiply it.'],
-              ['3', 'Redeem with the brands', 'Discount codes after three workouts. Free product after more.'],
+              ['3', 'Redeem with the brands', 'Discount codes at NOBULL, Momentous, Thorne, and Trifecta after three workouts.'],
             ].map(([n, t, d]) => (
               <div key={n} style={{ padding: '16px', background: '#171716', border: `1px solid ${LINE}`, borderRadius: 14 }}>
                 <p style={{ fontFamily: MONO, fontSize: 12, color: COPPER, marginBottom: 8 }}>{n}</p>
