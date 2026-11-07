@@ -138,7 +138,7 @@ export default function LandingPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 14 }}>
             {[
               ['1', 'Log or sync a workout', 'Tap it in, or connect Strava and it verifies itself.'],
-              ['2', 'Earn coins', '200 a session. Streaks and tiers multiply it.'],
+              ['2', 'Earn coins', '500 for a verified session, 200 for a manual log. A 7-day streak adds 50%.'],
               ['3', 'Redeem with the brands', 'Discount codes at NOBULL, Momentous, Thorne, and Trifecta after three workouts.'],
             ].map(([n, t, d]) => (
               <div key={n} style={{ padding: '16px', background: '#171716', border: `1px solid ${LINE}`, borderRadius: 14 }}>

@@ -64,7 +64,6 @@ function emailShell(headline: string, bodyHtml: string, ctaLabel: string, ctaHre
 }
 
 const APP_URL = 'https://countfitness.app/app'
-const PDF_URL = 'https://countfitness.app/COUNT-getting-started.pdf'
 
 const dripSchedule = [
   // Day 0 — Welcome
@@ -73,10 +72,10 @@ const dripSchedule = [
     subject: "You're in. Here's the playbook.",
     headline: "You're in. Here's the playbook.",
     body: `<p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">Hey,</p>
-      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">Welcome to COUNT. Quick version: log workouts &rarr; earn points &rarr; redeem for real stuff from brands you already use. NOBULL, Thorne, Momentous, Kane, and Amazon are live in the catalog right now, with more rolling in monthly.</p>
-      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">I put together a 2-page guide that walks through how points, streaks, and rewards work. Pin it to your phone for reference.</p>`,
-    ctaLabel: 'Download the Starter Guide',
-    ctaHref: PDF_URL,
+      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">Welcome to COUNT. Quick version: log workouts &rarr; earn coins &rarr; redeem them for discounts at brands you already buy from. NOBULL, Momentous, Thorne, and Trifecta are live in the catalog right now, with more as we sign them.</p>
+      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">First move: connect Strava or Garmin in the app. Synced workouts verify themselves and pay 500 coins instead of 200.</p>`,
+    ctaLabel: 'Open COUNT',
+    ctaHref: APP_URL,
   },
   // Day 2 — How it works
   {
@@ -84,9 +83,9 @@ const dripSchedule = [
     subject: 'How to turn workouts into rewards',
     headline: 'The streak is everything.',
     body: `<p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">Quick walkthrough of how COUNT actually works:</p>
-      <p style="margin:0 0 12px 0;font-size:15px;line-height:1.6;color:#3A3530;"><strong>Log.</strong> Every workout you log is 1 point baseline. Walk, lift, run, ride &mdash; any movement counts.</p>
-      <p style="margin:0 0 12px 0;font-size:15px;line-height:1.6;color:#3A3530;"><strong>Earn.</strong> Streaks multiply your points. Two days in a row = 1.5x. Five days = 2x. Ten days = 2.5x.</p>
-      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;"><strong>Redeem.</strong> Points trade for actual products from brands we partner with.</p>
+      <p style="margin:0 0 12px 0;font-size:15px;line-height:1.6;color:#3A3530;"><strong>Log.</strong> A verified workout (synced from Strava or Garmin) is 500 coins. A manual log is 200. Walk, lift, run, ride &mdash; any movement counts, one a day.</p>
+      <p style="margin:0 0 12px 0;font-size:15px;line-height:1.6;color:#3A3530;"><strong>Earn.</strong> Hit a 7-day streak and every workout pays 50% more. That&rsquo;s the only bonus. You can do the math in your head.</p>
+      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;"><strong>Redeem.</strong> 600 coins, three verified workouts, gets you a discount code at NOBULL, Momentous, Thorne, or Trifecta.</p>
       <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">The hook: consistency pays off. Literally. Day 1 of your streak starts the moment you log a workout.</p>`,
     ctaLabel: 'Start Your Streak',
     ctaHref: APP_URL,
@@ -97,12 +96,11 @@ const dripSchedule = [
     subject: 'The rewards are already live (and growing)',
     headline: 'What you can actually earn.',
     body: `<p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;"><strong>Live in the catalog right now:</strong></p>
-      <p style="margin:0 0 12px 0;font-size:15px;line-height:1.6;color:#3A3530;"><strong>NOBULL</strong> &middot; training shoes and apparel built for serious work.<br/>
-      <strong>Thorne</strong> &middot; supplements backed by their research.<br/>
-      <strong>Momentous</strong> &middot; athlete-grade protein and recovery.<br/>
-      <strong>Kane</strong> &middot; recovery footwear for the days you don&rsquo;t train.<br/>
-      <strong>Amazon</strong> &middot; for everything else you need.</p>
-      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">More brands rolling in monthly. Vuori and AG1 are next in the pipeline.</p>
+      <p style="margin:0 0 12px 0;font-size:15px;line-height:1.6;color:#3A3530;"><strong>NOBULL</strong> &middot; 30% off training shoes and apparel.<br/>
+      <strong>Momentous</strong> &middot; up to 35% off your first subscription, 14% off one-time.<br/>
+      <strong>Thorne</strong> &middot; 15% off your entire order.<br/>
+      <strong>Trifecta</strong> &middot; 50% off your first meal order, 10% off after.</p>
+      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">Every one of these is 600 coins or less. Three verified workouts and you&rsquo;re there.</p>
       <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">We&rsquo;re picky about partners &mdash; only brands we&rsquo;d actually use. If there&rsquo;s a brand you want to see, hit reply and tell me.</p>`,
     ctaLabel: 'View Rewards Catalog',
     ctaHref: APP_URL + '/rewards',
@@ -113,7 +111,7 @@ const dripSchedule = [
     subject: 'Early members are already stacking points',
     headline: 'See where you rank.',
     body: `<p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">This is the part where I tell you something&rsquo;s working.</p>
-      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">People who signed up early are building real streaks &mdash; some past 20 days. Bronze tier members are grinding. We&rsquo;re seeing serious consistency.</p>
+      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">Early members are building real streaks and the leaderboard is starting to fill in.</p>
       <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">Real talk: working out is harder when no one&rsquo;s watching. But when other members are logging workouts and climbing the leaderboard, it changes things. You start showing up.</p>
       <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">The leaderboard&rsquo;s in the app. Bronze, Silver, Gold tiers. Space at the top isn&rsquo;t unlimited.</p>`,
     ctaLabel: 'Check Your Rank',
@@ -128,8 +126,7 @@ const dripSchedule = [
       <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">12 days in, and I wanted to say this directly.</p>
       <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">I built COUNT because I was tired of the exchange being one-way. Years of grinding in the gym, spending money on supplements and gear, and the apps on my phone just tracked me. No one was paying me back.</p>
       <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">So I built something where they do.</p>
-      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">If you&rsquo;ve got feedback &mdash; brands you want, features you need, anything &mdash; reply to this email. I read every one.</p>
-      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">P.S. Hit a 30-day streak and I&rsquo;m sending you something. Just saying.</p>`,
+      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">If you&rsquo;ve got feedback &mdash; brands you want, features you need, anything &mdash; reply to this email. I read every one.</p>`,
     ctaLabel: 'Tell Me What You Want',
     ctaHref: 'mailto:joe@countfitness.app?subject=COUNT%20feedback',
   },
