@@ -13,7 +13,24 @@ const MUTED = 'rgba(245,240,234,0.45)'
 const COPPER = '#B5593C'
 const GREEN = '#16a34a'
 
-type Tab = 'signups' | 'activity' | 'redemptions'
+type Tab = 'signups' | 'activity' | 'redemptions' | 'pilot'
+
+interface GymMember {
+  id: string; name: string; email: string; tier: string
+  lifetime_sessions: number; points_balance: number
+  connected: boolean; active_this_week: boolean; created_at: string
+}
+interface GymPilotData {
+  id: string; name: string; slug: string
+  total_members: number; connected_members: number; weekly_active: number; total_redemptions: number
+  members: GymMember[]
+  survey: {
+    responses: number
+    brand_counts: Record<string, number>
+    other_brands: string[]
+    local_shops: string[]
+  }
+}
 
 interface User {
   id: string; name: string; email: string; created_at: string
@@ -46,6 +63,8 @@ export default function AdminPage() {
   const [users, setUsers] = useState<User[]>([])
   const [workouts, setWorkouts] = useState<Workout[]>([])
   const [redemptions, setRedemptions] = useState<Redemption[]>([])
+  const [gyms, setGyms] = useState<GymPilotData[]>([])
+  const [expandedGym, setExpandedGym] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -56,10 +75,12 @@ export default function AdminPage() {
       fetch('/api/admin/users').then(r => r.json()),
       fetch('/api/admin/workouts').then(r => r.json()),
       fetch('/api/admin/redemptions').then(r => r.json()),
-    ]).then(([u, w, r]) => {
+      fetch('/api/admin/gyms').then(r => r.json()),
+    ]).then(([u, w, r, g]) => {
       if (Array.isArray(u)) setUsers(u)
       if (Array.isArray(w)) setWorkouts(w)
       if (Array.isArray(r)) setRedemptions(r)
+      if (Array.isArray(g)) setGyms(g)
     }).catch(() => setError('Failed to load data')).finally(() => setLoading(false))
   }, [user])
 
@@ -104,10 +125,11 @@ export default function AdminPage() {
           <Stat label="Pending Rewards" value={pendingCount} />
         </div>
 
-        <div style={{ display: 'flex', gap: 4, marginBottom: 20, background: CARD, padding: 4, borderRadius: 10, border: `1px solid ${BORDER}`, width: 'fit-content' }}>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 20, background: CARD, padding: 4, borderRadius: 10, border: `1px solid ${BORDER}`, width: 'fit-content', flexWrap: 'wrap' }}>
           {tabBtn('signups', `Sign Ups (${users.length})`)}
           {tabBtn('activity', `Activity (${workouts.length})`)}
           {tabBtn('redemptions', pendingCount > 0 ? `Redemptions (${pendingCount} new)` : `Redemptions (${redemptions.length})`)}
+          {tabBtn('pilot', `Gym Pilot (${gyms.length})`)}
         </div>
 
         {error && <p style={{ color: COPPER, fontSize: 14, marginBottom: 16 }}>{error}</p>}
@@ -208,6 +230,132 @@ export default function AdminPage() {
                       Buy &amp; Send →
                     </a>
                   </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* GYM PILOT */}
+        {!loading && tab === 'pilot' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {gyms.length === 0 && <p style={{ color: MUTED }}>No gyms yet. Run the migration to create the pilot gym.</p>}
+
+            {/* Pilot targets legend */}
+            {gyms.length > 0 && (
+              <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: '12px 16px', display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+                <span style={{ color: MUTED, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>Targets →</span>
+                {[['50+ connected', '50'], ['25+ weekly active', '25'], ['10+ redemptions', '10']].map(([lbl]) => (
+                  <span key={lbl} style={{ color: MUTED, fontSize: 12 }}>{lbl}</span>
+                ))}
+              </div>
+            )}
+
+            {gyms.map(gym => {
+              const expanded = expandedGym === gym.id
+              const metrics: Array<{ label: string; value: number; target: number }> = [
+                { label: 'Connected', value: gym.connected_members, target: 50 },
+                { label: 'Weekly Active', value: gym.weekly_active, target: 25 },
+                { label: 'Redemptions', value: gym.total_redemptions, target: 10 },
+              ]
+              const brandEntries = Object.entries(gym.survey.brand_counts).sort((a, b) => b[1] - a[1])
+
+              return (
+                <div key={gym.id} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: 'hidden' }}>
+                  {/* Gym header */}
+                  <div style={{ padding: '16px 18px', borderBottom: `1px solid ${BORDER}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                      <span style={{ color: TEXT, fontWeight: 700, fontSize: 16 }}>{gym.name}</span>
+                      <span style={{ color: MUTED, fontSize: 11, fontFamily: 'monospace' }}>/{gym.slug}</span>
+                    </div>
+                    <div style={{ color: MUTED, fontSize: 12 }}>{gym.total_members} member{gym.total_members !== 1 ? 's' : ''} total</div>
+                  </div>
+
+                  {/* Scorecard */}
+                  <div style={{ padding: '14px 18px', display: 'flex', gap: 12, flexWrap: 'wrap', borderBottom: `1px solid ${BORDER}` }}>
+                    {metrics.map(({ label, value, target }) => {
+                      const pct = Math.min(100, Math.round((value / target) * 100))
+                      const hit = value >= target
+                      return (
+                        <div key={label} style={{ flex: 1, minWidth: 100 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
+                            <span style={{ color: MUTED, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8 }}>{label}</span>
+                            <span style={{ color: hit ? GREEN : TEXT, fontWeight: 800, fontSize: 20 }}>{value}</span>
+                          </div>
+                          <div style={{ height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${pct}%`, background: hit ? GREEN : COPPER, borderRadius: 2, transition: 'width 0.4s' }} />
+                          </div>
+                          <div style={{ color: MUTED, fontSize: 10, marginTop: 3 }}>of {target}</div>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {/* Brand survey summary */}
+                  {gym.survey.responses > 0 && (
+                    <div style={{ padding: '14px 18px', borderBottom: `1px solid ${BORDER}` }}>
+                      <div style={{ color: MUTED, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>
+                        Brand survey · {gym.survey.responses} response{gym.survey.responses !== 1 ? 's' : ''}
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: brandEntries.length > 0 ? 10 : 0 }}>
+                        {brandEntries.map(([brand, count]) => (
+                          <div key={brand} style={{ background: 'rgba(181,89,60,0.10)', border: `1px solid rgba(181,89,60,0.25)`, borderRadius: 20, padding: '5px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ color: COPPER, fontSize: 12, fontWeight: 700 }}>{brand}</span>
+                            <span style={{ color: MUTED, fontSize: 11 }}>{count}</span>
+                          </div>
+                        ))}
+                      </div>
+                      {gym.survey.other_brands.length > 0 && (
+                        <div style={{ marginTop: 6 }}>
+                          <span style={{ color: MUTED, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8 }}>Other: </span>
+                          <span style={{ color: TEXT, fontSize: 12 }}>{gym.survey.other_brands.join(', ')}</span>
+                        </div>
+                      )}
+                      {gym.survey.local_shops.length > 0 && (
+                        <div style={{ marginTop: 4 }}>
+                          <span style={{ color: MUTED, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8 }}>Local shops: </span>
+                          <span style={{ color: TEXT, fontSize: 12 }}>{gym.survey.local_shops.join(', ')}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Member list toggle */}
+                  <button
+                    onClick={() => setExpandedGym(expanded ? null : gym.id)}
+                    style={{ width: '100%', padding: '12px 18px', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', color: COPPER, fontSize: 13, fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                  >
+                    <span>{expanded ? 'Hide' : 'Show'} members ({gym.members.length})</span>
+                    <span style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', display: 'inline-block' }}>▾</span>
+                  </button>
+
+                  {expanded && (
+                    <div style={{ borderTop: `1px solid ${BORDER}` }}>
+                      {gym.members.length === 0 && (
+                        <p style={{ color: MUTED, padding: '12px 18px', fontSize: 13 }}>No members yet.</p>
+                      )}
+                      {gym.members.map((m, i) => (
+                        <div key={m.id} style={{ padding: '10px 18px', borderTop: i > 0 ? `1px solid ${BORDER}` : 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                          <div style={{ flex: 1, minWidth: 160 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                              <span style={{ color: TEXT, fontWeight: 600, fontSize: 14 }}>{m.name || 'Unnamed'}</span>
+                              {m.connected && <span style={{ background: 'rgba(22,163,74,0.14)', color: GREEN, borderRadius: 4, padding: '1px 6px', fontSize: 10, fontWeight: 700 }}>CONNECTED</span>}
+                              {m.active_this_week && <span style={{ background: 'rgba(181,89,60,0.14)', color: COPPER, borderRadius: 4, padding: '1px 6px', fontSize: 10, fontWeight: 700 }}>ACTIVE</span>}
+                            </div>
+                            <div style={{ color: MUTED, fontSize: 12 }}>{m.email}</div>
+                          </div>
+                          <div style={{ display: 'flex', gap: 16 }}>
+                            {[['sessions', m.lifetime_sessions], ['pts', m.points_balance.toLocaleString()], ['tier', m.tier]].map(([lbl, val]) => (
+                              <div key={String(lbl)} style={{ textAlign: 'right' }}>
+                                <div style={{ color: TEXT, fontWeight: 700, fontSize: 14 }}>{val}</div>
+                                <div style={{ color: MUTED, fontSize: 10 }}>{lbl}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )
             })}

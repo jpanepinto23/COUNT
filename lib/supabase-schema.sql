@@ -176,3 +176,64 @@ CREATE POLICY "Service role can insert referrals" ON public.referrals
 
 CREATE POLICY "Service role can update referrals" ON public.referrals
   FOR UPDATE USING (true);
+
+
+-- ============================================================
+-- GYM PILOT (migration 2 — run after referrals migration)
+-- ============================================================
+
+-- Gyms table: one row per gym partner
+CREATE TABLE IF NOT EXISTS public.gyms (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  logo_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.gyms ENABLE ROW LEVEL SECURITY;
+-- Gyms are public read (join page needs them without auth)
+CREATE POLICY "Gyms are public read" ON public.gyms FOR SELECT USING (true);
+-- New tables post-Oct 30 need explicit Data API grants
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT SELECT ON TABLE public.gyms TO anon, authenticated;
+GRANT INSERT, UPDATE, DELETE ON TABLE public.gyms TO authenticated;
+
+-- Link users to a gym
+ALTER TABLE public.users
+  ADD COLUMN IF NOT EXISTS gym_id UUID REFERENCES public.gyms(id);
+
+-- Seed the pilot gym — rename `name` here when you know the gym's real name
+INSERT INTO public.gyms (name, slug)
+VALUES ('Pilot Gym', 'pilot-gym')
+ON CONFLICT (slug) DO NOTHING;
+
+
+-- ============================================================
+-- BRAND SURVEY (migration 3 — run after gym migration)
+-- ============================================================
+
+-- Flags on users to control survey lifecycle
+ALTER TABLE public.users
+  ADD COLUMN IF NOT EXISTS brand_survey_shown BOOLEAN DEFAULT FALSE,
+  ADD COLUMN IF NOT EXISTS brand_survey_completed BOOLEAN DEFAULT FALSE;
+
+-- Survey responses table
+CREATE TABLE IF NOT EXISTS public.brand_survey_responses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  gym_id UUID REFERENCES public.gyms(id),
+  selected_brands TEXT[] NOT NULL DEFAULT '{}',
+  other_brands TEXT,
+  local_shops TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.brand_survey_responses ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users own survey responses" ON public.brand_survey_responses
+  FOR ALL USING (auth.uid() = user_id);
+-- Service role needs to insert on behalf of the user (via API route)
+CREATE POLICY "Service role insert survey" ON public.brand_survey_responses
+  FOR INSERT WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.brand_survey_responses TO authenticated;
+GRANT INSERT ON TABLE public.brand_survey_responses TO anon;

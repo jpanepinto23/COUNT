@@ -1,10 +1,6 @@
+export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
 
 const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL
 const RESEND_API_KEY = process.env.RESEND_API_KEY
@@ -163,6 +159,10 @@ async function sendDripStage(email: string, stage: typeof dripSchedule[number]) 
 }
 
 export async function POST(req: NextRequest) {
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
   try {
     const { email } = await req.json()
 

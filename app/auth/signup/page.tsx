@@ -20,6 +20,7 @@ function SignupContent() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [gymSlug, setGymSlug] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [goingToStrava, setGoingToStrava] = useState(false)
@@ -45,6 +46,11 @@ function SignupContent() {
         if (data && data[0]) setFirstReward(data[0])
       })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const gym = searchParams.get('gym')
+    if (gym) setGymSlug(gym)
+  }, [searchParams])
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
@@ -74,6 +80,18 @@ function SignupContent() {
       return
     }
 
+    // Tag user to their gym if they arrived via a join link
+    if (gymSlug) {
+      const { data: gym } = await supabase
+        .from('gyms')
+        .select('id')
+        .eq('slug', gymSlug)
+        .single()
+      if (gym) {
+        await supabase.from('users').update({ gym_id: gym.id }).eq('id', data.user.id)
+      }
+    }
+
     router.replace('/connect')
   }
 
@@ -91,6 +109,12 @@ function SignupContent() {
       <div style={{ marginBottom: 36 }}>
         <TallyLogo />
       </div>
+      {gymSlug && (
+        <div style={{ marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(181,89,60,0.10)', border: '1px solid rgba(181,89,60,0.25)', borderRadius: 20, padding: '5px 14px' }}>
+          <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#B5593C' }} />
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#B5593C', letterSpacing: 0.5, fontFamily: 'Archivo, sans-serif' }}>Joining via gym link</span>
+        </div>
+      )}
 
       <div style={{ width: '100%', maxWidth: 380 }}>
         <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#F5F0EA' }}>Get paid for your workouts</h1>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
-import { getTierLabel } from '@/lib/points'
+import { getTierLabel, type Tier } from '@/lib/points'
 import Icon from '@/components/Icon'
 import type { LeaderboardEntry } from '@/lib/types'
 
@@ -13,10 +13,23 @@ const TIER_COLORS: Record<string, string> = {
 
 const CROWN_ICONS = ['Trophy', 'Medal', 'Medal']
 
+interface GymEntry {
+  user_id: string
+  name: string
+  tier: string
+  current_streak: number
+  points_earned_this_month: number
+  rank: number
+}
+
 export default function LeaderboardPage() {
   const { user } = useAuth()
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [tab, setTab] = useState<'global' | 'gym'>('global')
+  const [gymName, setGymName] = useState<string | null>(null)
+  const [gymEntries, setGymEntries] = useState<GymEntry[]>([])
+  const [gymLoading, setGymLoading] = useState(false)
   const supabase = createClient()
 
   const currentMonth = new Date().toISOString().slice(0, 7)
@@ -33,8 +46,6 @@ export default function LeaderboardPage() {
         .order('points_earned_this_month', { ascending: false })
         .limit(50)
       if (data) {
-        // Display fields come from the public_profiles view — the users table
-        // itself is no longer publicly readable (it holds emails).
         const ids = data.map((row: any) => row.user_id)
         const { data: profiles } = ids.length
           ? await supabase.from('public_profiles').select('id, name, current_streak, tier').in('id', ids)
@@ -56,9 +67,63 @@ export default function LeaderboardPage() {
     load()
   }, []) // eslint-disable-line
 
+  // Load gym name and gym leaderboard when user has a gym
+  useEffect(() => {
+    if (!user?.gym_id) return
+    async function loadGym() {
+      const { data: gym } = await supabase.from('gyms').select('name').eq('id', user!.gym_id!).single()
+      if (gym) setGymName(gym.name)
+    }
+    loadGym()
+  }, [user?.gym_id]) // eslint-disable-line
+
+  useEffect(() => {
+    if (tab !== 'gym' || !user?.gym_id) return
+    async function loadGymLeaderboard() {
+      setGymLoading(true)
+      // Get all user IDs in this gym
+      const { data: gymMembers } = await supabase
+        .from('users')
+        .select('id')
+        .eq('gym_id', user!.gym_id!)
+      const memberIds = (gymMembers ?? []).map((m: any) => m.id)
+      if (!memberIds.length) { setGymLoading(false); return }
+
+      // Get their leaderboard entries for the current month
+      const { data: lb } = await supabase
+        .from('leaderboard')
+        .select('user_id, points_earned_this_month')
+        .eq('month', currentMonth)
+        .in('user_id', memberIds)
+        .order('points_earned_this_month', { ascending: false })
+      const { data: profiles } = await supabase
+        .from('public_profiles')
+        .select('id, name, current_streak, tier')
+        .in('id', memberIds)
+      const byId = new Map((profiles ?? []).map((p: any) => [p.id, p]))
+      const enriched: GymEntry[] = (lb ?? []).map((row: any, i: number) => ({
+        user_id: row.user_id,
+        name: byId.get(row.user_id)?.name ?? 'Member',
+        tier: byId.get(row.user_id)?.tier ?? 'bronze',
+        current_streak: byId.get(row.user_id)?.current_streak ?? 0,
+        points_earned_this_month: row.points_earned_this_month,
+        rank: i + 1,
+      }))
+      setGymEntries(enriched)
+      setGymLoading(false)
+    }
+    loadGymLeaderboard()
+  }, [tab, user?.gym_id]) // eslint-disable-line
+
   const userEntry = entries.find(e => e.user_id === user?.id)
   const podium = entries.slice(0, 3)
   const rest = entries.slice(3)
+
+  const activeEntries = tab === 'gym' ? gymEntries : entries
+  const activeLoading = tab === 'gym' ? gymLoading : loading
+  const activeUserEntry = activeEntries.find(e => e.user_id === user?.id)
+  const activePodium = activeEntries.slice(0, 3)
+  const activeRest = activeEntries.slice(3)
 
   return (
     <div style={{ background: '#0E0E0D', minHeight: '100dvh', paddingBottom: 100 }}>
@@ -69,40 +134,62 @@ export default function LeaderboardPage() {
           <h1 style={{ fontSize: 24, fontWeight: 900, letterSpacing: -0.5, fontFamily: 'Archivo, sans-serif', color: '#F5F0EA' }}>{monthLabel}</h1>
           <p style={{ fontSize: 11, color: '#8A8478' }}>Resets {resetDate}</p>
         </div>
+        {/* Gym tab toggle — only shown to gym members */}
+        {user?.gym_id && gymName && (
+          <div style={{ display: 'flex', gap: 6, marginTop: 12, marginBottom: 4 }}>
+            {(['global', 'gym'] as const).map(t => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                style={{
+                  padding: '7px 16px', borderRadius: 20, border: 'none', cursor: 'pointer',
+                  fontFamily: 'Archivo, sans-serif', fontSize: 12, fontWeight: 700,
+                  background: tab === t ? '#B5593C' : 'rgba(255,255,255,0.06)',
+                  color: tab === t ? '#F5F0EA' : '#8A8478',
+                  transition: 'background 0.15s',
+                }}
+              >
+                {t === 'global' ? 'Global' : gymName}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Your position pill */}
-      {userEntry && (
+      {activeUserEntry && (
         <div style={{ margin: '12px 16px', background: 'rgba(181,89,60,0.15)', border: '1px solid rgba(181,89,60,0.35)', borderRadius: 14, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <p style={{ color: '#8A8478', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>Your Rank</p>
-            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 26, fontWeight: 900, color: '#F5F0EA', lineHeight: 1 }}>#{userEntry.rank}</p>
+            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 26, fontWeight: 900, color: '#F5F0EA', lineHeight: 1 }}>#{activeUserEntry.rank}</p>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 20, fontWeight: 900, color: '#B5593C' }}>{userEntry.points_earned_this_month.toLocaleString()}</p>
+            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 20, fontWeight: 900, color: '#B5593C' }}>{activeUserEntry.points_earned_this_month.toLocaleString()}</p>
             <p style={{ color: '#8A8478', fontSize: 11 }}>pts this month</p>
           </div>
         </div>
       )}
 
-      {loading ? (
+      {activeLoading ? (
         <div style={{ textAlign: 'center', padding: 60, color: '#8A8478' }}>Loading...</div>
-      ) : entries.length === 0 ? (
+      ) : activeEntries.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 24px' }}>
           <div style={{ fontSize: 48, marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
             <Icon emoji="Trophy" size={48} />
           </div>
           <p style={{ fontWeight: 800, color: '#F5F0EA', marginBottom: 6 }}>No entries yet</p>
-          <p style={{ color: '#8A8478', fontSize: 14 }}>Be the first to log a session this month!</p>
+          <p style={{ color: '#8A8478', fontSize: 14 }}>
+            {tab === 'gym' ? 'No gym members have logged sessions this month yet.' : 'Be the first to log a session this month!'}
+          </p>
         </div>
       ) : (
         <>
           {/* Stepping Podium */}
-          {podium.length > 0 && (
+          {activePodium.length > 0 && (
             <div style={{ padding: '20px 16px 0' }}>
               <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 16 }}>Top 3</p>
               <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
-                {(podium.length >= 3 ? [podium[1], podium[0], podium[2]] : podium).map((e) => {
+                {(activePodium.length >= 3 ? [activePodium[1], activePodium[0], activePodium[2]] : activePodium).map((e) => {
                   const isFirst = e.rank === 1
                   const isUser = e.user_id === user?.id
                   const tc = TIER_COLORS[e.tier] ?? '#B5593C'
@@ -133,7 +220,7 @@ export default function LeaderboardPage() {
                         </p>
                         <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>pts</p>
                         <div style={{ marginTop: 4 }}>
-                          <span style={{ fontSize: 9, color: tc, fontWeight: 800 }}>{getTierLabel(e.tier)}</span>
+                          <span style={{ fontSize: 9, color: tc, fontWeight: 800 }}>{getTierLabel(e.tier as Tier)}</span>
                         </div>
                       </div>
                       <div style={{ width: '100%', height: barH, background: isFirst ? 'rgba(181,89,60,0.2)' : 'rgba(255,255,255,0.04)', borderRadius: '0 0 8px 8px', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: 10 }}>
@@ -149,11 +236,11 @@ export default function LeaderboardPage() {
           )}
 
           {/* Rest of list */}
-          {rest.length > 0 && (
+          {activeRest.length > 0 && (
             <div style={{ margin: '16px 16px 0' }}>
               <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 10 }}>Rankings</p>
               <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.07)' }}>
-                {rest.map((e, i) => {
+                {activeRest.map((e, i) => {
                   const isUser = e.user_id === user?.id
                   const tc = TIER_COLORS[e.tier] ?? '#B5593C'
                   return (
@@ -169,7 +256,7 @@ export default function LeaderboardPage() {
                           {isUser ? 'You' : e.name.split(' ')[0] + ' ' + (e.name.split(' ')[1]?.[0] ?? '') + '.'}
                         </p>
                         <p style={{ fontSize: 11, color: '#8A8478', display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <Icon emoji="Flame" size={12} /> {e.current_streak} · {getTierLabel(e.tier)}
+                          <Icon emoji="Flame" size={12} /> {e.current_streak} · {getTierLabel(e.tier as Tier)}
                         </p>
                       </div>
                       <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14, fontWeight: 900, color: isUser ? '#B5593C' : '#F5F0EA' }}>

@@ -1,10 +1,7 @@
+export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
 
 // New #feedback channel webhook if set, otherwise falls back to the #signups one
 const SLACK_WEBHOOK_URL = process.env.SLACK_FEEDBACK_WEBHOOK_URL ?? process.env.SLACK_WEBHOOK_URL
@@ -58,6 +55,10 @@ function clamp(v: unknown, max = 4000): string | null {
 }
 
 export async function POST(req: NextRequest) {
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
   try {
     const body = await req.json().catch(() => ({}))
 

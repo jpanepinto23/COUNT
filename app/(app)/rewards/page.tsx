@@ -783,8 +783,8 @@ function UnlockSheet({
           </div>
           {!canUnlock && !reward.coming_soon && (
             <div style={{ marginTop: 10, fontFamily: 'var(--sans)', fontSize: 12, color: TOK.muted, lineHeight: 1.5 }}>
-              <span style={{ color: accent, fontFamily: 'var(--mono)', fontWeight: 600 }}>{needed.toLocaleString()} coins</span> to unlock. Roughly{' '}
-              <span style={{ color: TOK.fg }}>{Math.ceil(needed / (60 * 1.2))} workouts</span> at your current pace.
+              <span style={{ color: accent, fontFamily: 'var(--mono)', fontWeight: 600 }}>{needed.toLocaleString()} coins</span> to unlock — roughly{' '}
+              <span style={{ color: TOK.fg }}>{Math.ceil(needed / 250)} synced session{Math.ceil(needed / 250) !== 1 ? 's' : ''}</span> away.
             </div>
           )}
         </div>
@@ -1203,7 +1203,7 @@ export default function RewardsPage() {
           count · earn more by training
         </div>
         <div style={{ fontFamily: 'var(--sans)', fontSize: 11, color: TOK.muted, marginTop: 6, lineHeight: 1.5, maxWidth: 260, margin: '6px auto 0' }}>
-          Each workout earns <span style={{ color: TOK.fg }}>200</span> base coins, multiplied by your tier and streak (up to 6×).
+          Sync Garmin or Strava: <span style={{ color: TOK.fg }}>250</span> coins per session. Manual logs: <span style={{ color: TOK.fg }}>200</span>. All multiplied by your tier and streak (up to 6×).
         </div>
       </div>
 

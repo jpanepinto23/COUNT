@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { calculatePoints, getTier, getTierLabel } from '@/lib/points'
 import type { WorkoutType } from '@/lib/types'
+import BrandSurveyCard from '@/components/BrandSurveyCard'
 
 // ===== Design tokens (per Claude Design handoff) =====
 const TOK = {
@@ -262,6 +263,7 @@ export default function LogPage() {
   const [newSessionCount, setNewSessionCount] = useState(0)
   const [sharedStreak, setSharedStreak] = useState(0)
   const [shareCopied, setShareCopied] = useState(false)
+  const [showSurvey, setShowSurvey] = useState(false)
 
   if (!user) return null
 
@@ -327,6 +329,7 @@ export default function LogPage() {
     setNewSessionCount(data.newSessions)
     setSharedStreak(data.newStreak)
     setVerificationSource(data.verified ? data.verificationMethod : null)
+    if (data.verified && !user.brand_survey_shown) setShowSurvey(true)
     await refreshUser()
     return { ok: true }
   }
@@ -757,6 +760,13 @@ export default function LogPage() {
             )}
           </div>
         </div>
+
+        {/* Brand survey — shown once after first verified session */}
+        {showSurvey && (
+          <div style={{ padding: '14px 16px 0' }}>
+            <BrandSurveyCard onDismiss={() => setShowSurvey(false)} />
+          </div>
+        )}
 
         {/* Share card */}
         <div style={{ padding: '14px 16px 0' }}>

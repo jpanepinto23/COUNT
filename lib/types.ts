@@ -42,6 +42,17 @@ export interface User {
   referral_bonus_claimed?: boolean
   referral_count?: number
   avatar_url?: string
+  gym_id?: string | null
+  brand_survey_shown?: boolean
+  brand_survey_completed?: boolean
+}
+
+export interface Gym {
+  id: string
+  name: string
+  slug: string
+  logo_url?: string | null
+  created_at?: string
 }
 
 export interface Workout {
