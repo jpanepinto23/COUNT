@@ -93,9 +93,10 @@ export async function GET(request: NextRequest) {
       { user_id: user.id, type: 'strava', status: 'active' },
       { onConflict: 'user_id,type' }
     )
-    if (cookieGym) {
-      const { data: gym } = await supabase.from('gyms').select('id').eq('slug', cookieGym).maybeSingle()
-      if (gym) await supabase.from('users').update({ gym_id: gym.id }).eq('id', user.id)
+    if (cookieGym && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      const gymAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY)
+      const { data: gym } = await gymAdmin.from('gyms').select('id').eq('slug', cookieGym).maybeSingle()
+      if (gym) await gymAdmin.from('users').update({ gym_id: gym.id }).eq('id', user.id)
     }
     return finish('/profile?connect=strava&status=success')
   }

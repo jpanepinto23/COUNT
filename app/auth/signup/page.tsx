@@ -81,14 +81,11 @@ function SignupContent() {
 
     // Tag user to their gym if they arrived via a join link
     if (gymSlug) {
-      const { data: gym } = await supabase
-        .from('gyms')
-        .select('id')
-        .eq('slug', gymSlug)
-        .single()
-      if (gym) {
-        await supabase.from('users').update({ gym_id: gym.id }).eq('id', data.user.id)
-      }
+      await fetch('/api/gym/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: gymSlug }),
+      }).catch(() => null)
     }
 
     router.replace('/connect')

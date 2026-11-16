@@ -75,16 +75,22 @@ export default function JoinPage() {
     )
   }
 
+  const signupUrl = `/auth/signup?gym=${encodeURIComponent(gym.slug)}`
+
   // Existing members who are already signed in join the gym on their current account.
   async function joinWithCurrentAccount(e: React.MouseEvent) {
     if (!userId || !gym) return
     e.preventDefault()
     setJoining(true)
-    await createClient().from('users').update({ gym_id: gym.id }).eq('id', userId)
-    router.push('/leaderboard')
+    const res = await fetch('/api/gym/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug: gym.slug }),
+    }).catch(() => null)
+    if (res?.ok) router.push('/leaderboard')
+    else router.push(signupUrl)
   }
 
-  const signupUrl = `/auth/signup?gym=${encodeURIComponent(gym.slug)}`
 
   return (
     <div style={{ minHeight: '100dvh', background: BG, display: 'flex', flexDirection: 'column', fontFamily: 'Archivo, sans-serif' }}>
