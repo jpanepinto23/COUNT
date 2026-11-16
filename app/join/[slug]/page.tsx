@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 
@@ -34,7 +34,8 @@ function TallyLogo() {
   )
 }
 
-export default function JoinPage({ params }: { params: { slug: string } }) {
+export default function JoinPage() {
+  const params = useParams<{ slug: string }>()
   const [gym, setGym] = useState<Gym | null>(null)
   const [notFound, setNotFound] = useState(false)
   const router = useRouter()
