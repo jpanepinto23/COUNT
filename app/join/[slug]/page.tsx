@@ -38,10 +38,13 @@ export default function JoinPage() {
   const params = useParams<{ slug: string }>()
   const [gym, setGym] = useState<Gym | null>(null)
   const [notFound, setNotFound] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [joining, setJoining] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
     const supabase = createClient()
+    supabase.auth.getSession().then(({ data: { session } }) => setUserId(session?.user.id ?? null))
     supabase
       .from('gyms')
       .select('id, name, slug, logo_url')
@@ -70,6 +73,15 @@ export default function JoinPage() {
         <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
       </div>
     )
+  }
+
+  // Existing members who are already signed in join the gym on their current account.
+  async function joinWithCurrentAccount(e: React.MouseEvent) {
+    if (!userId || !gym) return
+    e.preventDefault()
+    setJoining(true)
+    await createClient().from('users').update({ gym_id: gym.id }).eq('id', userId)
+    router.push('/leaderboard')
   }
 
   const signupUrl = `/auth/signup?gym=${encodeURIComponent(gym.slug)}`
@@ -130,9 +142,10 @@ export default function JoinPage() {
         {/* CTA */}
         <Link
           href={signupUrl}
+          onClick={joinWithCurrentAccount}
           style={{ display: 'block', width: '100%', maxWidth: 340, textAlign: 'center', padding: '17px 24px', background: COPPER, color: TEXT, textDecoration: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800, letterSpacing: 0.3, marginBottom: 12, boxShadow: '0 4px 20px rgba(181,89,60,0.4)' }}
         >
-          Join {gym.name} on COUNT →
+          {joining ? 'Joining…' : `Join ${gym.name} on COUNT →`}
         </Link>
         <p style={{ color: '#444', fontSize: 12, textAlign: 'center' }}>No subscription. Cancel any time.</p>
       </div>

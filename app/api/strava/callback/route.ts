@@ -93,6 +93,10 @@ export async function GET(request: NextRequest) {
       { user_id: user.id, type: 'strava', status: 'active' },
       { onConflict: 'user_id,type' }
     )
+    if (cookieGym) {
+      const { data: gym } = await supabase.from('gyms').select('id').eq('slug', cookieGym).maybeSingle()
+      if (gym) await supabase.from('users').update({ gym_id: gym.id }).eq('id', user.id)
+    }
     return finish('/profile?connect=strava&status=success')
   }
 
