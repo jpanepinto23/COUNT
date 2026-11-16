@@ -178,4 +178,11 @@ export async function GET(request: NextRequest) {
     console.error('[strava/callback] generateLink failed', linkError?.message)
     return fail('failed', 'Sign-in failed')
   }
-  const { error: verifyError } = await supabase.auth.verifyOtp({ type: 'magiclin
+  const { error: verifyError } = await supabase.auth.verifyOtp({ type: 'magiclink', token_hash: tokenHash })
+  if (verifyError) {
+    console.error('[strava/callback] verifyOtp failed', verifyError.message)
+    return fail('failed', 'Sign-in failed')
+  }
+
+  return finish(isNew ? '/home?welcome=strava' : '/home')
+}

@@ -33,4 +33,12 @@ export async function GET(request: NextRequest) {
     `&state=${nonce}`
 
   const response = NextResponse.redirect(url)
-  response.cookies.set(STRAVA_STATE_COOKIE, `${nonce}.${ref}.${gym
+  response.cookies.set(STRAVA_STATE_COOKIE, `${nonce}.${ref}.${gym}`, {
+    httpOnly: true,
+    secure: appUrl.startsWith('https'),
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 600,
+  })
+  return response
+}

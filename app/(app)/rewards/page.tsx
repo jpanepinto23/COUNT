@@ -1362,3 +1362,8 @@ export default function RewardsPage() {
               Back to Shop
             </button>
           </div>
+        </div>
+      )}
+    </div>
+  )
+}

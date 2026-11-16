@@ -147,4 +147,10 @@ export default function FirstRewardProgress({ user, onUserChanged }: { user: Use
             href={unlocked ? '/rewards' : '/log'}
             style={{ display: 'block', marginTop: 14, padding: '12px', textAlign: 'center', background: unlocked ? C.copper : 'transparent', border: `1px solid ${C.copper}`, color: C.fg, borderRadius: 10, textDecoration: 'none', fontFamily: 'var(--sans)', fontSize: 13, fontWeight: 700 }}
           >
-            {unlocked ? 'Redeem it' : stravaConnected ? "Import today's workout
+            {unlocked ? 'Redeem it' : stravaConnected ? "Import today's workout from Strava" : 'Log a workout'}
+          </Link>
+        )}
+      </div>
+    </div>
+  )
+}

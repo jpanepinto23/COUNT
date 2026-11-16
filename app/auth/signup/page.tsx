@@ -236,4 +236,10 @@ const btnStyle: React.CSSProperties = {
   padding: '15px',
   background: '#B5593C',
   color: '#F5F0EA',
-  fontFami
+  fontFamily: 'Archivo, sans-serif',
+  fontSize: 15,
+  fontWeight: 800,
+  border: 'none',
+  borderRadius: 10,
+  cursor: 'pointer',
+}

@@ -235,4 +235,7 @@ export default function LandingPage() {
           Garmin is a registered trademark of Garmin Ltd. or its subsidiaries. COUNT is an independent app and is not affiliated with or endorsed by Garmin.
         </p>
 
- 
+      </div>
+    </div>
+  )
+}
