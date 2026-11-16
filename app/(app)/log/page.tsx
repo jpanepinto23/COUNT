@@ -1239,7 +1239,7 @@ export default function LogPage() {
             }
           />
           <HowRow
-            title="Unverified earn 10%"
+            title="Manual logs earn 200"
             body="Still worth logging. Verified is always better."
             icon={
               <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

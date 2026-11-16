@@ -13,10 +13,10 @@ const LINE = '#222220'
 
 /* Live rewards. Keep in sync with the rewards table. */
 const REWARDS = [
-  { brand: 'NOBULL',    what: '30% off shoes and gear',           coins: 600,  note: '3 workouts',  logo: 'https://cdn.brandfetch.io/nobullproject.com/w/256/h/256' },
-  { brand: 'Trifecta',  what: '50% off first meal order',         coins: 500,  note: '2 workouts',  logo: 'https://cdn.brandfetch.io/trifectanutrition.com/w/256/h/256' },
-  { brand: 'Momentous', what: 'Up to 35% off your first subscription, 14% off one-time', coins: 600, note: '3 workouts', logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
-  { brand: 'Thorne',    what: '15% off supplements',              coins: 600,  note: '3 workouts',  logo: 'https://cdn.brandfetch.io/thorne.com/w/256/h/256' },
+  { brand: 'NOBULL',    what: '30% off shoes and gear',           coins: 600,  note: '2 verified workouts',  logo: 'https://cdn.brandfetch.io/nobullproject.com/w/256/h/256' },
+  { brand: 'Trifecta',  what: '50% off first meal order',         coins: 500,  note: '1 verified workout',  logo: 'https://cdn.brandfetch.io/trifectanutrition.com/w/256/h/256' },
+  { brand: 'Momentous', what: 'Up to 35% off your first subscription, 14% off one-time', coins: 600, note: '2 verified workouts', logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
+  { brand: 'Thorne',    what: '15% off supplements',              coins: 600,  note: '2 verified workouts',  logo: 'https://cdn.brandfetch.io/thorne.com/w/256/h/256' },
 ]
 
 function Tally({ size = 1 }: { size?: number }) {
@@ -126,7 +126,7 @@ export default function LandingPage() {
               Cashing in sweat equity.
             </h1>
             <p style={{ color: MUTED, fontSize: 17, lineHeight: 1.6, maxWidth: 480 }}>
-              Log a workout or sync one from Strava. Every session earns coins. Three sessions gets you 30% off at NOBULL. Every session after that stacks coins toward real discounts at Momentous, Thorne, and Trifecta. No card. No subscription. The brands pay, not you.
+              Log a workout or sync one from Strava. Every session earns coins. Two verified sessions get you 30% off at NOBULL. Every session after that stacks coins toward real discounts at Momentous, Thorne, and Trifecta. No card. No subscription. The brands pay, not you.
             </p>
           </div>
           <img src="/shots/balance.jpg" alt="COUNT balance screen showing coins earned" width={640} height={1169} style={{ flex: '0 0 auto', width: 180, height: 'auto', margin: '0 auto', boxShadow: '0 18px 50px rgba(0,0,0,0.55)', borderRadius: 22 }} />
@@ -139,7 +139,7 @@ export default function LandingPage() {
             {[
               ['1', 'Log or sync a workout', 'Tap it in, or connect Strava and it verifies itself.'],
               ['2', 'Earn coins', '500 for a verified session, 200 for a manual log. A 7-day streak adds 50%.'],
-              ['3', 'Redeem with the brands', 'Discount codes at NOBULL, Momentous, Thorne, and Trifecta after three workouts.'],
+              ['3', 'Redeem with the brands', 'Discount codes at NOBULL, Momentous, Thorne, and Trifecta after two verified workouts.'],
             ].map(([n, t, d]) => (
               <div key={n} style={{ padding: '16px', background: '#171716', border: `1px solid ${LINE}`, borderRadius: 14 }}>
                 <p style={{ fontFamily: MONO, fontSize: 12, color: COPPER, marginBottom: 8 }}>{n}</p>
@@ -185,7 +185,7 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-          <p style={{ fontFamily: MONO, fontSize: 12, color: MUTED, marginTop: 14 }}>Prices in coins. A logged workout is 200, a Strava-synced one is 250. Streaks and tiers multiply from there.</p>
+          <p style={{ fontFamily: MONO, fontSize: 12, color: MUTED, marginTop: 14 }}>Prices in coins. A verified workout is 500, a manual log is 200. A 7-day streak adds 50%.</p>
         </div>
 
         {/* Reviews */}
@@ -235,7 +235,4 @@ export default function LandingPage() {
           Garmin is a registered trademark of Garmin Ltd. or its subsidiaries. COUNT is an independent app and is not affiliated with or endorsed by Garmin.
         </p>
 
-      </div>
-    </div>
-  )
-}
+ 

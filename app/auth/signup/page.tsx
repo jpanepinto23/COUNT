@@ -4,9 +4,8 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
+import { VERIFIED_POINTS } from '@/lib/points'
 
-// Base 200 + 50 verified bonus (lib/points.ts), before tier and streak.
-const VERIFIED_WORKOUT_COINS = 250
 
 const STRAVA_ERRORS: Record<string, string> = {
   denied: 'Strava was not connected. Try again, or sign up with email below.',
@@ -96,9 +95,13 @@ function SignupContent() {
   }
 
   const cleanRef = refCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '')
-  const stravaHref = '/api/strava/start' + (cleanRef ? `?ref=${cleanRef}` : '')
+  const stravaParams = new URLSearchParams()
+  if (cleanRef) stravaParams.set('ref', cleanRef)
+  if (gymSlug) stravaParams.set('gym', gymSlug)
+  const stravaQuery = stravaParams.toString()
+  const stravaHref = '/api/strava/start' + (stravaQuery ? `?${stravaQuery}` : '')
   const cost = firstReward?.point_cost ?? 600
-  const workoutsNeeded = Math.max(1, Math.ceil(cost / VERIFIED_WORKOUT_COINS))
+  const workoutsNeeded = Math.max(1, Math.ceil(cost / VERIFIED_POINTS))
   const steps = [
     'Connect Strava',
     ...Array.from({ length: workoutsNeeded }, (_, i) => `Workout ${i + 1}`),
@@ -233,10 +236,4 @@ const btnStyle: React.CSSProperties = {
   padding: '15px',
   background: '#B5593C',
   color: '#F5F0EA',
-  fontFamily: 'Archivo, sans-serif',
-  fontSize: 15,
-  fontWeight: 800,
-  border: 'none',
-  borderRadius: 10,
-  cursor: 'pointer',
-}
+  fontFami

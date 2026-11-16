@@ -110,15 +110,15 @@ export default function JoinPage() {
           should <span style={{ color: COPPER }}>pay you back.</span>
         </h1>
         <p style={{ color: MUTED, fontSize: 15, lineHeight: 1.65, textAlign: 'center', maxWidth: 300, marginBottom: 36 }}>
-          Connect Garmin or Strava, earn 250 coins per session, and redeem discounts on protein, pre-workout, and gear — completely free.
+          Connect Garmin or Strava, earn 500 coins per verified workout, and redeem discounts on protein, pre-workout, and gear — completely free.
         </p>
 
         {/* Stats row */}
         <div style={{ display: 'flex', gap: 0, width: '100%', maxWidth: 340, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: 'hidden', marginBottom: 28 }}>
           {[
             { num: '$0',   label: 'to join' },
-            { num: '250',  label: 'coins/sync' },
-            { num: '6×',   label: 'max boost' },
+            { num: '500',  label: 'coins/workout' },
+            { num: '+50%', label: '7-day streak' },
           ].map(({ num, label }, i) => (
             <div key={label} style={{ flex: 1, textAlign: 'center', padding: '14px 8px', borderRight: i < 2 ? `1px solid ${BORDER}` : 'none' }}>
               <p style={{ fontSize: 20, fontWeight: 900, color: COPPER, marginBottom: 2 }}>{num}</p>

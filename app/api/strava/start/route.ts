@@ -18,6 +18,11 @@ export async function GET(request: NextRequest) {
     .replace(/[^A-Z0-9]/g, '')
     .slice(0, 8)
 
+  const gym = (new URL(request.url).searchParams.get('gym') ?? '')
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '')
+    .slice(0, 64)
+
   const nonce = randomBytes(16).toString('hex')
   const redirectUri = `${appUrl}/api/strava/callback`
   const url =
@@ -28,12 +33,4 @@ export async function GET(request: NextRequest) {
     `&state=${nonce}`
 
   const response = NextResponse.redirect(url)
-  response.cookies.set(STRAVA_STATE_COOKIE, `${nonce}.${ref}`, {
-    httpOnly: true,
-    secure: appUrl.startsWith('https'),
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 600,
-  })
-  return response
-}
+  response.cookies.set(STRAVA_STATE_COOKIE, `${nonce}.${ref}.${gym

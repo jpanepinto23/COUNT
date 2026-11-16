@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { isPlaceholderEmail } from '@/lib/strava-auth'
+import { VERIFIED_POINTS, UNVERIFIED_POINTS } from '@/lib/points'
 import type { User } from '@/lib/types'
 
 const C = {
@@ -60,7 +61,7 @@ export default function FirstRewardProgress({ user, onUserChanged }: { user: Use
   const cost = reward.point_cost
   const pct = Math.min(1, coins / cost)
   const unlocked = coins >= cost
-  const perWorkout = stravaConnected ? 250 : 200
+  const perWorkout = stravaConnected ? VERIFIED_POINTS : UNVERIFIED_POINTS
   const workoutsLeft = Math.max(1, Math.ceil((cost - coins) / perWorkout))
   const rewardName = `${reward.brand_name} ${reward.product_name}`.replace(
     new RegExp(`^${reward.brand_name} (.*${reward.brand_name})`, 'i'),
@@ -146,10 +147,4 @@ export default function FirstRewardProgress({ user, onUserChanged }: { user: Use
             href={unlocked ? '/rewards' : '/log'}
             style={{ display: 'block', marginTop: 14, padding: '12px', textAlign: 'center', background: unlocked ? C.copper : 'transparent', border: `1px solid ${C.copper}`, color: C.fg, borderRadius: 10, textDecoration: 'none', fontFamily: 'var(--sans)', fontSize: 13, fontWeight: 700 }}
           >
-            {unlocked ? 'Redeem it' : stravaConnected ? "Import today's workout from Strava" : 'Log a workout'}
-          </Link>
-        )}
-      </div>
-    </div>
-  )
-}
+            {unlocked ? 'Redeem it' : stravaConnected ? "Import today's workout

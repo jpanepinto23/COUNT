@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
   if (oauthError || !code) return fail('denied', 'Authorization denied')
 
   // Signed-out flow must come from our own /api/strava/start (state cookie).
-  const [cookieNonce, cookieRef] = (cookieStore.get(STRAVA_STATE_COOKIE)?.value ?? '').split('.')
+  const [cookieNonce, cookieRef, cookieGym] = (cookieStore.get(STRAVA_STATE_COOKIE)?.value ?? '').split('.')
   if (!user && (!state || !cookieNonce || state !== cookieNonce)) {
     return fail('state', 'Session expired')
   }
@@ -159,6 +159,10 @@ export async function GET(request: NextRequest) {
     { user_id: userId, type: 'strava', status: 'active' },
     { onConflict: 'user_id,type' }
   )
+  if (cookieGym) {
+    const { data: gym } = await admin.from('gyms').select('id').eq('slug', cookieGym).maybeSingle()
+    if (gym) await admin.from('users').update({ gym_id: gym.id }).eq('id', userId).is('gym_id', null)
+  }
   if (isNew) {
     await admin.from('funnel_events').insert({ user_id: userId, event: 'signup_strava' })
   }
@@ -174,11 +178,4 @@ export async function GET(request: NextRequest) {
     console.error('[strava/callback] generateLink failed', linkError?.message)
     return fail('failed', 'Sign-in failed')
   }
-  const { error: verifyError } = await supabase.auth.verifyOtp({ type: 'magiclink', token_hash: tokenHash })
-  if (verifyError) {
-    console.error('[strava/callback] verifyOtp failed', verifyError.message)
-    return fail('failed', 'Sign-in failed')
-  }
-
-  return finish(isNew ? '/home?welcome=strava' : '/home')
-}
+  const { error: verifyError } = await supabase.auth.verifyOtp({ type: 'magiclin

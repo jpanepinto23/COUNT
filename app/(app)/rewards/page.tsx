@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import type { Reward, RewardType } from '@/lib/types'
-import { getStreakMultiplierLabel } from '@/lib/points'
+import { getStreakMultiplierLabel, VERIFIED_POINTS } from '@/lib/points'
 
 // ===== Design tokens (per Claude Design handoff) =====
 const TOK = {
@@ -784,7 +784,7 @@ function UnlockSheet({
           {!canUnlock && !reward.coming_soon && (
             <div style={{ marginTop: 10, fontFamily: 'var(--sans)', fontSize: 12, color: TOK.muted, lineHeight: 1.5 }}>
               <span style={{ color: accent, fontFamily: 'var(--mono)', fontWeight: 600 }}>{needed.toLocaleString()} coins</span> to unlock — roughly{' '}
-              <span style={{ color: TOK.fg }}>{Math.ceil(needed / 250)} synced session{Math.ceil(needed / 250) !== 1 ? 's' : ''}</span> away.
+              <span style={{ color: TOK.fg }}>{Math.ceil(needed / VERIFIED_POINTS)} synced session{Math.ceil(needed / VERIFIED_POINTS) !== 1 ? 's' : ''}</span> away.
             </div>
           )}
         </div>
@@ -1362,8 +1362,3 @@ export default function RewardsPage() {
               Back to Shop
             </button>
           </div>
-        </div>
-      )}
-    </div>
-  )
-}
