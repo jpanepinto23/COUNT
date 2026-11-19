@@ -145,6 +145,31 @@ export default function JoinPage() {
           ))}
         </div>
 
+        {/* What your workouts earn */}
+        <div style={{ width: '100%', maxWidth: 340, marginBottom: 28 }}>
+          <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: MUTED, textTransform: 'uppercase', letterSpacing: 1.5, fontWeight: 700, marginBottom: 10, textAlign: 'center' }}>
+            What your workouts earn
+          </p>
+          <div style={{ border: `1px solid ${BORDER}`, borderRadius: 14, overflow: 'hidden' }}>
+            {[
+              { brand: 'NOBULL', offer: '30% off', coins: 600, workouts: '2 verified workouts', logo: 'https://cdn.brandfetch.io/nobullproject.com/w/256/h/256' },
+              { brand: 'Trifecta', offer: '50% off a first order', coins: 500, workouts: '1 verified workout', logo: 'https://cdn.brandfetch.io/trifectanutrition.com/w/256/h/256' },
+            ].map((r, i) => (
+              <div key={r.brand} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderTop: i === 0 ? 'none' : `1px solid ${BORDER}` }}>
+                <img src={r.logo} alt="" style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'contain', background: '#141413', flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 15, fontWeight: 800, color: TEXT }}>{r.brand}</p>
+                  <p style={{ fontSize: 13, color: MUTED }}>{r.offer}</p>
+                </div>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 700, color: COPPER }}>{r.coins} coins</p>
+                  <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: MUTED }}>{r.workouts}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* CTA */}
         <Link
           href={signupUrl}
