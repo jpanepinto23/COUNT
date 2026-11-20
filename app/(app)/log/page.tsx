@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
-import { calculatePoints, getTier, getTierLabel } from '@/lib/points'
+import { calculatePoints, getTier, getTierLabel, getReferralPoints } from '@/lib/points'
 import type { WorkoutType } from '@/lib/types'
 import BrandSurveyCard from '@/components/BrandSurveyCard'
 
@@ -949,7 +949,7 @@ export default function LogPage() {
                       Challenge a friend to match it
                     </div>
                     <div style={{ fontFamily: 'var(--sans)', fontSize: 12, color: TOK.muted, marginTop: 6 }}>
-                      You both earn <span style={{ color: '#86efac', fontWeight: 600 }}>500 bonus coins</span> when they join.
+                      You earn <span style={{ color: '#86efac', fontWeight: 600 }}>{getReferralPoints(tier)} bonus coins</span> when they join.
                     </div>
                   </>
                 ) : (

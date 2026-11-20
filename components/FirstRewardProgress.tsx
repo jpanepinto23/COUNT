@@ -78,10 +78,13 @@ export default function FirstRewardProgress({ user, onUserChanged }: { user: Use
     }
     setSaving(true)
     setEmailError('')
-    const supabase = createClient()
-    const { error } = await supabase.from('users').update({ email: value }).eq('id', user.id)
-    if (error) {
-      setEmailError(error.code === '23505' ? 'That email already has a COUNT account.' : 'Could not save. Try again.')
+    const res = await fetch('/api/user/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: value }),
+    }).catch(() => null)
+    if (!res?.ok) {
+      setEmailError(res?.status === 409 ? 'That email already has a COUNT account.' : 'Could not save. Try again.')
       setSaving(false)
       return
     }
