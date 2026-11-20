@@ -153,7 +153,7 @@ export default function JoinPage() {
           <div style={{ border: `1px solid ${BORDER}`, borderRadius: 14, overflow: 'hidden' }}>
             {[
               { brand: 'NOBULL', offer: '30% off', coins: 600, workouts: '2 verified workouts', logo: 'https://cdn.brandfetch.io/nobullproject.com/w/256/h/256' },
-              { brand: 'Trifecta', offer: '50% off a first order', coins: 500, workouts: '1 verified workout', logo: 'https://cdn.brandfetch.io/trifectanutrition.com/w/256/h/256' },
+              { brand: 'Trifecta', offer: '50% off a first order, 10% after', coins: 500, workouts: '1 verified workout', logo: 'https://cdn.brandfetch.io/trifectanutrition.com/w/256/h/256' },
             ].map((r, i) => (
               <div key={r.brand} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderTop: i === 0 ? 'none' : `1px solid ${BORDER}` }}>
                 <img src={r.logo} alt="" style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'contain', background: '#141413', flexShrink: 0 }} />
