@@ -13,7 +13,11 @@ const MUTED = 'rgba(245,240,234,0.45)'
 const COPPER = '#B5593C'
 const GREEN = '#16a34a'
 
-type Tab = 'signups' | 'activity' | 'redemptions' | 'pilot'
+type Tab = 'signups' | 'activity' | 'redemptions' | 'pilot' | 'cohorts'
+
+interface CohortRow { id: string; name: string; slug: string; kind: 'gym' | 'coach'; signups: number; first_verified: number; first_manual: number; redemptions: number }
+interface CohortData { cohorts: CohortRow[]; trains_with: Record<string, number>; apple_watch_waitlist: number }
+const TRAINS_WITH_LABELS: Record<string, string> = { garmin: 'Garmin', strava: 'Strava', apple_watch: 'Apple Watch', fitbit: 'Fitbit', manual: 'Just my phone (manual)', other: 'Other' }
 
 interface GymMember {
   id: string; name: string; email: string; tier: string
@@ -65,6 +69,7 @@ export default function AdminPage() {
   const [redemptions, setRedemptions] = useState<Redemption[]>([])
   const [gyms, setGyms] = useState<GymPilotData[]>([])
   const [expandedGym, setExpandedGym] = useState<string | null>(null)
+  const [cohortData, setCohortData] = useState<CohortData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -76,7 +81,9 @@ export default function AdminPage() {
       fetch('/api/admin/workouts').then(r => r.json()),
       fetch('/api/admin/redemptions').then(r => r.json()),
       fetch('/api/admin/gyms').then(r => r.json()),
-    ]).then(([u, w, r, g]) => {
+      fetch('/api/admin/cohorts').then(r => r.json()),
+    ]).then(([u, w, r, g, c]) => {
+      if (c && Array.isArray(c.cohorts)) setCohortData(c)
       if (Array.isArray(u)) setUsers(u)
       if (Array.isArray(w)) setWorkouts(w)
       if (Array.isArray(r)) setRedemptions(r)
@@ -130,6 +137,7 @@ export default function AdminPage() {
           {tabBtn('activity', `Activity (${workouts.length})`)}
           {tabBtn('redemptions', pendingCount > 0 ? `Redemptions (${pendingCount} new)` : `Redemptions (${redemptions.length})`)}
           {tabBtn('pilot', `Gym Pilot (${gyms.length})`)}
+          {tabBtn('cohorts', `Cohorts (${cohortData?.cohorts.length ?? 0})`)}
         </div>
 
         {error && <p style={{ color: COPPER, fontSize: 14, marginBottom: 16 }}>{error}</p>}
@@ -233,6 +241,57 @@ export default function AdminPage() {
                 </div>
               )
             })}
+          </div>
+        )}
+
+        {/* COHORTS (gyms and coaches) */}
+        {!loading && tab === 'cohorts' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {!cohortData && <p style={{ color: MUTED }}>Could not load cohorts.</p>}
+            {cohortData && (
+              <>
+                <div style={{ overflowX: 'auto', background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, color: TEXT, minWidth: 560 }}>
+                    <thead>
+                      <tr style={{ color: MUTED, textAlign: 'left' }}>
+                        {['Cohort', 'Type', 'Link', 'Signups', 'First verified', 'First manual', 'Redemptions'].map(h => (
+                          <th key={h} style={{ padding: '10px 12px', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, borderBottom: `1px solid ${BORDER}` }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cohortData.cohorts.map(c => (
+                        <tr key={c.id}>
+                          <td style={{ padding: '10px 12px', fontWeight: 700 }}>{c.name}</td>
+                          <td style={{ padding: '10px 12px', color: MUTED }}>{c.kind}</td>
+                          <td style={{ padding: '10px 12px', color: MUTED, fontFamily: 'monospace' }}>/join/{c.slug}</td>
+                          <td style={{ padding: '10px 12px' }}>{c.signups}</td>
+                          <td style={{ padding: '10px 12px' }}>{c.first_verified}</td>
+                          <td style={{ padding: '10px 12px' }}>{c.first_manual}</td>
+                          <td style={{ padding: '10px 12px' }}>{c.redemptions}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                  <div style={{ flex: '1 1 260px', background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: '14px 16px' }}>
+                    <p style={{ color: MUTED, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>What do you train with?</p>
+                    {Object.keys(TRAINS_WITH_LABELS).map(k => (
+                      <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: 13, color: TEXT }}>
+                        <span>{TRAINS_WITH_LABELS[k]}</span>
+                        <span style={{ fontFamily: 'monospace' }}>{cohortData.trains_with[k] ?? 0}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ flex: '1 1 200px', background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: '14px 16px' }}>
+                    <p style={{ color: MUTED, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Apple Watch waitlist</p>
+                    <p style={{ color: TEXT, fontSize: 28, fontWeight: 800 }}>{cohortData.apple_watch_waitlist}</p>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )}
 

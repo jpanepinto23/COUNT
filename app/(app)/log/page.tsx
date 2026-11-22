@@ -3,9 +3,10 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
-import { calculatePoints, getTier, getTierLabel, getReferralPoints } from '@/lib/points'
+import { calculatePoints, getTier, getTierLabel } from '@/lib/points'
 import type { WorkoutType } from '@/lib/types'
 import BrandSurveyCard from '@/components/BrandSurveyCard'
+import InviteFriends from '@/components/InviteFriends'
 
 // ===== Design tokens (per Claude Design handoff) =====
 const TOK = {
@@ -550,7 +551,6 @@ export default function LogPage() {
     const milestone = MILESTONES[newSessionCount]
     const wt = WORKOUT_TYPES.find((t) => t.value === workoutType)!
     const MilestoneIcon = milestone?.Icon
-    const isStreakMilestone = [3, 7, 14, 21, 30].includes(sharedStreak)
     return (
       <div
         style={{
@@ -909,74 +909,10 @@ export default function LogPage() {
           </button>
         </div>
 
-        {/* Referral nudge */}
+        {/* Invite friends */}
         {user.referral_code && (
           <div style={{ padding: '14px 16px 0' }}>
-            <Link href="/invite" style={{ textDecoration: 'none', color: 'inherit' }}>
-              <div
-                style={{
-                  background: isStreakMilestone
-                    ? 'linear-gradient(135deg, rgba(34,197,94,0.10) 0%, rgba(181,89,60,0.10) 100%)'
-                    : TOK.card,
-                  border: `1px solid ${isStreakMilestone ? 'rgba(34,197,94,0.28)' : TOK.hairline}`,
-                  borderRadius: 14,
-                  padding: '14px 16px',
-                }}
-              >
-                {isStreakMilestone ? (
-                  <>
-                    <div
-                      style={{
-                        fontFamily: 'var(--mono)',
-                        fontSize: 10,
-                        letterSpacing: '0.22em',
-                        textTransform: 'uppercase',
-                        color: '#86efac',
-                        fontWeight: 600,
-                      }}
-                    >
-                      {sharedStreak}-day streak!
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: 'var(--serif)',
-                        fontSize: 20,
-                        letterSpacing: '-0.015em',
-                        lineHeight: 1.1,
-                        marginTop: 4,
-                      }}
-                    >
-                      Challenge a friend to match it
-                    </div>
-                    <div style={{ fontFamily: 'var(--sans)', fontSize: 12, color: TOK.muted, marginTop: 6 }}>
-                      You earn <span style={{ color: '#86efac', fontWeight: 600 }}>{getReferralPoints(tier)} bonus coins</span> when they join.
-                    </div>
-                  </>
-                ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          fontFamily: 'var(--mono)',
-                          fontSize: 9,
-                          letterSpacing: '0.22em',
-                          textTransform: 'uppercase',
-                          color: TOK.muted,
-                        }}
-                      >
-                        Bring a friend
-                      </div>
-                      <div style={{ fontFamily: 'var(--sans)', fontSize: 13, color: TOK.fg, fontWeight: 500, marginTop: 2 }}>
-                        Invite and both earn <span style={{ color: '#86efac', fontWeight: 600 }}>500 coins</span>
-                      </div>
-                    </div>
-                    <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={TOK.muted} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="9 6 15 12 9 18" />
-                    </svg>
-                  </div>
-                )}
-              </div>
-            </Link>
+            <InviteFriends code={user.referral_code} compact />
           </div>
         )}
 

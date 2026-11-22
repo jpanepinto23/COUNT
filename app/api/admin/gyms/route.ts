@@ -24,7 +24,7 @@ export async function GET() {
   )
 
   // All gyms
-  const { data: gyms } = await admin.from('gyms').select('id, name, slug').order('created_at')
+  const { data: gyms } = await admin.from('gyms').select('id, name, slug').eq('kind', 'gym').order('created_at')
   if (!gyms?.length) return NextResponse.json([])
 
   const gymIds = gyms.map(g => g.id)

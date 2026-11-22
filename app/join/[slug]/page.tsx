@@ -16,6 +16,7 @@ interface Gym {
   name: string
   slug: string
   logo_url: string | null
+  kind: 'gym' | 'coach'
 }
 
 function TallyLogo() {
@@ -47,7 +48,7 @@ export default function JoinPage() {
     supabase.auth.getSession().then(({ data: { session } }) => setUserId(session?.user.id ?? null))
     supabase
       .from('gyms')
-      .select('id, name, slug, logo_url')
+      .select('id, name, slug, logo_url, kind')
       .eq('slug', params.slug)
       .single()
       .then(({ data, error }) => {
@@ -76,6 +77,8 @@ export default function JoinPage() {
   }
 
   const signupUrl = `/auth/signup?gym=${encodeURIComponent(gym.slug)}`
+  // Coach cohorts use standard COUNT branding: no gym badge, no pilot, no leaderboard.
+  const isCoach = gym.kind === 'coach'
 
   // Existing members who are already signed in join the gym on their current account.
   async function joinWithCurrentAccount(e: React.MouseEvent) {
@@ -87,7 +90,7 @@ export default function JoinPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ slug: gym.slug }),
     }).catch(() => null)
-    if (res?.ok) router.push('/leaderboard')
+    if (res?.ok) router.push(isCoach ? '/home' : '/leaderboard')
     else router.push(signupUrl)
   }
 
@@ -103,8 +106,14 @@ export default function JoinPage() {
       </div>
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 24px', gap: 0 }}>
+        {isCoach && (
+          <p style={{ marginBottom: 22, fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: MUTED, letterSpacing: 0.5, textAlign: 'center' }}>
+            Invited by <span style={{ color: TEXT, fontWeight: 700 }}>{gym.name}</span>
+          </p>
+        )}
+
         {/* Gym badge */}
-        <div style={{ marginBottom: 28, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
+        {!isCoach && <div style={{ marginBottom: 28, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
           {gym.logo_url ? (
             <img
               src={gym.logo_url}
@@ -120,7 +129,7 @@ export default function JoinPage() {
             <div style={{ width: 5, height: 5, borderRadius: '50%', background: COPPER }} />
             <span style={{ fontSize: 12, fontWeight: 700, color: COPPER, letterSpacing: 0.5 }}>{gym.name}</span>
           </div>
-        </div>
+        </div>}
 
         {/* Headline */}
         <h1 style={{ fontSize: 'clamp(28px, 8vw, 44px)', fontWeight: 900, color: TEXT, textAlign: 'center', lineHeight: 1.1, marginBottom: 14, maxWidth: 320 }}>
@@ -176,7 +185,7 @@ export default function JoinPage() {
           onClick={joinWithCurrentAccount}
           style={{ display: 'block', width: '100%', maxWidth: 340, textAlign: 'center', padding: '17px 24px', background: COPPER, color: TEXT, textDecoration: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800, letterSpacing: 0.3, marginBottom: 12, boxShadow: '0 4px 20px rgba(181,89,60,0.4)' }}
         >
-          {joining ? 'Joining…' : `Join ${gym.name} on COUNT →`}
+          {joining ? 'Joining…' : isCoach ? 'Join COUNT →' : `Join ${gym.name} on COUNT →`}
         </Link>
         <p style={{ color: '#444', fontSize: 12, textAlign: 'center' }}>No subscription. Cancel any time.</p>
       </div>

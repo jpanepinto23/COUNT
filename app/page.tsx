@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
+import AppleWatchWaitlist from '@/components/AppleWatchWaitlist'
 
 const SANS = 'Archivo, sans-serif'
 const MONO = 'JetBrains Mono, monospace'
@@ -69,6 +70,7 @@ export default function LandingPage() {
               ['How it works', '#how'],
               ['What\u2019s in the store', '#store'],
               ['About', '#about'],
+              ['For brands', '/brands'],
               ['Request a brand', 'mailto:joe@countfitness.app?subject=Brand%20request%20for%20COUNT'],
             ].map(([label, href]) => (
               <a key={href} href={href} onClick={() => setMenuOpen(false)} style={{ color: INK, textDecoration: 'none', fontFamily: SANS, fontSize: 18, fontWeight: 700, padding: '14px 0', borderBottom: `1px solid ${LINE}` }}>{label}</a>
@@ -113,6 +115,10 @@ export default function LandingPage() {
               </div>
             ))}
             <span style={{ fontFamily: MONO, fontSize: 12, color: 'rgba(245,240,234,0.8)' }}>syncs and verifies</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 10, padding: '8px 14px' }}>
+              <span style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700 }}>No wearable?</span>
+              <span style={{ fontFamily: MONO, fontSize: 12, color: 'rgba(245,240,234,0.8)' }}>log manually</span>
+            </div>
           </div>
         </div>
       </div>
@@ -135,9 +141,30 @@ export default function LandingPage() {
         {/* How it works */}
         <div id="how" style={{ borderTop: `1px solid ${LINE}`, padding: '32px 0' }}>
           <h2 style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, marginBottom: 18 }}>How it works</h2>
+          <p style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: MUTED, marginBottom: 10 }}>Three ways to log</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginBottom: 14 }}>
+            {[
+              { name: 'Garmin', logo: 'https://cdn.brandfetch.io/garmin.com/w/256/h/256', how: 'Syncs and verifies', coins: 500 },
+              { name: 'Strava', logo: 'https://cdn.brandfetch.io/strava.com/w/256/h/256', how: 'Syncs and verifies', coins: 500 },
+              { name: 'Manual log', logo: null, how: 'No wearable needed', coins: 200 },
+            ].map(w => (
+              <div key={w.name} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px', background: '#171716', border: `1px solid ${LINE}`, borderRadius: 14 }}>
+                {w.logo
+                  ? <img src={w.logo} alt="" style={{ width: 28, height: 28, borderRadius: 6, objectFit: 'contain', flexShrink: 0 }} />
+                  : <span aria-hidden="true" style={{ width: 28, height: 28, borderRadius: 6, background: 'rgba(181,89,60,0.15)', color: COPPER, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</span>}
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ fontFamily: SANS, fontSize: 15, fontWeight: 800 }}>{w.name}</p>
+                  <p style={{ fontFamily: MONO, fontSize: 12, color: MUTED }}>{w.how} &middot; <span style={{ color: COPPER }}>{w.coins} coins</span></p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginBottom: 22 }}>
+            <AppleWatchWaitlist source="homepage" />
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 14 }}>
             {[
-              ['1', 'Log or sync a workout', 'Tap it in, or connect Strava and it verifies itself.'],
+              ['1', 'Log or sync a workout', 'Connect Garmin or Strava and it verifies itself, or log it manually.'],
               ['2', 'Earn coins', '500 for a verified session, 200 for a manual log. A 7-day streak adds 50%.'],
               ['3', 'Redeem with the brands', 'Discount codes at NOBULL, Momentous, Thorne, and Trifecta after two verified workouts.'],
             ].map(([n, t, d]) => (
@@ -227,6 +254,7 @@ export default function LandingPage() {
         {/* Footer */}
         <div style={{ borderTop: `1px solid ${LINE}`, paddingTop: 24, marginTop: 28, display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
           <a href="https://instagram.com/countfitness.app" target="_blank" rel="noopener" style={{ color: MUTED, fontSize: 12, textDecoration: 'none', fontFamily: MONO }}>Instagram</a>
+          <a href="/brands" style={{ color: MUTED, fontSize: 12, textDecoration: 'none', fontFamily: MONO }}>For brands</a>
           <a href="/terms" style={{ color: MUTED, fontSize: 12, textDecoration: 'none', fontFamily: MONO }}>Terms</a>
           <a href="/privacy" style={{ color: MUTED, fontSize: 12, textDecoration: 'none', fontFamily: MONO }}>Privacy</a>
           <span style={{ fontSize: 12, color: '#3A3A38', fontFamily: MONO }}>&copy; {new Date().getFullYear()} COUNT</span>
