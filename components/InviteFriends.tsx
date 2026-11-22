@@ -1,11 +1,12 @@
 'use client'
 import { useState } from 'react'
+import { REFERRAL_BONUS } from '@/lib/points'
 
-// Referral code + one-tap share. Plain copy: no coin-bonus promise here.
+// Referral code + one-tap share. Bonus matches the award_referral_bonus trigger.
 export default function InviteFriends({ code, compact = false }: { code: string; compact?: boolean }) {
   const [copied, setCopied] = useState(false)
   const link = `https://countfitness.app/auth/signup?ref=${encodeURIComponent(code)}`
-  const message = `I'm earning brand discounts for my workouts on COUNT. Join with my code ${code}: ${link}`
+  const message = `I'm earning brand discounts for my workouts on COUNT. Join with my code ${code} and we both get ${REFERRAL_BONUS} coins after your first verified workout: ${link}`
 
   async function share() {
     if (typeof navigator !== 'undefined' && navigator.share) {
@@ -42,7 +43,7 @@ export default function InviteFriends({ code, compact = false }: { code: string;
       </p>
       {!compact && (
         <p style={{ color: '#C9C1B6', fontSize: 14, lineHeight: 1.5, marginBottom: 12 }}>
-          Know someone who trains? Send them your link and they&rsquo;ll sign up with your code.
+          Know someone who trains? Send them your link. You both get {REFERRAL_BONUS} coins after their first verified workout.
         </p>
       )}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '10px 12px', background: '#111110', borderRadius: 10, marginBottom: 10 }}>

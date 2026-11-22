@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
-import { getReferralPoints } from '@/lib/points'
+import { REFERRAL_BONUS } from '@/lib/points'
 import { createClient } from '@/lib/supabase'
 import Icon from '@/components/Icon'
 
@@ -58,7 +58,7 @@ export default function InvitePage() {
   if (!user) return null
 
   const referralLink = `https://countfitness.app/auth/signup?ref=${user.referral_code ?? ''}`
-  const bonusPerReferral   = getReferralPoints(user.tier)
+  const bonusPerReferral   = REFERRAL_BONUS
   const pendingBonus       = referrals.filter(r => !r.bonus_awarded).length * bonusPerReferral
   const earnedBonus        = referrals.filter(r => r.bonus_awarded).length * bonusPerReferral
   const totalReferrals     = referrals.length
@@ -73,7 +73,7 @@ export default function InvitePage() {
       try {
         await navigator.share({
           title: 'Join me on COUNT',
-          text: `I've been earning points every time I work out. Join COUNT with my code ${user?.referral_code} and we both get ${bonusPerReferral} bonus points! 💪`,
+          text: `I've been earning points every time I work out. Join COUNT with my code ${user?.referral_code} and we both get ${bonusPerReferral} bonus coins after your first verified workout! 💪`,
           url: referralLink,
         })
       } catch {}
@@ -136,7 +136,7 @@ export default function InvitePage() {
           </div>
 
           <p style={{ textAlign: 'center', fontSize: 14, fontWeight: 800, color: '#F5F0EA', fontFamily: "'Archivo', sans-serif", marginBottom: 4 }}>You both earn {bonusPerReferral} coins</p>
-          <p style={{ textAlign: 'center', fontSize: 12, color: '#8A8478', marginBottom: 20 }}>When your friend logs their first workout</p>
+          <p style={{ textAlign: 'center', fontSize: 12, color: '#8A8478', marginBottom: 20 }}>After your friend&apos;s first verified workout</p>
 
           {/* Referral code */}
           <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, color: '#8A8478', marginBottom: 6, textAlign: 'center' }}>Your code</p>
@@ -225,8 +225,8 @@ export default function InvitePage() {
         {[
           { num: '1', icon: 'Link2', title: 'Share your link or code',     desc: 'Send your unique referral link to a friend.' },
           { num: '2', icon: 'Pencil', title: 'Friend signs up',              desc: "They enter your code during signup — it's pre-filled from your link." },
-          { num: '3', icon: 'Dumbbell', title: 'They log their first workout', desc: 'Once they complete their first session, the bonus triggers.' },
-          { num: '4', icon: 'Gift', title: `You BOTH get ${bonusPerReferral} coins`, desc: 'Bonus coins land in both accounts instantly.' },
+          { num: '3', icon: 'Dumbbell', title: 'They log their first verified workout', desc: 'A workout synced from Garmin or Strava. That triggers the bonus.' },
+          { num: '4', icon: 'Gift', title: `You BOTH get ${bonusPerReferral} coins`, desc: 'Bonus coins land in both accounts right after that workout.' },
         ].map((step, i) => (
           <div key={i} style={{ display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: i < 3 ? 14 : 0 }}>
             <div style={{ width: 34, height: 34, borderRadius: 10, background: 'linear-gradient(135deg, rgba(181,89,60,0.15) 0%, rgba(181,89,60,0.08) 100%)', border: '1.5px solid rgba(181,89,60,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
@@ -275,7 +275,7 @@ export default function InvitePage() {
             <Icon emoji="Users" size={40} />
           </p>
           <p style={{ fontSize: 15, fontWeight: 800, color: '#F5F0EA', fontFamily: "'Archivo', sans-serif", marginBottom: 4 }}>No referrals yet</p>
-          <p style={{ fontSize: 12, color: '#8A8478', marginBottom: 16, lineHeight: 1.4 }}>Share your code with friends who work out — you&apos;ll both earn {bonusPerReferral} bonus coins when they join!</p>
+          <p style={{ fontSize: 12, color: '#8A8478', marginBottom: 16, lineHeight: 1.4 }}>Share your code with friends who work out — you&apos;ll both earn {bonusPerReferral} bonus coins after their first verified workout.</p>
           <button onClick={handleShare} style={{ padding: '12px 28px', background: 'linear-gradient(135deg, #B5593C 0%, #D4734F 100%)', color: '#F5F0EA', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: "'Archivo', sans-serif" }}>
             Share Your Code →
           </button>
