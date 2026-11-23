@@ -37,6 +37,24 @@ export default function LoginPage() {
         <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#F5F0EA' }}>Welcome back</h1>
         <p style={{ color: '#8A8680', fontSize: 15, marginBottom: 28 }}>Sign in to keep your streak alive.</p>
 
+        <a
+          href="/api/garmin/start"
+          style={{ ...btnStyle, display: 'block', textAlign: 'center', background: '#007CC3', color: '#fff', textDecoration: 'none', marginBottom: 10 }}
+        >
+          Continue with Garmin
+        </a>
+        <a
+          href="/api/strava/start"
+          style={{ ...btnStyle, display: 'block', textAlign: 'center', background: '#FC4C02', color: '#fff', textDecoration: 'none' }}
+        >
+          Continue with Strava
+        </a>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '18px 0' }}>
+          <div style={{ flex: 1, height: 1, background: '#2E2C29' }} />
+          <span style={{ color: '#8A8680', fontSize: 12 }}>or use email</span>
+          <div style={{ flex: 1, height: 1, background: '#2E2C29' }} />
+        </div>
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <input
             type="email"
@@ -59,24 +77,6 @@ export default function LoginPage() {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '18px 0' }}>
-          <div style={{ flex: 1, height: 1, background: '#2E2C29' }} />
-          <span style={{ color: '#8A8680', fontSize: 12 }}>or</span>
-          <div style={{ flex: 1, height: 1, background: '#2E2C29' }} />
-        </div>
-        <a
-          href="/api/garmin/start"
-          style={{ ...btnStyle, display: 'block', textAlign: 'center', background: '#007CC3', color: '#fff', textDecoration: 'none', marginBottom: 10 }}
-        >
-          Continue with Garmin
-        </a>
-        <a
-          href="/api/strava/start"
-          style={{ ...btnStyle, display: 'block', textAlign: 'center', background: '#FC4C02', color: '#fff', textDecoration: 'none' }}
-        >
-          Continue with Strava
-        </a>
 
         <div style={{ marginTop: 20, textAlign: 'center' }}>
           <Link href="/auth/forgot-password" style={{ color: '#8A8680', fontSize: 13, textDecoration: 'none' }}>Forgot password?</Link>

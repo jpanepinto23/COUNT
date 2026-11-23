@@ -164,6 +164,36 @@ function SignupContent() {
           </p>
         )}
 
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <a
+            href={garminHref}
+            onClick={() => setGoingToGarmin(true)}
+            style={{ ...btnStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: '#007CC3', color: '#fff', fontSize: 16, padding: '17px', textDecoration: 'none', opacity: goingToGarmin ? 0.7 : 1 }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M12 2 2 21h20L12 2zm0 5.2 6.1 11.6H5.9L12 7.2z" /></svg>
+            {goingToGarmin ? 'Opening Garmin...' : 'Continue with Garmin'}
+          </a>
+          <a
+            href={stravaHref}
+            onClick={() => setGoingToStrava(true)}
+            style={{ ...btnStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: '#FC4C02', color: '#fff', fontSize: 16, padding: '17px', textDecoration: 'none', opacity: goingToStrava ? 0.7 : 1 }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+              <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
+            </svg>
+            {goingToStrava ? 'Opening Strava...' : 'Continue with Strava'}
+          </a>
+        </div>
+        <p style={{ color: '#8A8680', fontSize: 12, textAlign: 'center', marginTop: 10, lineHeight: 1.5 }}>
+          One tap. We only read your activities and never post.
+        </p>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '18px 0 14px' }}>
+          <div style={{ flex: 1, height: 1, background: '#2E2C29' }} />
+          <span style={{ color: '#8A8680', fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>OR USE EMAIL</span>
+          <div style={{ flex: 1, height: 1, background: '#2E2C29' }} />
+        </div>
+
         <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: 12, }}>
           <input type="text" placeholder="First name" value={name} onChange={e => setName(e.target.value)} style={inputStyle} autoComplete="given-name" />
           <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} autoComplete="email" />
@@ -177,40 +207,13 @@ function SignupContent() {
             style={{ ...inputStyle, fontFamily: refCode ? 'JetBrains Mono, monospace' : 'Archivo, sans-serif', letterSpacing: refCode ? 2 : 0 }}
           />
           {error && <p style={{ color: '#ef4444', fontSize: 13 }}>{error}</p>}
-          <button type="submit" disabled={loading} style={{ ...btnStyle, fontSize: 16, padding: '17px' }}>
-            {loading ? 'Creating account...' : 'Create account'}
+          <button type="submit" disabled={loading} style={{ ...btnStyle, background: 'transparent', border: '1.5px solid #B5593C', color: '#F5F0EA' }}>
+            {loading ? 'Creating account...' : 'Create account with email'}
           </button>
         </form>
         <p style={{ color: '#8A8680', fontSize: 12, textAlign: 'center', marginTop: 10, lineHeight: 1.5 }}>
-          Next you&rsquo;ll pick how you train: Garmin, Strava, or log manually. Apple Watch is coming soon. You must be 13 or older.
+          No tracker? You can log workouts manually. Apple Watch is coming soon. You must be 13 or older.
         </p>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '18px 0 14px' }}>
-          <div style={{ flex: 1, height: 1, background: '#2E2C29' }} />
-          <span style={{ color: '#8A8680', fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>OR</span>
-          <div style={{ flex: 1, height: 1, background: '#2E2C29' }} />
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <a
-            href={garminHref}
-            onClick={() => setGoingToGarmin(true)}
-            style={{ ...btnStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: 'transparent', border: '1.5px solid #007CC3', color: '#F5F0EA', textDecoration: 'none', opacity: goingToGarmin ? 0.7 : 1 }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#007CC3" aria-hidden="true"><path d="M12 2 2 21h20L12 2zm0 5.2 6.1 11.6H5.9L12 7.2z" /></svg>
-            {goingToGarmin ? 'Opening Garmin...' : 'Sign up with Garmin'}
-          </a>
-          <a
-            href={stravaHref}
-            onClick={() => setGoingToStrava(true)}
-            style={{ ...btnStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: 'transparent', border: '1.5px solid #FC4C02', color: '#F5F0EA', textDecoration: 'none', opacity: goingToStrava ? 0.7 : 1 }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#FC4C02" aria-hidden="true">
-              <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
-            </svg>
-            {goingToStrava ? 'Opening Strava...' : 'Sign up with Strava'}
-          </a>
-        </div>
 
         <div style={{ marginTop: 20, textAlign: 'center' }}>
           <span style={{ color: '#8A8680', fontSize: 13 }}>Already have an account? </span>
