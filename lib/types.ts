@@ -43,6 +43,7 @@ export interface User {
   referral_count?: number
   avatar_url?: string
   gym_id?: string | null
+  trains_with?: 'garmin' | 'strava' | 'apple_watch' | 'fitbit' | 'manual' | 'other' | null
   brand_survey_shown?: boolean
   brand_survey_completed?: boolean
 }

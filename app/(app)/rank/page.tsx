@@ -1,7 +1,7 @@
 'use client'
 
 import { useAuth } from '@/lib/auth-context'
-import { getTier, getTierLabel, getReferralPoints, getNextTierSessions, VERIFIED_POINTS, UNVERIFIED_POINTS } from '@/lib/points'
+import { getTier, getTierLabel, REFERRAL_BONUS, getNextTierSessions, VERIFIED_POINTS, UNVERIFIED_POINTS } from '@/lib/points'
 import Icon from '@/components/Icon'
 
 const TIERS = [
@@ -26,7 +26,7 @@ export default function RankPage() {
   if (!user) return null
 
   const tier = getTier(user.lifetime_sessions)
-  const referralPts = getReferralPoints(tier)
+  const referralPts = REFERRAL_BONUS
   const { next, sessionsNeeded, threshold } = getNextTierSessions(user.lifetime_sessions)
 
   const tierStart: Record<string, number> = { bronze: 0, silver: 30, gold: 60, platinum: 120 }

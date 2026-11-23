@@ -81,7 +81,7 @@ const dripSchedule = [
     body: `<p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">Quick walkthrough of how COUNT actually works:</p>
       <p style="margin:0 0 12px 0;font-size:15px;line-height:1.6;color:#3A3530;"><strong>Log.</strong> A verified workout (synced from Strava or Garmin) is 500 coins. A manual log is 200. Walk, lift, run, ride &mdash; any movement counts, one a day.</p>
       <p style="margin:0 0 12px 0;font-size:15px;line-height:1.6;color:#3A3530;"><strong>Earn.</strong> Hit a 7-day streak and every workout pays 50% more. That&rsquo;s the only bonus. You can do the math in your head.</p>
-      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;"><strong>Redeem.</strong> 600 coins, three verified workouts, gets you a discount code at NOBULL, Momentous, Thorne, or Trifecta.</p>
+      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;"><strong>Redeem.</strong> Two verified workouts (600 coins) get you a discount code at NOBULL, Momentous, or Thorne. Trifecta takes just one (500 coins).</p>
       <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">The hook: consistency pays off. Literally. Day 1 of your streak starts the moment you log a workout.</p>`,
     ctaLabel: 'Start Your Streak',
     ctaHref: APP_URL,
@@ -96,7 +96,7 @@ const dripSchedule = [
       <strong>Momentous</strong> &middot; up to 35% off your first subscription, 14% off one-time.<br/>
       <strong>Thorne</strong> &middot; 15% off your entire order.<br/>
       <strong>Trifecta</strong> &middot; 50% off your first meal order, 10% off after.</p>
-      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">Every one of these is 600 coins or less. Three verified workouts and you&rsquo;re there.</p>
+      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">Every one of these is 600 coins or less. Two verified workouts and you&rsquo;re there, one for Trifecta.</p>
       <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#3A3530;">We&rsquo;re picky about partners &mdash; only brands we&rsquo;d actually use. If there&rsquo;s a brand you want to see, hit reply and tell me.</p>`,
     ctaLabel: 'View Rewards Catalog',
     ctaHref: APP_URL + '/rewards',

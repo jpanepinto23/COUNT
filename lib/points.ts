@@ -39,7 +39,11 @@ export function getStreakMultiplierLabel(streak: number): string {
   return getStreakMultiplier(streak) + 'x'
 }
 
-// Referral payout to the referrer — this is the tier perk.
+// Referral bonus actually paid (award_referral_bonus trigger): 500 coins to BOTH people
+// when the referred member logs their first verified workout. Same for every tier.
+export const REFERRAL_BONUS = 500
+
+// Legacy tier ladder. No longer paid out; kept for reference only.
 export function getReferralPoints(tier: Tier): number {
   const points: Record<Tier, number> = {
     bronze: 300,

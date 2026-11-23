@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
-import { VERIFIED_POINTS } from '@/lib/points'
+import { VERIFIED_POINTS, UNVERIFIED_POINTS } from '@/lib/points'
 
 
 const STRAVA_ERRORS: Record<string, string> = {
@@ -20,6 +20,7 @@ function SignupContent() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [gymSlug, setGymSlug] = useState<string | null>(null)
+  const [cohort, setCohort] = useState<{ name: string; kind: 'gym' | 'coach' } | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [goingToStrava, setGoingToStrava] = useState(false)
@@ -49,6 +50,17 @@ function SignupContent() {
     const gym = searchParams.get('gym')
     if (gym) setGymSlug(gym)
   }, [searchParams])
+
+  // Name the gym or coach behind the invite link (from the record, never hardcoded).
+  useEffect(() => {
+    if (!gymSlug) return
+    supabase
+      .from('gyms')
+      .select('name, kind')
+      .eq('slug', gymSlug)
+      .maybeSingle()
+      .then(({ data }) => { if (data) setCohort(data as { name: string; kind: 'gym' | 'coach' }) })
+  }, [gymSlug]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
@@ -111,7 +123,7 @@ function SignupContent() {
       {gymSlug && (
         <div style={{ marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(181,89,60,0.10)', border: '1px solid rgba(181,89,60,0.25)', borderRadius: 20, padding: '5px 14px' }}>
           <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#B5593C' }} />
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#B5593C', letterSpacing: 0.5, fontFamily: 'Archivo, sans-serif' }}>Joining via gym link</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#B5593C', letterSpacing: 0.5, fontFamily: 'Archivo, sans-serif' }}>{cohort ? (cohort.kind === 'coach' ? `Invited by ${cohort.name}` : `Joining ${cohort.name}`) : 'Joining via invite link'}</span>
         </div>
       )}
 
@@ -162,7 +174,7 @@ function SignupContent() {
           </button>
         </form>
         <p style={{ color: '#8A8680', fontSize: 12, textAlign: 'center', marginTop: 10, lineHeight: 1.5 }}>
-          Use Garmin? Connect your watch on the next screen. You must be 13 or older.
+          Use Garmin? Connect your watch on the next screen. No tracker? Log workouts manually for {UNVERIFIED_POINTS} coins each. You must be 13 or older.
         </p>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0 14px' }}>

@@ -3,8 +3,7 @@
 // app/(app)/log/page.tsx (points, streak, tier, referral) and enforces COUNT's
 // one-credited-session-per-day rule server-side.
 
-import { calculatePoints, getTier, getReferralPoints } from '@/lib/points'
-import type { Tier } from '@/lib/points'
+import { calculatePoints, getTier } from '@/lib/points'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -149,30 +148,13 @@ async function mintFromActivity(
     lifetime_sessions: newSessions,
     tier: newTier,
     multiplier: TIER_MULTIPLIERS[newTier],
-    points_balance: (u.points_balance ?? 0) + pts.total,
-    points_lifetime_earned: (u.points_lifetime_earned ?? 0) + pts.total,
     current_streak: newStreak,
     longest_streak: newLongest,
   }).eq('id', userId)
+  // Increment, never overwrite: the referral trigger may have just added coins to this row.
+  await supabase.rpc('increment_user_points', { p_user_id: userId, p_points: pts.total })
 
-  // Referral bonus on the user's first-ever session.
-  if (u.lifetime_sessions === 0 && u.referred_by && !u.referral_bonus_claimed) {
-    const { data: referrer } = await supabase
-      .from('users')
-      .select('id, points_balance, points_lifetime_earned, tier')
-      .eq('id', u.referred_by)
-      .single()
-    if (referrer) {
-      const bonus = getReferralPoints(referrer.tier as Tier)
-      await supabase.from('users').update({
-        points_balance: referrer.points_balance + bonus,
-        points_lifetime_earned: referrer.points_lifetime_earned + bonus,
-      }).eq('id', referrer.id)
-      await supabase.from('users').update({ referral_bonus_claimed: true }).eq('id', userId)
-      await supabase.from('referrals')
-        .update({ bonus_awarded: true, bonus_awarded_at: new Date().toISOString() })
-        .eq('referred_id', userId)
-    }
-  }
+  // Referral bonus: paid by the award_referral_bonus database trigger
+  // (500 coins to both people on the referred member's first verified workout).
   return true
 }

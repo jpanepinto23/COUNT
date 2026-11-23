@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import { getTierLabel, getStreakMultiplier } from '@/lib/points'
 import type { Redemption } from '@/lib/types'
+import InviteFriends from '@/components/InviteFriends'
 
 // ===== Design tokens (per Claude Design handoff) =====
 const TOK = {
@@ -995,6 +996,13 @@ export default function ProfilePage() {
         <StatTile label="Redeemed" value={pointsRedeemed.toLocaleString()} suffix="coins" />
       </div>
 
+      {/* Invite friends */}
+      {user.referral_code && (
+        <div style={{ padding: '20px 16px 0' }}>
+          <InviteFriends code={user.referral_code} />
+        </div>
+      )}
+
       {/* Achievements */}
       <SectionHead
         eyebrow="Milestones"
@@ -1041,7 +1049,7 @@ export default function ProfilePage() {
         <LinkRow
           href="/invite"
           label="Friends"
-          hint="Invite friends · earn bonus coins"
+          hint="Your invites and referral code"
           icon={
             <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -1067,7 +1075,7 @@ export default function ProfilePage() {
         <LinkRow
           href="/log"
           label="Earn"
-          hint="Log a workout · +50–80 coins"
+          hint="Log a workout · 200–500 coins"
           icon={
             <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="9" />

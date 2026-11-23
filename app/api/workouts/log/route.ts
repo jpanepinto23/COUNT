@@ -6,8 +6,6 @@ import { cookies } from 'next/headers'
 import {
   calculatePoints,
   getTier,
-  getReferralPoints,
-  type Tier,
 } from '@/lib/points'
 import { getTodaysStravaActivity } from '@/lib/strava'
 
@@ -185,8 +183,6 @@ export async function POST(req: NextRequest) {
       lifetime_sessions: newSessions,
       tier: newTier,
       multiplier: 1,
-      points_balance: profile.points_balance + totalWithBonus,
-      points_lifetime_earned: profile.points_lifetime_earned + totalWithBonus,
       current_streak: newStreak,
       longest_streak: newLongest,
     })
@@ -194,27 +190,14 @@ export async function POST(req: NextRequest) {
   if (updateError) {
     return NextResponse.json({ error: updateError.message }, { status: 500 })
   }
-
-  // 9. First-workout referral bonus.
-  if (profile.lifetime_sessions === 0 && profile.referred_by && !profile.referral_bonus_claimed) {
-    const { data: referrer } = await admin
-      .from('users')
-      .select('id, points_balance, points_lifetime_earned, tier')
-      .eq('id', profile.referred_by)
-      .single()
-    if (referrer) {
-      const referralPts = getReferralPoints(referrer.tier as Tier)
-      await admin
-        .from('users')
-        .update({
-          points_balance: referrer.points_balance + referralPts,
-          points_lifetime_earned: referrer.points_lifetime_earned + referralPts,
-        })
-        .eq('id', referrer.id)
-      await admin.from('users').update({ referral_bonus_claimed: true }).eq('id', authUser.id)
-      await admin.from('referrals').update({ bonus_awarded: true }).eq('referred_id', authUser.id)
-    }
+  // Increment, never overwrite: the referral trigger may have just added coins to this row.
+  const { error: pointsError } = await admin.rpc('increment_user_points', { p_user_id: authUser.id, p_points: totalWithBonus })
+  if (pointsError) {
+    return NextResponse.json({ error: pointsError.message }, { status: 500 })
   }
+
+  // 9. Referral bonus: paid by the award_referral_bonus database trigger
+  //    (500 coins to both people on the referred member's first verified workout).
 
   // 10. Everything the success screen needs.
   return NextResponse.json({
