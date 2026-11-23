@@ -10,6 +10,15 @@ export function stravaPlaceholderEmail(athleteId: number | string): string {
   return `athlete-${athleteId}@${STRAVA_PLACEHOLDER_DOMAIN}`
 }
 
+// Garmin does not share email either; same treatment, its own subdomain.
+export const GARMIN_PLACEHOLDER_DOMAIN = 'garmin.countfitness.app'
+
+export function garminPlaceholderEmail(garminUserId: string): string {
+  return `garmin-${garminUserId.toLowerCase().replace(/[^a-z0-9-]/g, '')}@${GARMIN_PLACEHOLDER_DOMAIN}`
+}
+
 export function isPlaceholderEmail(email: string | null | undefined): boolean {
-  return !email || email.toLowerCase().endsWith('@' + STRAVA_PLACEHOLDER_DOMAIN)
+  if (!email) return true
+  const e = email.toLowerCase()
+  return e.endsWith('@' + STRAVA_PLACEHOLDER_DOMAIN) || e.endsWith('@' + GARMIN_PLACEHOLDER_DOMAIN)
 }

@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
-import { VERIFIED_POINTS, UNVERIFIED_POINTS } from '@/lib/points'
+import { VERIFIED_POINTS } from '@/lib/points'
 
 
 const STRAVA_ERRORS: Record<string, string> = {
@@ -24,15 +24,16 @@ function SignupContent() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [goingToStrava, setGoingToStrava] = useState(false)
+  const [goingToGarmin, setGoingToGarmin] = useState(false)
   const [firstReward, setFirstReward] = useState<{ brand_name: string; point_cost: number } | null>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
   const supabase = createClient()
 
   const stravaError = searchParams.get('strava_error')
-  // Pre-fill referral code from URL ?ref=CODE. Open the email form when Strava is the thing that failed.
+  const garminError = searchParams.get('garmin_error')
+  // Pre-fill referral code from URL ?ref=CODE.
   const [refCode, setRefCode] = useState(() => (searchParams.get('ref') ?? '').toUpperCase())
-  const [showEmail, setShowEmail] = useState(() => Boolean(stravaError && stravaError !== 'denied' && stravaError !== 'state'))
 
   // Cheapest live reward, so the page can say exactly what the first win is.
   useEffect(() => {
@@ -109,10 +110,11 @@ function SignupContent() {
   if (gymSlug) stravaParams.set('gym', gymSlug)
   const stravaQuery = stravaParams.toString()
   const stravaHref = '/api/strava/start' + (stravaQuery ? `?${stravaQuery}` : '')
+  const garminHref = '/api/garmin/start' + (stravaQuery ? `?${stravaQuery}` : '')
   const cost = firstReward?.point_cost ?? 600
   const workoutsNeeded = Math.max(1, Math.ceil(cost / VERIFIED_POINTS))
   const steps = [
-    'Connect Strava',
+    'Connect a tracker',
     ...Array.from({ length: workoutsNeeded }, (_, i) => `Workout ${i + 1}`),
   ]
 
@@ -131,7 +133,7 @@ function SignupContent() {
       <div style={{ width: '100%', maxWidth: 380 }}>
         <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: -1, marginBottom: 6, fontFamily: 'Archivo, sans-serif', color: '#F5F0EA' }}>Get paid for your workouts</h1>
         <p style={{ color: '#8A8680', fontSize: 15, marginBottom: 22, lineHeight: 1.5 }}>
-          One tap. Your Strava activities earn coins, and coins buy rewards. No forms, no password.
+          Your workouts earn coins, and coins buy rewards. Works with Garmin, Strava, or no wearable at all.
         </p>
 
         {/* Path to the first reward */}
@@ -156,51 +158,59 @@ function SignupContent() {
         {stravaError && (
           <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12, lineHeight: 1.45 }}>{STRAVA_ERRORS[stravaError] ?? STRAVA_ERRORS.failed}</p>
         )}
+        {garminError && (
+          <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12, lineHeight: 1.45 }}>
+            {garminError === 'denied' ? 'Garmin was not connected. Try again, or sign up with email.' : 'Something went wrong with Garmin. Try again, or sign up with email.'}
+          </p>
+        )}
 
-        <a
-          href={stravaHref}
-          onClick={() => setGoingToStrava(true)}
-          style={{ ...btnStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: '#FC4C02', color: '#fff', textDecoration: 'none', fontSize: 16, padding: '17px', opacity: goingToStrava ? 0.7 : 1 }}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
-            <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
-          </svg>
-          {goingToStrava ? 'Opening Strava...' : 'Connect with Strava'}
-        </a>
+        <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: 12, }}>
+          <input type="text" placeholder="First name" value={name} onChange={e => setName(e.target.value)} style={inputStyle} autoComplete="given-name" />
+          <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} autoComplete="email" />
+          <input type="password" placeholder="Password (min 6 chars)" value={password} onChange={e => setPassword(e.target.value)} style={inputStyle} autoComplete="new-password" />
+          <input
+            type="text"
+            placeholder="Referral code (optional)"
+            value={refCode}
+            onChange={e => setRefCode(e.target.value.toUpperCase())}
+            maxLength={8}
+            style={{ ...inputStyle, fontFamily: refCode ? 'JetBrains Mono, monospace' : 'Archivo, sans-serif', letterSpacing: refCode ? 2 : 0 }}
+          />
+          {error && <p style={{ color: '#ef4444', fontSize: 13 }}>{error}</p>}
+          <button type="submit" disabled={loading} style={{ ...btnStyle, fontSize: 16, padding: '17px' }}>
+            {loading ? 'Creating account...' : 'Create account'}
+          </button>
+        </form>
         <p style={{ color: '#8A8680', fontSize: 12, textAlign: 'center', marginTop: 10, lineHeight: 1.5 }}>
-          We only read your activities. We never post. You must be 13 or older.
+          Next you&rsquo;ll pick how you train: Garmin, Strava, or log manually. Apple Watch is coming soon. You must be 13 or older.
         </p>
 
-        {!showEmail ? (
-          <button
-            type="button"
-            onClick={() => setShowEmail(true)}
-            style={{ display: 'block', width: '100%', marginTop: 14, padding: '14px 16px', background: '#181714', border: '1.5px solid #2E2C29', borderRadius: 10, color: '#F5F0EA', fontSize: 15, fontWeight: 800, fontFamily: 'Archivo, sans-serif', cursor: 'pointer', textAlign: 'left' }}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '18px 0 14px' }}>
+          <div style={{ flex: 1, height: 1, background: '#2E2C29' }} />
+          <span style={{ color: '#8A8680', fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>OR</span>
+          <div style={{ flex: 1, height: 1, background: '#2E2C29' }} />
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <a
+            href={garminHref}
+            onClick={() => setGoingToGarmin(true)}
+            style={{ ...btnStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: 'transparent', border: '1.5px solid #007CC3', color: '#F5F0EA', textDecoration: 'none', opacity: goingToGarmin ? 0.7 : 1 }}
           >
-            No Strava? Sign up with email
-            <span style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#8A8680', marginTop: 3, fontFamily: 'JetBrains Mono, monospace' }}>
-              Connect Garmin next, or log workouts manually for {UNVERIFIED_POINTS} coins each
-            </span>
-          </button>
-        ) : (
-          <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 22, paddingTop: 22, borderTop: '1.5px solid #2E2C29' }}>
-            <input type="text" placeholder="First name" value={name} onChange={e => setName(e.target.value)} style={inputStyle} autoComplete="given-name" />
-            <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} autoComplete="email" />
-            <input type="password" placeholder="Password (min 6 chars)" value={password} onChange={e => setPassword(e.target.value)} style={inputStyle} autoComplete="new-password" />
-            <input
-              type="text"
-              placeholder="Referral code (optional)"
-              value={refCode}
-              onChange={e => setRefCode(e.target.value.toUpperCase())}
-              maxLength={8}
-              style={{ ...inputStyle, fontFamily: refCode ? 'JetBrains Mono, monospace' : 'Archivo, sans-serif', letterSpacing: refCode ? 2 : 0 }}
-            />
-            {error && <p style={{ color: '#ef4444', fontSize: 13 }}>{error}</p>}
-            <button type="submit" disabled={loading} style={{ ...btnStyle, background: 'transparent', border: '1.5px solid #B5593C', color: '#F5F0EA' }}>
-              {loading ? 'Creating account...' : 'Create account with email'}
-            </button>
-          </form>
-        )}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#007CC3" aria-hidden="true"><path d="M12 2 2 21h20L12 2zm0 5.2 6.1 11.6H5.9L12 7.2z" /></svg>
+            {goingToGarmin ? 'Opening Garmin...' : 'Sign up with Garmin'}
+          </a>
+          <a
+            href={stravaHref}
+            onClick={() => setGoingToStrava(true)}
+            style={{ ...btnStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: 'transparent', border: '1.5px solid #FC4C02', color: '#F5F0EA', textDecoration: 'none', opacity: goingToStrava ? 0.7 : 1 }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#FC4C02" aria-hidden="true">
+              <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
+            </svg>
+            {goingToStrava ? 'Opening Strava...' : 'Sign up with Strava'}
+          </a>
+        </div>
 
         <div style={{ marginTop: 20, textAlign: 'center' }}>
           <span style={{ color: '#8A8680', fontSize: 13 }}>Already have an account? </span>
