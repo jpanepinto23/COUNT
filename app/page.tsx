@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import AppleWatchWaitlist from '@/components/AppleWatchWaitlist'
+import { momentousOffer, isMomentousBfcm, MOMENTOUS_BFCM_BANNER, MOMENTOUS_BFCM_BANNER_TAG } from '@/lib/promos'
 
 const SANS = 'Archivo, sans-serif'
 const MONO = 'JetBrains Mono, monospace'
@@ -16,7 +17,7 @@ const LINE = '#222220'
 const REWARDS = [
   { brand: 'NOBULL',    what: '30% off shoes and gear',           coins: 600,  note: '2 verified workouts',  logo: 'https://cdn.brandfetch.io/nobullproject.com/w/256/h/256' },
   { brand: 'Trifecta',  what: '50% off first meal order',         coins: 500,  note: '1 verified workout',  logo: 'https://cdn.brandfetch.io/trifectanutrition.com/w/256/h/256' },
-  { brand: 'Momentous', what: 'Up to 35% off your first subscription, 14% off one-time', coins: 600, note: '2 verified workouts', logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
+  { brand: 'Momentous', what: momentousOffer(), coins: 600, note: '2 verified workouts', logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
   { brand: 'Thorne',    what: '15% off supplements',              coins: 600,  note: '2 verified workouts',  logo: 'https://cdn.brandfetch.io/thorne.com/w/256/h/256' },
 ]
 
@@ -57,6 +58,14 @@ export default function LandingPage() {
 
   return (
     <div style={{ minHeight: '100dvh', background: '#111110', color: INK }}>
+
+      {/* Momentous BFCM banner. Hides itself after MOMENTOUS_BFCM_END (lib/promos.ts). */}
+      {isMomentousBfcm() && (
+        <a href="#store" style={{ display: 'block', background: '#0A0A09', borderBottom: `2px solid ${COPPER}`, color: INK, textDecoration: 'none', textAlign: 'center', padding: '9px 16px', fontFamily: MONO, fontSize: 11, letterSpacing: '0.06em', lineHeight: 1.45 }}>
+          <span style={{ color: COPPER, fontWeight: 700 }}>{MOMENTOUS_BFCM_BANNER_TAG}</span>
+          <span> &mdash; {MOMENTOUS_BFCM_BANNER}</span>
+        </a>
+      )}
 
       {/* Menu */}
       {menuOpen && (
