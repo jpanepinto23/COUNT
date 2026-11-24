@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase'
 import type { Reward, RewardType } from '@/lib/types'
 import { getStreakMultiplierLabel, VERIFIED_POINTS } from '@/lib/points'
+import { applyPromoCopy } from '@/lib/promos'
 
 // ===== Design tokens (per Claude Design handoff) =====
 const TOK = {
@@ -882,7 +883,7 @@ export default function RewardsPage() {
       .neq('category', 'gift_cards')
       .order('point_cost', { ascending: true })
       .then(({ data }) => {
-        if (data) setRewards(data as Reward[])
+        if (data) setRewards((data as Reward[]).map(r => applyPromoCopy(r)))
       })
   }, [])
 
