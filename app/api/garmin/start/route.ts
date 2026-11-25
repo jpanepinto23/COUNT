@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { GARMIN_STATE_COOKIE, appUrl, authorizeUrl, garminConfigured, makePkce } from '@/lib/garmin'
+import { GARMIN_STATE_COOKIE, appUrl, authorizeUrl, garminConfigured, makePkce, saveGarminState } from '@/lib/garmin'
 
 // Public entry point for "Sign up / Continue with Garmin" on the signup and
 // login pages. No COUNT session is needed: the callback finds the COUNT
@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
   const gym = (params.get('gym') ?? '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 64)
 
   const { verifier, challenge, state } = makePkce()
+  await saveGarminState(state, { verifier, userId: 'new', ref, gym })
   const response = NextResponse.redirect(authorizeUrl(challenge, state))
   response.cookies.set(GARMIN_STATE_COOKIE, `${state}.${verifier}.new.${ref}.${gym}`, {
     httpOnly: true,
