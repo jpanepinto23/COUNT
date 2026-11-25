@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { STRAVA_STATE_COOKIE, stravaPlaceholderEmail } from '@/lib/strava-auth'
+import { takeOAuthState } from '@/lib/oauth-state'
 
 // Strava sends the athlete back here in two situations:
 //   1. Already signed in to COUNT (Connect page / Profile): link Strava to
@@ -51,8 +52,19 @@ export async function GET(request: NextRequest) {
   if (oauthError || !code) return fail('denied', 'Authorization denied')
 
   // Signed-out flow must come from our own /api/strava/start (state cookie).
-  const [cookieNonce, cookieRef, cookieGym] = (cookieStore.get(STRAVA_STATE_COOKIE)?.value ?? '').split('.')
-  if (!user && (!state || !cookieNonce || state !== cookieNonce)) {
+  let [cookieNonce, cookieRef, cookieGym] = (cookieStore.get(STRAVA_STATE_COOKIE)?.value ?? '').split('.')
+  // Server-side copy (always consumed). Used when Strava returned the user in
+  // a different browser (iOS Strava app) that has none of our cookies.
+  const stored = state ? await takeOAuthState('strava', state) : null
+  // Signed-in connect that finished in Strava's in-app browser: link to the
+  // user who started it, not to whoever (no one) is signed in here.
+  const linkUserId = !user && stored && stored.userId !== 'new' ? stored.userId : null
+  if (!user && stored && (!cookieNonce || cookieNonce !== state)) {
+    cookieNonce = state!
+    cookieRef = stored.ref
+    cookieGym = stored.gym
+  }
+  if (!user && !linkUserId && (!state || !cookieNonce || state !== cookieNonce)) {
     return fail('state', 'Session expired')
   }
 
@@ -99,6 +111,17 @@ export async function GET(request: NextRequest) {
       if (gym) await gymAdmin.from('users').update({ gym_id: gym.id }).eq('id', user.id)
     }
     return finish('/profile?connect=strava&status=success')
+  }
+
+  // ---- 1b. Started signed in, finished in Strava's in-app browser ----
+  if (linkUserId) {
+    const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+    await admin.from('strava_connections').upsert({ user_id: linkUserId, ...connection }, { onConflict: 'user_id' })
+    await admin.from('connected_devices').upsert(
+      { user_id: linkUserId, type: 'strava', status: 'active' },
+      { onConflict: 'user_id,type' }
+    )
+    return finish('/strava-connected')
   }
 
   // ---- 2. Signed out: sign in or create the account from Strava ----

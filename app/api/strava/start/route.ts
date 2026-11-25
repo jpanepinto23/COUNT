@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { randomBytes } from 'crypto'
 import { STRAVA_STATE_COOKIE } from '@/lib/strava-auth'
+import { saveOAuthState } from '@/lib/oauth-state'
 
 // Public entry point for "Connect Strava" on the signup and login pages.
 // No COUNT session is needed: the callback creates the account (or signs the
@@ -32,6 +33,7 @@ export async function GET(request: NextRequest) {
     '&response_type=code&scope=activity:read_all&approval_prompt=auto' +
     `&state=${nonce}`
 
+  await saveOAuthState('strava', nonce, { verifier: '', userId: 'new', ref, gym })
   const response = NextResponse.redirect(url)
   response.cookies.set(STRAVA_STATE_COOKIE, `${nonce}.${ref}.${gym}`, {
     httpOnly: true,
