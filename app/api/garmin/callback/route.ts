@@ -9,6 +9,7 @@ import {
   exchangeCode,
   fetchGarminUserId,
   requestActivityBackfill,
+  takeGarminState,
 } from '@/lib/garmin'
 
 // Garmin sends the user back here after the consent screen.
@@ -20,7 +21,19 @@ export async function GET(req: NextRequest) {
   const oauthError = searchParams.get('error')
 
   const cookieStore = await cookies()
-  const [cookieState, verifier, cookieUser, cookieRef, cookieGym] = (cookieStore.get(GARMIN_STATE_COOKIE)?.value ?? '').split('.')
+  let [cookieState, verifier, cookieUser, cookieRef, cookieGym] = (cookieStore.get(GARMIN_STATE_COOKIE)?.value ?? '').split('.')
+  // Server-side copy (always consumed so it can't be replayed). Used when the
+  // cookie is missing, i.e. Garmin returned the user in a different browser.
+  const stored = state ? await takeGarminState(state) : null
+  let otherBrowser = false
+  if ((!cookieState || cookieState !== state) && stored) {
+    cookieState = state!
+    verifier = stored.verifier
+    cookieUser = stored.userId
+    cookieRef = stored.ref
+    cookieGym = stored.gym
+    otherBrowser = true
+  }
   // "new" = signed-out sign up / sign in from /api/garmin/start
   const signupFlow = cookieUser === 'new'
   let userId: string | null = signupFlow ? null : cookieUser
@@ -132,7 +145,11 @@ export async function GET(req: NextRequest) {
   const end = Math.floor(Date.now() / 1000)
   requestActivityBackfill(tokens.access_token, end - 2 * 86400, end).catch(() => {})
 
-  if (!signupFlow) return finish('/profile?connected=true')
+  if (!signupFlow) {
+    // In Garmin's in-app browser the user isn't signed in to COUNT, so /profile
+    // would bounce to login. Show a plain "done, go back" page instead.
+    return finish(otherBrowser ? '/garmin-connected' : '/profile?connected=true')
+  }
 
   if (cookieGym) {
     const { data: gym } = await supabase.from('gyms').select('id').eq('slug', cookieGym).maybeSingle()

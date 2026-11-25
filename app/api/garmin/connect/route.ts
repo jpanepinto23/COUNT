@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { GARMIN_STATE_COOKIE, appUrl, authorizeUrl, garminConfigured, makePkce } from '@/lib/garmin'
+import { GARMIN_STATE_COOKIE, appUrl, authorizeUrl, garminConfigured, makePkce, saveGarminState } from '@/lib/garmin'
 
 // Signed-in user clicks "Connect Garmin". Returns the Garmin consent URL and
 // parks the PKCE verifier + state in an httpOnly cookie for the callback.
@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
 
   const { verifier, challenge, state } = makePkce()
   const url = authorizeUrl(challenge, state)
+  await saveGarminState(state, { verifier, userId: user.id, ref: '', gym: '' })
 
   const response = NextResponse.json({ url })
   response.cookies.set(GARMIN_STATE_COOKIE, `${state}.${verifier}.${user.id}`, {

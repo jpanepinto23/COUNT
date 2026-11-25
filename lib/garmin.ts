@@ -8,6 +8,7 @@
 // Developer Portal → API Tools → Endpoint Configuration → "Activities").
 
 import { createHash, randomBytes } from 'crypto'
+import { createClient } from '@supabase/supabase-js'
 
 export const GARMIN_STATE_COOKIE = 'count_garmin_oauth'
 
@@ -25,6 +26,42 @@ export function appUrl(): string {
 
 export function redirectUri(): string {
   return `${appUrl()}/api/garmin/callback`
+}
+
+// ---------- OAuth state (server-side) ----------
+// On iOS, connect.garmin.com is a universal link: the consent screen opens in
+// the Garmin Connect app, and Garmin sends the user back to our callback in
+// that app's in-app browser. That browser has none of our cookies, so a
+// cookie-only state check fails ("Garmin session expired"). We keep the
+// cookie for the normal case and also park the state server-side, keyed by
+// the random state value, so the callback works from any browser.
+
+export type GarminPendingState = { verifier: string; userId: string; ref: string; gym: string }
+
+function serviceClient() {
+  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+}
+
+export async function saveGarminState(state: string, s: GarminPendingState): Promise<void> {
+  const { error } = await serviceClient().from('oauth_states').insert({
+    state, provider: 'garmin', verifier: s.verifier, user_id: s.userId, ref: s.ref || null, gym: s.gym || null,
+  })
+  if (error) console.error('[garmin] save state failed', error.message)
+}
+
+// One-time read: returns the row (if under 15 min old) and deletes it.
+export async function takeGarminState(state: string): Promise<GarminPendingState | null> {
+  const supabase = serviceClient()
+  const { data } = await supabase
+    .from('oauth_states')
+    .delete()
+    .eq('state', state)
+    .eq('provider', 'garmin')
+    .gte('created_at', new Date(Date.now() - 15 * 60 * 1000).toISOString())
+    .select('verifier, user_id, ref, gym')
+    .maybeSingle()
+  if (!data) return null
+  return { verifier: data.verifier, userId: data.user_id, ref: data.ref ?? '', gym: data.gym ?? '' }
 }
 
 // ---------- PKCE ----------
