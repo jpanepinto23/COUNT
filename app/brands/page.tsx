@@ -1,6 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { VERIFIED_POINTS, UNVERIFIED_POINTS } from '@/lib/points'
+import { momentousOffer } from '@/lib/promos'
+
+// Re-render hourly so time-boxed promo copy (lib/promos.ts) flips back on its own.
+export const revalidate = 3600
 
 export const metadata: Metadata = {
   title: 'COUNT for Brands',
@@ -18,7 +22,7 @@ const CONTACT = 'joseph.s.panepinto@countfitness.app'
 // Confirmed live offers only. Keep in sync with the rewards table.
 const LIVE = [
   { brand: 'NOBULL', offer: '30% off', coins: 600, workouts: '2 verified workouts', logo: 'https://cdn.brandfetch.io/nobullproject.com/w/256/h/256' },
-  { brand: 'Momentous', offer: 'Up to 35% off a first subscription, 14% off one-time', coins: 600, workouts: '2 verified workouts', logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
+  { brand: 'Momentous', offer: momentousOffer(), coins: 600, workouts: '2 verified workouts', logo: 'https://cdn.brandfetch.io/livemomentous.com/w/256/h/256' },
   { brand: 'Thorne', offer: '15% off', coins: 600, workouts: '2 verified workouts', logo: 'https://cdn.brandfetch.io/thorne.com/w/256/h/256' },
   { brand: 'Trifecta', offer: '50% off a first order', coins: 500, workouts: '1 verified workout', logo: 'https://cdn.brandfetch.io/trifectanutrition.com/w/256/h/256' },
 ]
@@ -74,6 +78,23 @@ export default function BrandsPage() {
           </div>
         </div>
 
+        {/* 2b. Partner links (no coins, no discount) */}
+        <div style={section}>
+          <h2 style={h2}>Partner</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 0' }}>
+            <img src="https://cdn.brandfetch.io/kanefootwear.com/w/256/h/256" alt="" style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 7, flexShrink: 0 }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontFamily: SANS, fontWeight: 800, fontSize: 16 }}>KANE Footwear</p>
+              <p style={{ color: MUTED, fontSize: 14, lineHeight: 1.4 }}>
+                KANE Footwear &mdash; recovery shoes built for after the workout. Shop KANE through our partner link and you support COUNT at no extra cost to you.
+              </p>
+            </div>
+            <a href="https://glnk.io/qv9ww/joseph-panepinto" target="_blank" rel="sponsored nofollow noopener" style={{ flexShrink: 0, color: INK, fontSize: 13, fontWeight: 700, textDecoration: 'none', fontFamily: SANS, padding: '8px 14px', borderRadius: 8, border: `1px solid ${LINE}` }}>
+              Shop KANE
+            </a>
+          </div>
+        </div>
+
         {/* 3. How listing works */}
         <div style={section}>
           <h2 style={h2}>How listing works</h2>
@@ -101,6 +122,9 @@ export default function BrandsPage() {
           <a href="/terms" style={{ color: MUTED, fontSize: 12, textDecoration: 'none', fontFamily: MONO }}>Terms</a>
           <a href="/privacy" style={{ color: MUTED, fontSize: 12, textDecoration: 'none', fontFamily: MONO }}>Privacy</a>
         </div>
+        <p style={{ fontFamily: MONO, fontSize: 11, color: '#3A3A38', textAlign: 'center', lineHeight: 1.5, marginTop: 14 }}>
+          Some links are partner/affiliate links &mdash; COUNT may earn a commission at no cost to you.
+        </p>
       </div>
     </div>
   )
