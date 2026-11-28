@@ -54,9 +54,12 @@ export function captureAttribution(): string | null {
   }
 }
 
-/** Writes the first touch to the user's row once. Never overwrites an existing value. */
+/**
+ * Sends the first touch to /api/attribution once per user. The users.signup_*
+ * columns are not client-writable, so the server writes them (never
+ * overwriting an existing value).
+ */
 export async function saveSignupSource(
-  supabase: { from: (t: string) => any }, // eslint-disable-line @typescript-eslint/no-explicit-any
   userId: string,
   userCreatedAt: string | null | undefined,
 ) {
@@ -71,17 +74,12 @@ export async function saveSignupSource(
       localStorage.setItem(SAVED_KEY, userId)
       return
     }
-    const { error } = await supabase
-      .from('users')
-      .update({
-        signup_source: touch.source,
-        signup_medium: touch.medium,
-        signup_campaign: touch.campaign,
-        signup_landing: touch.landing,
-      })
-      .eq('id', userId)
-      .is('signup_source', null)
-    if (!error) localStorage.setItem(SAVED_KEY, userId)
+    const res = await fetch('/api/attribution', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(touch),
+    })
+    if (res.ok) localStorage.setItem(SAVED_KEY, userId)
   } catch {
     // attribution must never break the app
   }

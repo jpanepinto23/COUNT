@@ -36,7 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .single()
     if (data) {
       setUser(data)
-      saveSignupSource(supabase, userId, data.created_at)
+      saveSignupSource(userId, data.created_at)
     }
   }, [supabase])
 
