@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
+import { captureAttribution } from '@/lib/attribution'
 
 const ENDPOINT =
   'https://lqedpkevxwzopctpgxoe.supabase.co/functions/v1/trifecta-stats'
@@ -16,12 +17,12 @@ export default function VisitTracker() {
         key = crypto.randomUUID()
         sessionStorage.setItem('count_session_key', key)
       }
-      const params = new URLSearchParams(window.location.search)
+      const utmSource = captureAttribution()
       const body = JSON.stringify({
         path: pathname,
         referrer: document.referrer || null,
         session_key: key,
-        utm_source: params.get('utm_source'),
+        utm_source: utmSource,
       })
       // No custom headers -> no CORS preflight; endpoint parses body as JSON.
       fetch(ENDPOINT, { method: 'POST', body, keepalive: true }).catch(() => {})

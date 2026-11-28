@@ -36,6 +36,15 @@ export default function LandingPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [pastHero, setPastHero] = useState(false)
+
+  // Sticky CTA appears once the hero button has scrolled out of view.
+  useEffect(() => {
+    const onScroll = () => setPastHero(window.scrollY > 520)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   useEffect(() => {
     if (!loading && user) router.replace('/home')
@@ -52,8 +61,13 @@ export default function LandingPage() {
 
   const cta = (
     <Link href="/auth/signup" style={{ display: 'inline-block', padding: '16px 36px', background: COPPER, color: INK, textDecoration: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800, fontFamily: SANS, letterSpacing: 0.3, boxShadow: '0 4px 20px rgba(181,89,60,0.45)' }}>
-      Start earning &rarr;
+      Get 30% off NOBULL &rarr;
     </Link>
+  )
+  const ctaNote = (
+    <p style={{ fontFamily: MONO, fontSize: 12, color: 'rgba(245,240,234,0.8)', marginTop: 10 }}>
+      Free. No card. Two workouts unlocks it.
+    </p>
   )
 
   return (
@@ -113,9 +127,10 @@ export default function LandingPage() {
             COUNT
           </span>
           <p style={{ fontFamily: SANS, fontSize: 'clamp(17px, 3.2vw, 22px)', fontWeight: 600, color: INK, opacity: 0.9, marginBottom: 26, textShadow: '0 1px 12px rgba(0,0,0,0.6)' }}>
-            COUNT turns workouts into rewards.
+            Your workouts earn real discounts at NOBULL, Momentous, Thorne and Trifecta.
           </p>
           {cta}
+          {ctaNote}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 22, flexWrap: 'wrap', justifyContent: 'center' }}>
             {[['Garmin', 'https://cdn.brandfetch.io/garmin.com/w/256/h/256'], ['Strava', 'https://cdn.brandfetch.io/strava.com/w/256/h/256']].map(([name, logo]) => (
               <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 10, padding: '8px 14px' }}>
@@ -255,10 +270,14 @@ export default function LandingPage() {
         {/* Final CTA */}
         <div style={{ borderTop: `1px solid ${LINE}`, padding: '36px 0 20px', textAlign: 'center' }}>
           <p style={{ fontFamily: SANS, fontSize: 24, fontWeight: 900, lineHeight: 1.2, marginBottom: 18 }}>
-            Your next workout is worth 200 coins.
+            Your next workout is worth 500 coins.
           </p>
           {cta}
+          {ctaNote}
         </div>
+
+        {/* Room so the sticky CTA never covers the footer */}
+        <div style={{ height: 72 }} />
 
         {/* Footer */}
         <div style={{ borderTop: `1px solid ${LINE}`, paddingTop: 24, marginTop: 28, display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
@@ -272,6 +291,17 @@ export default function LandingPage() {
           Garmin is a registered trademark of Garmin Ltd. or its subsidiaries. COUNT is an independent app and is not affiliated with or endorsed by Garmin.
         </p>
 
+      </div>
+
+      {/* Sticky CTA */}
+      <div aria-hidden={!pastHero} style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40, padding: '12px 16px calc(12px + env(safe-area-inset-bottom))', background: 'rgba(17,17,16,0.94)', borderTop: `1px solid ${LINE}`, backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, transform: pastHero ? 'translateY(0)' : 'translateY(110%)', transition: 'transform 0.25s ease', pointerEvents: pastHero ? 'auto' : 'none' }}>
+        <p style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, lineHeight: 1.3, color: INK }}>
+          2 workouts = <span style={{ color: COPPER }}>30% off NOBULL</span>
+          <span style={{ display: 'block', fontFamily: MONO, fontSize: 11, fontWeight: 400, color: MUTED }}>Free. No card.</span>
+        </p>
+        <Link href="/auth/signup" tabIndex={pastHero ? 0 : -1} style={{ flexShrink: 0, padding: '12px 20px', background: COPPER, color: INK, textDecoration: 'none', borderRadius: 10, fontSize: 15, fontWeight: 800, fontFamily: SANS }}>
+          Start free
+        </Link>
       </div>
     </div>
   )
