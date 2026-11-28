@@ -1,17 +1,23 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 
-export default function LoginPage() {
+function LoginContent() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
+
+  // Arrived from a gym or coach join page: carry the slug through every way in,
+  // so a new account made from Garmin/Strava here is still credited to that gym.
+  const gym = (searchParams.get('gym') ?? '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 64)
+  const gymQuery = gym ? `?gym=${encodeURIComponent(gym)}` : ''
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -22,6 +28,13 @@ export default function LoginPage() {
       setError(error.message)
       setLoading(false)
     } else {
+      if (gym) {
+        await fetch('/api/gym/join', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slug: gym }),
+        }).catch(() => null)
+      }
       router.replace('/home')
     }
   }
@@ -38,13 +51,13 @@ export default function LoginPage() {
         <p style={{ color: '#8A8680', fontSize: 15, marginBottom: 28 }}>Sign in to keep your streak alive.</p>
 
         <a
-          href="/api/garmin/start"
+          href={`/api/garmin/start${gymQuery}`}
           style={{ ...btnStyle, display: 'block', textAlign: 'center', background: '#007CC3', color: '#fff', textDecoration: 'none', marginBottom: 10 }}
         >
           Continue with Garmin
         </a>
         <a
-          href="/api/strava/start"
+          href={`/api/strava/start${gymQuery}`}
           style={{ ...btnStyle, display: 'block', textAlign: 'center', background: '#FC4C02', color: '#fff', textDecoration: 'none' }}
         >
           Continue with Strava
@@ -83,10 +96,18 @@ export default function LoginPage() {
         </div>
         <div style={{ marginTop: 12, textAlign: 'center' }}>
           <span style={{ color: '#8A8680', fontSize: 13 }}>No account? </span>
-          <Link href="/auth/signup" style={{ color: '#B5593C', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>Create one →</Link>
+          <Link href={`/auth/signup${gymQuery}`} style={{ color: '#B5593C', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>Create one →</Link>
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
   )
 }
 

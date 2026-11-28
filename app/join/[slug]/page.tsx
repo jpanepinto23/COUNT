@@ -100,7 +100,7 @@ export default function JoinPage() {
       {/* Top bar */}
       <div style={{ padding: '20px 24px', borderBottom: `1px solid ${BORDER}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <TallyLogo />
-        <Link href="/auth/login" style={{ fontSize: 13, fontWeight: 700, color: MUTED, textDecoration: 'none', border: `1px solid ${BORDER}`, padding: '8px 14px', borderRadius: 8 }}>
+        <Link href={`/auth/login?gym=${encodeURIComponent(gym.slug)}`} style={{ fontSize: 13, fontWeight: 700, color: MUTED, textDecoration: 'none', border: `1px solid ${BORDER}`, padding: '8px 14px', borderRadius: 8 }}>
           Log in
         </Link>
       </div>
