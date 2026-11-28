@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { createClient } from './supabase'
 import type { User as AppUser } from './types'
 import type { Session } from '@supabase/supabase-js'
+import { saveSignupSource } from './attribution'
 
 interface AuthContextType {
   session: Session | null
@@ -33,7 +34,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .select('*')
       .eq('id', userId)
       .single()
-    if (data) setUser(data)
+    if (data) {
+      setUser(data)
+      saveSignupSource(supabase, userId, data.created_at)
+    }
   }, [supabase])
 
   const refreshUser = useCallback(async () => {
